@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased min-h-screen font-sans;
+  }
+}
+
+/* Custom utility styles for sleek banking dashboard design */
+.card {
+  @apply bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 transition-all;
+}
+
+.card-hover {
+  @apply hover:shadow-md hover:border-slate-300;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-outline-danger {
+  @apply inline-flex items-center justify-center px-3 py-1.5 border border-red-200 rounded-lg text-xs font-medium text-red-600 bg-red-50/50 hover:bg-red-100/80 focus:outline-none transition-colors;
+}
+
+.input-field {
+  @apply block w-full rounded-lg border-slate-300 border px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors;
+}
