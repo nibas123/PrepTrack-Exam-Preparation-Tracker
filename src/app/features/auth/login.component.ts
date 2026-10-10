@@ -124,22 +124,7 @@ import { AuthService } from '../../core/auth/auth.service';
             <div class="absolute inset-0 flex items-center">
               <div class="w-full border-t border-slate-200"></div>
             </div>
-            <div class="relative flex justify-center text-xs uppercase">
-              <span class="bg-white px-2 text-slate-400 font-semibold tracking-wider">Fast Evaluation</span>
-            </div>
           </div>
-
-          <!-- Quick Demo Login Button -->
-          <button
-            type="button"
-            (click)="quickDemoLogin()"
-            class="w-full btn-secondary py-2.5 text-xs font-semibold text-slate-700 flex items-center justify-center space-x-2"
-          >
-            <svg class="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span>Quick Login as Demo Aspirant</span>
-          </button>
         </div>
 
         <!-- Security / Architecture notice -->
@@ -158,9 +143,9 @@ export class LoginComponent {
   public isSignUp = signal<boolean>(false);
 
   public authForm: FormGroup = this.fb.group({
-    email: ['aspirant@preptrack.in', [Validators.required, Validators.email]],
-    password: ['password123', [Validators.required, Validators.minLength(6)]],
-    fullName: ['Rahul Sharma', []]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    fullName: ['', []]
   });
 
   async onSubmit(): Promise<void> {
@@ -173,9 +158,5 @@ export class LoginComponent {
     } else {
       await this.authService.signIn(email, password);
     }
-  }
-
-  async quickDemoLogin(): Promise<void> {
-    await this.authService.signIn('aspirant@preptrack.in', 'password123');
   }
 }

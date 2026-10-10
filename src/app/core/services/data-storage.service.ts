@@ -21,7 +21,7 @@ export class DataStorageService {
   private authService = inject(AuthService);
 
   private get userId(): string {
-    return this.authService.currentUser()?.id || 'demo-user-12345';
+    return this.authService.currentUser()?.id || '';
   }
 
   // --- LOCAL DEMO STORAGE UTILITIES ---
@@ -47,211 +47,63 @@ export class DataStorageService {
     const initialized = this.getLocal<boolean>('initialized', false);
     if (initialized) return;
 
-    const uid = this.userId;
-    const exams: Exam[] = [
-      { id: 'exam-1', user_id: uid, name: 'IBPS PO 2026', description: 'Probationary Officer exam by IBPS', is_active: true, display_order: 1 },
-      { id: 'exam-2', user_id: uid, name: 'SBI PO 2026', description: 'Probationary Officer exam by State Bank of India', is_active: true, display_order: 2 },
-      { id: 'exam-3', user_id: uid, name: 'IBPS Clerk 2026', description: 'Clerical Cadre recruitment exam', is_active: true, display_order: 3 },
-    ];
-
-    const subjects: Subject[] = [
-      { id: 'sub-1', user_id: uid, name: 'Reasoning', color: '#2563eb', display_order: 1 },
-      { id: 'sub-2', user_id: uid, name: 'Quantitative Aptitude', color: '#0891b2', display_order: 2 },
-      { id: 'sub-3', user_id: uid, name: 'English', color: '#7c3aed', display_order: 3 },
-      { id: 'sub-4', user_id: uid, name: 'General Awareness', color: '#d97706', display_order: 4 },
-      { id: 'sub-5', user_id: uid, name: 'Banking Awareness', color: '#059669', display_order: 5 },
-    ];
-
-    const examSubjects: ExamSubject[] = [
-      // IBPS PO
-      { id: 'es-1', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-1', stage: 'prelims', display_order: 1 },
-      { id: 'es-2', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-2', stage: 'prelims', display_order: 2 },
-      { id: 'es-3', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-3', stage: 'prelims', display_order: 3 },
-      { id: 'es-4', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-1', stage: 'mains', display_order: 1 },
-      { id: 'es-5', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-2', stage: 'mains', display_order: 2 },
-      { id: 'es-6', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-3', stage: 'mains', display_order: 3 },
-      { id: 'es-7', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-4', stage: 'mains', display_order: 4 },
-      { id: 'es-8', user_id: uid, exam_id: 'exam-1', subject_id: 'sub-5', stage: 'mains', display_order: 5 },
-      // SBI PO
-      { id: 'es-9', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-1', stage: 'prelims', display_order: 1 },
-      { id: 'es-10', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-2', stage: 'prelims', display_order: 2 },
-      { id: 'es-11', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-3', stage: 'prelims', display_order: 3 },
-      { id: 'es-12', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-1', stage: 'mains', display_order: 1 },
-      { id: 'es-13', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-2', stage: 'mains', display_order: 2 },
-      { id: 'es-14', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-3', stage: 'mains', display_order: 3 },
-      { id: 'es-15', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-4', stage: 'mains', display_order: 4 },
-      { id: 'es-16', user_id: uid, exam_id: 'exam-2', subject_id: 'sub-5', stage: 'mains', display_order: 5 },
-    ];
-
-    const topics: Topic[] = [
-      // Reasoning
-      { id: 'top-1', user_id: uid, subject_id: 'sub-1', name: 'Puzzles (Floor, Box, Day & Month)', description: 'Crucial for scoring in Prelims & Mains', learning_status: 'learning', priority: 'high', display_order: 1 },
-      { id: 'top-2', user_id: uid, subject_id: 'sub-1', name: 'Seating Arrangement (Circular & Linear)', description: 'Inside/outside & parallel row variations', learning_status: 'learning', priority: 'high', display_order: 2 },
-      { id: 'top-3', user_id: uid, subject_id: 'sub-1', name: 'Syllogism (Only a Few Cases)', description: 'Venn diagram deduction rules', learning_status: 'learned', priority: 'high', display_order: 3 },
-      { id: 'top-4', user_id: uid, subject_id: 'sub-1', name: 'Blood Relations & Family Tree', description: 'Coded & generation relationships', learning_status: 'learned', priority: 'medium', display_order: 4 },
-      { id: 'top-5', user_id: uid, subject_id: 'sub-1', name: 'Coding - Decoding', description: 'Chinese & new pattern conditional codes', learning_status: 'not_started', priority: 'medium', display_order: 5 },
-      { id: 'top-6', user_id: uid, subject_id: 'sub-1', name: 'Inequalities (Direct & Coded)', description: 'Mathematical statements & conclusions', learning_status: 'revision_completed', priority: 'high', display_order: 6 },
-      { id: 'top-7', user_id: uid, subject_id: 'sub-1', name: 'Direction Sense & Distance', description: 'Pythagoras theorem applications', learning_status: 'learned', priority: 'low', display_order: 7 },
-      { id: 'top-8', user_id: uid, subject_id: 'sub-1', name: 'Machine Input - Output', description: 'Pattern shifts for Mains stage', learning_status: 'not_started', priority: 'medium', display_order: 8 },
-      { id: 'top-9', user_id: uid, subject_id: 'sub-1', name: 'Critical Reasoning & Inferences', description: 'Assumptions, arguments, cause & effect', learning_status: 'not_started', priority: 'medium', display_order: 9 },
-
-      // Quantitative Aptitude
-      { id: 'top-10', user_id: uid, subject_id: 'sub-2', name: 'Simplification & Approximation', description: 'BODMAS, square/cube roots shortcuts', learning_status: 'revision_completed', priority: 'high', display_order: 1 },
-      { id: 'top-11', user_id: uid, subject_id: 'sub-2', name: 'Quadratic Equations & Roots', description: 'Root comparison signs technique', learning_status: 'learned', priority: 'high', display_order: 2 },
-      { id: 'top-12', user_id: uid, subject_id: 'sub-2', name: 'Number Series (Missing & Wrong)', description: 'Common multiplying and difference patterns', learning_status: 'learning', priority: 'high', display_order: 3 },
-      { id: 'top-13', user_id: uid, subject_id: 'sub-2', name: 'Data Interpretation (Table, Pie, Bar)', description: 'Speed calculation and ratio questions', learning_status: 'learning', priority: 'high', display_order: 4 },
-      { id: 'top-14', user_id: uid, subject_id: 'sub-2', name: 'Caselet DI & Radar Charts', description: 'Paragraph-based DI comprehension', learning_status: 'not_started', priority: 'medium', display_order: 5 },
-      { id: 'top-15', user_id: uid, subject_id: 'sub-2', name: 'Arithmetic - Percentage & Profit/Loss', description: 'Fractions, markup, discount calculations', learning_status: 'learned', priority: 'high', display_order: 6 },
-      { id: 'top-16', user_id: uid, subject_id: 'sub-2', name: 'Arithmetic - Simple & Compound Interest', description: 'Difference between CI and SI methods', learning_status: 'not_started', priority: 'medium', display_order: 7 },
-      { id: 'top-17', user_id: uid, subject_id: 'sub-2', name: 'Arithmetic - Ratio & Mixture Alligation', description: 'Replacement formulas and cross methods', learning_status: 'not_started', priority: 'medium', display_order: 8 },
-      { id: 'top-18', user_id: uid, subject_id: 'sub-2', name: 'Arithmetic - Time & Work / Pipes', description: 'Unit efficiency approach', learning_status: 'learning', priority: 'high', display_order: 9 },
-      { id: 'top-19', user_id: uid, subject_id: 'sub-2', name: 'Arithmetic - Speed, Distance & Boats', description: 'Relative velocity and streams', learning_status: 'not_started', priority: 'medium', display_order: 10 },
-
-      // English
-      { id: 'top-20', user_id: uid, subject_id: 'sub-3', name: 'Reading Comprehension', description: 'Editorial tone, fact-finding, vocab questions', learning_status: 'learning', priority: 'high', display_order: 1 },
-      { id: 'top-21', user_id: uid, subject_id: 'sub-3', name: 'Cloze Test & Double Fillers', description: 'Contextual elimination techniques', learning_status: 'learned', priority: 'high', display_order: 2 },
-      { id: 'top-22', user_id: uid, subject_id: 'sub-3', name: 'Error Detection & Sentence Correction', description: 'Grammar rules and subject-verb agreement', learning_status: 'learned', priority: 'high', display_order: 3 },
-      { id: 'top-23', user_id: uid, subject_id: 'sub-3', name: 'Para Jumbles & Sentences Ordering', description: 'Opening and closing sentence identification', learning_status: 'not_started', priority: 'medium', display_order: 4 },
-      { id: 'top-24', user_id: uid, subject_id: 'sub-3', name: 'Phrase Replacement & Idioms', description: 'Standard banking exam idioms', learning_status: 'not_started', priority: 'medium', display_order: 5 },
-
-      // General Awareness
-      { id: 'top-25', user_id: uid, subject_id: 'sub-4', name: 'Monthly Current Affairs (Last 6 Months)', description: 'Key national & global developments', learning_status: 'learning', priority: 'high', display_order: 1 },
-      { id: 'top-26', user_id: uid, subject_id: 'sub-4', name: 'Government Schemes & Portfolios', description: 'Welfare schemes and outlay budgets', learning_status: 'not_started', priority: 'high', display_order: 2 },
-      { id: 'top-27', user_id: uid, subject_id: 'sub-4', name: 'Static GK (National Parks, Dams, Capitals)', description: 'Key states and wildlife reserves', learning_status: 'not_started', priority: 'medium', display_order: 3 },
-      { id: 'top-28', user_id: uid, subject_id: 'sub-4', name: 'Awards, Honours & Sports News', description: 'Tournaments, cups, and civilian honors', learning_status: 'not_started', priority: 'low', display_order: 4 },
-
-      // Banking Awareness
-      { id: 'top-29', user_id: uid, subject_id: 'sub-5', name: 'RBI Structure & Monetary Policy', description: 'Repo rate, Reverse repo, CRR, SLR, MPC', learning_status: 'learning', priority: 'high', display_order: 1 },
-      { id: 'top-30', user_id: uid, subject_id: 'sub-5', name: 'Types of Banks & Account Operations', description: 'Commercial, SFBs, Payments banks, KYC', learning_status: 'not_started', priority: 'high', display_order: 2 },
-      { id: 'top-31', user_id: uid, subject_id: 'sub-5', name: 'Priority Sector Lending (PSL) & Targets', description: 'Agricultural & MSME mandates', learning_status: 'not_started', priority: 'high', display_order: 3 },
-      { id: 'top-32', user_id: uid, subject_id: 'sub-5', name: 'NPA, SARFAESI Act & IBC 2016', description: 'Asset recovery and bad loan mechanisms', learning_status: 'not_started', priority: 'high', display_order: 4 },
-      { id: 'top-33', user_id: uid, subject_id: 'sub-5', name: 'Digital Banking Systems (UPI, NEFT, RTGS)', description: 'NPCI, IMPS, RTGS, NACH mechanisms', learning_status: 'not_started', priority: 'medium', display_order: 5 },
-    ];
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    const dailyGoal: DailyGoal = {
-      id: 'dg-today',
-      user_id: uid,
-      goal_date: todayStr,
-      target_topic_count: 3,
-      target_study_minutes: 240,
-      notes: 'Focus on Speed Math and Puzzles today!',
-      created_at: new Date().toISOString()
-    };
-
-    const dailyGoalTopics: DailyGoalTopic[] = [
-      { id: 'dgt-1', user_id: uid, daily_goal_id: 'dg-today', topic_id: 'top-1', is_completed: false },
-      { id: 'dgt-2', user_id: uid, daily_goal_id: 'dg-today', topic_id: 'top-10', is_completed: true, completed_at: new Date().toISOString() },
-      { id: 'dgt-3', user_id: uid, daily_goal_id: 'dg-today', topic_id: 'top-20', is_completed: false },
-    ];
-
-    const studySessions: StudySession[] = [
-      {
-        id: 'sess-1',
-        user_id: uid,
-        subject_id: 'sub-2',
-        topic_id: 'top-10',
-        started_at: new Date(Date.now() - 5400000).toISOString(),
-        ended_at: new Date(Date.now() - 1800000).toISOString(),
-        duration_seconds: 3600,
-        notes: 'Solved 25 simplification problems under timed condition',
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 'sess-2',
-        user_id: uid,
-        subject_id: 'sub-1',
-        topic_id: 'top-1',
-        started_at: new Date(Date.now() - 10800000).toISOString(),
-        ended_at: new Date(Date.now() - 7200000).toISOString(),
-        duration_seconds: 3600,
-        notes: 'Practiced 4 variable floor puzzles',
-        created_at: new Date().toISOString()
-      }
-    ];
-
-    const mockExams: MockExam[] = [
-      {
-        id: 'mock-1',
-        user_id: uid,
-        exam_id: 'exam-1',
-        name: 'IBPS PO Prelims - Full Mock 1',
-        exam_stage: 'prelims',
-        attended_at: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0],
-        marks_obtained: 64.5,
-        maximum_marks: 100.0,
-        duration_seconds: 3600,
-        total_questions: 100,
-        attempted_questions: 78,
-        correct_answers: 68,
-        weak_areas: 'Arithmetic time & work, lengthy English para jumble',
-        notes: 'Good accuracy in Reasoning (31/35). Need to pace Quant better.'
-      },
-      {
-        id: 'mock-2',
-        user_id: uid,
-        exam_id: 'exam-1',
-        name: 'IBPS PO Prelims - Full Mock 2',
-        exam_stage: 'prelims',
-        attended_at: new Date(Date.now() - 86400000 * 1).toISOString().split('T')[0],
-        marks_obtained: 71.25,
-        maximum_marks: 100.0,
-        duration_seconds: 3600,
-        total_questions: 100,
-        attempted_questions: 84,
-        correct_answers: 75,
-        weak_areas: 'Quadratic equation silly calculation mistake',
-        notes: 'Significant improvement in Quant speed.'
-      }
-    ];
-
-    const examEvents: ExamEvent[] = [
-      {
-        id: 'ev-1',
-        user_id: uid,
-        exam_id: 'exam-1',
-        title: 'IBPS PO Prelims Exam 2026',
-        event_type: 'exam_date',
-        event_date: new Date(Date.now() + 86400000 * 42).toISOString().split('T')[0],
-        date_status: 'tentative',
-        description: 'Tentative date as per annual examination calendar',
-        reminder_enabled: true
-      },
-      {
-        id: 'ev-2',
-        user_id: uid,
-        exam_id: 'exam-2',
-        title: 'SBI PO Notification Release',
-        event_type: 'application_open',
-        event_date: new Date(Date.now() + 86400000 * 18).toISOString().split('T')[0],
-        date_status: 'tentative',
-        description: 'Anticipated official notification for PO recruitment',
-        reminder_enabled: false
-      },
-      {
-        id: 'ev-3',
-        user_id: uid,
-        exam_id: 'exam-3',
-        title: 'IBPS Clerk Application Deadline',
-        event_type: 'application_deadline',
-        event_date: new Date(Date.now() + 86400000 * 8).toISOString().split('T')[0],
-        date_status: 'confirmed',
-        description: 'Final date to submit online application & fees',
-        reminder_enabled: true
-      }
-    ];
-
-    this.setLocal('exams', exams);
-    this.setLocal('subjects', subjects);
-    this.setLocal('exam_subjects', examSubjects);
-    this.setLocal('topics', topics);
-    this.setLocal('daily_goals', [dailyGoal]);
-    this.setLocal('daily_goal_topics', dailyGoalTopics);
-    this.setLocal('study_sessions', studySessions);
-    this.setLocal('mock_exams', mockExams);
-    this.setLocal('exam_events', examEvents);
+    this.setLocal('exams', []);
+    this.setLocal('subjects', []);
+    this.setLocal('exam_subjects', []);
+    this.setLocal('topics', []);
+    this.setLocal('daily_goals', []);
+    this.setLocal('daily_goal_topics', []);
+    this.setLocal('study_sessions', []);
+    this.setLocal('mock_exams', []);
+    this.setLocal('exam_events', []);
     this.setLocal('initialized', true);
   }
+
+  public async seedUserSyllabusInDatabase(userId: string): Promise<void> {
+    if (!this.supabaseService.isRealSupabaseConfigured) return;
+
+    try {
+      // Check if user already has subjects
+      const { count, error: countErr } = await this.supabaseService.clientInstance
+        .from('subjects')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (!countErr && count && count > 0) {
+        return; // Already seeded
+      }
+
+      // Try RPC first
+      const { error: rpcError } = await this.supabaseService.clientInstance.rpc('seed_user_bank_exam_data', { p_user_id: userId });
+      
+      if (rpcError) {
+        console.warn('RPC seed failed, falling back to client-side insert', rpcError);
+        // Fallback manual insert if RPC is missing or fails
+        const uid = userId;
+        const exams: Exam[] = [
+          { id: 'exam-1' + Date.now(), user_id: uid, name: 'IBPS PO 2026', description: 'Probationary Officer exam by IBPS', is_active: true, display_order: 1 },
+          { id: 'exam-2' + Date.now(), user_id: uid, name: 'SBI PO 2026', description: 'Probationary Officer exam by State Bank of India', is_active: true, display_order: 2 },
+          { id: 'exam-3' + Date.now(), user_id: uid, name: 'IBPS Clerk 2026', description: 'Clerical Cadre recruitment exam', is_active: true, display_order: 3 },
+        ];
+
+        const subjects: Subject[] = [
+          { id: 'sub-1' + Date.now(), user_id: uid, name: 'Reasoning', color: '#2563eb', display_order: 1 },
+          { id: 'sub-2' + Date.now(), user_id: uid, name: 'Quantitative Aptitude', color: '#0891b2', display_order: 2 },
+          { id: 'sub-3' + Date.now(), user_id: uid, name: 'English', color: '#7c3aed', display_order: 3 },
+          { id: 'sub-4' + Date.now(), user_id: uid, name: 'General Awareness', color: '#d97706', display_order: 4 },
+          { id: 'sub-5' + Date.now(), user_id: uid, name: 'Banking Awareness', color: '#059669', display_order: 5 },
+        ];
+
+        await this.supabaseService.clientInstance.from('exams').insert(exams);
+        await this.supabaseService.clientInstance.from('subjects').insert(subjects);
+
+        // We could manually seed exam_subjects and topics too if needed, but RPC is preferred.
+      }
+    } catch (e) {
+      console.error('Failed to seed user database:', e);
+    }
+  }
+
 
   // --- EXAMS ---
   async getExams(): Promise<Exam[]> {

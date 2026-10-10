@@ -250,7 +250,7 @@ BEGIN
   VALUES (p_user_id, 'General Awareness', '#d97706', 4) RETURNING id INTO v_sub_ga;
 
   INSERT INTO public.subjects (user_id, name, color, display_order)
-  VALUES (p_user_id, 'Banking Awareness', '#059669', 5) RETURNING id INTO v_sub_banking;
+  VALUES (p_user_id, 'Computer Aptitude', '#059669', 5) RETURNING id INTO v_sub_banking;
 
   -- Map Subjects to Prelims & Mains Stages for IBPS PO
   INSERT INTO public.exam_subjects (user_id, exam_id, subject_id, stage, display_order) VALUES
@@ -285,59 +285,66 @@ BEGIN
   (p_user_id, v_ibps_clerk, v_sub_ga, 'mains', 4),
   (p_user_id, v_ibps_clerk, v_sub_banking, 'mains', 5);
 
-  -- Seed Reasoning Topics
+    -- Seed Reasoning Topics
   INSERT INTO public.topics (user_id, subject_id, name, description, priority, learning_status, display_order) VALUES
-  (p_user_id, v_sub_reasoning, 'Puzzles (Floor, Box, Day & Month)', 'High weightage puzzle patterns for Prelims & Mains', 'high', 'learning', 1),
-  (p_user_id, v_sub_reasoning, 'Seating Arrangement (Circular & Linear)', 'Facing inside/outside, parallel rows', 'high', 'learning', 2),
-  (p_user_id, v_sub_reasoning, 'Syllogism (Only a few cases)', 'Venn diagram technique, reverse syllogism', 'high', 'learned', 3),
-  (p_user_id, v_sub_reasoning, 'Blood Relations & Family Tree', 'Coded relations and generation diagrams', 'medium', 'learned', 4),
-  (p_user_id, v_sub_reasoning, 'Coding - Decoding', 'Chinese coding, new pattern conditional coding', 'medium', 'not_started', 5),
-  (p_user_id, v_sub_reasoning, 'Inequalities (Direct & Coded)', 'Mathematical statements and conclusions', 'high', 'revision_completed', 6),
-  (p_user_id, v_sub_reasoning, 'Direction Sense & Distance', 'Pythagoras theorem, coded direction paths', 'low', 'learned', 7),
-  (p_user_id, v_sub_reasoning, 'Machine Input - Output', 'Shift and rearrangement steps (Mains focus)', 'medium', 'not_started', 8),
-  (p_user_id, v_sub_reasoning, 'Critical & Logical Reasoning', 'Assumptions, course of action, cause & effect', 'medium', 'not_started', 9);
+  (p_user_id, v_sub_reasoning, 'Puzzle', 'Floor, Box, Day & Month based puzzles', 'high', 'not_started', 1),
+  (p_user_id, v_sub_reasoning, 'Seating Arrangement', 'Circular, Linear, Square, Inside/Outside', 'high', 'not_started', 2),
+  (p_user_id, v_sub_reasoning, 'Direction Sense', 'Distance and direction based problems', 'medium', 'not_started', 3),
+  (p_user_id, v_sub_reasoning, 'Blood Relation', 'Family tree and coded relations', 'medium', 'not_started', 4),
+  (p_user_id, v_sub_reasoning, 'Syllogism', 'Statement and conclusions, Only a few cases', 'high', 'not_started', 5),
+  (p_user_id, v_sub_reasoning, 'Order and Ranking', 'Position based ranking', 'low', 'not_started', 6),
+  (p_user_id, v_sub_reasoning, 'Coding-Decoding', 'Fictitious language, conditional coding', 'medium', 'not_started', 7),
+  (p_user_id, v_sub_reasoning, 'Machine Input-Output', 'Pattern shifts for Mains stage', 'high', 'not_started', 8),
+  (p_user_id, v_sub_reasoning, 'Inequalities', 'Mathematical statements, Coded inequalities', 'medium', 'not_started', 9),
+  (p_user_id, v_sub_reasoning, 'Alpha-Numeric-Symbol Series', 'Series operations', 'low', 'not_started', 10),
+  (p_user_id, v_sub_reasoning, 'Data Sufficiency', 'Determining if data is sufficient', 'high', 'not_started', 11),
+  (p_user_id, v_sub_reasoning, 'Logical Reasoning', 'Inference, Statement & Assumption, Argument', 'high', 'not_started', 12);
 
   -- Seed Quantitative Aptitude Topics
   INSERT INTO public.topics (user_id, subject_id, name, description, priority, learning_status, display_order) VALUES
-  (p_user_id, v_sub_quant, 'Simplification & Approximation', 'BODMAS, square/cube roots, percentages shortcuts', 'high', 'revision_completed', 1),
-  (p_user_id, v_sub_quant, 'Quadratic Equations & Comparisons', 'Sign method for root comparison (x vs y)', 'high', 'learned', 2),
-  (p_user_id, v_sub_quant, 'Number Series (Missing & Wrong)', 'Multiplication, difference, alternate patterns', 'high', 'learning', 3),
-  (p_user_id, v_sub_quant, 'Data Interpretation (Table, Pie, Bar, Line)', 'Calculation speed and ratio/percentage questions', 'high', 'learning', 4),
-  (p_user_id, v_sub_quant, 'Caselet DI & Radar Charts', 'Paragraph and Venn diagram based sets', 'medium', 'not_started', 5),
-  (p_user_id, v_sub_quant, 'Arithmetic - Percentage & Profit/Loss', 'Fraction values, discount and markup', 'high', 'learned', 6),
-  (p_user_id, v_sub_quant, 'Arithmetic - Simple & Compound Interest', 'Tree method, difference between CI and SI', 'medium', 'not_started', 7),
-  (p_user_id, v_sub_quant, 'Arithmetic - Ratio & Mixture Alligation', 'Replacement and ratio balancing formulas', 'medium', 'not_started', 8),
-  (p_user_id, v_sub_quant, 'Arithmetic - Time, Work & Pipes/Cisterns', 'Efficiency method and alternate working hours', 'high', 'learning', 9),
-  (p_user_id, v_sub_quant, 'Arithmetic - Speed, Distance & Boats', 'Relative speed, upstream & downstream', 'medium', 'not_started', 10);
+  (p_user_id, v_sub_quant, 'Number Series', 'Missing and Wrong number series', 'high', 'not_started', 1),
+  (p_user_id, v_sub_quant, 'Simplification & Approximation', 'BODMAS, basic calculations', 'high', 'not_started', 2),
+  (p_user_id, v_sub_quant, 'Ratio & Proportion, Partnership', 'Basic ratio and business partnership', 'medium', 'not_started', 3),
+  (p_user_id, v_sub_quant, 'Percentage', 'Fractions to percentage conversion', 'high', 'not_started', 4),
+  (p_user_id, v_sub_quant, 'Mixtures & Allegations', 'Mixture replacements', 'medium', 'not_started', 5),
+  (p_user_id, v_sub_quant, 'Average & Ages', 'Age relations and average concepts', 'medium', 'not_started', 6),
+  (p_user_id, v_sub_quant, 'Profit & Loss', 'Discount, Markup, Successive discount', 'high', 'not_started', 7),
+  (p_user_id, v_sub_quant, 'Time and work & Pipe and cistern', 'Efficiency based problems', 'high', 'not_started', 8),
+  (p_user_id, v_sub_quant, 'Simple Interest & Compound Interest', 'Interest calculation and differences', 'medium', 'not_started', 9),
+  (p_user_id, v_sub_quant, 'Time & Distance, Boat & stream', 'Relative speed, upstream/downstream', 'high', 'not_started', 10),
+  (p_user_id, v_sub_quant, 'Permutation, Combination & Probability', 'Arrangements and event probability', 'medium', 'not_started', 11),
+  (p_user_id, v_sub_quant, 'Mensuration (2D & 3D)', 'Area and volume formulas', 'low', 'not_started', 12),
+  (p_user_id, v_sub_quant, 'Data Interpretation', 'Bar, line, pie, mixed, missing DI', 'high', 'not_started', 13),
+  (p_user_id, v_sub_quant, 'Caselet DI', 'Paragraph based data interpretation', 'high', 'not_started', 14),
+  (p_user_id, v_sub_quant, 'Quadratic Equation', 'Finding and comparing roots', 'high', 'not_started', 15);
 
-  -- Seed English Topics
+  -- Seed English Language Topics
   INSERT INTO public.topics (user_id, subject_id, name, description, priority, learning_status, display_order) VALUES
-  (p_user_id, v_sub_english, 'Reading Comprehension', 'Inference, central idea, vocabulary in context', 'high', 'learning', 1),
-  (p_user_id, v_sub_english, 'Cloze Test & Blank Fillers', 'Grammar and contextual elimination', 'high', 'learned', 2),
-  (p_user_id, v_sub_english, 'Error Detection & Sentence Correction', 'Subject-verb agreement, tenses, prepositions', 'high', 'learned', 3),
-  (p_user_id, v_sub_english, 'Para Jumbles & Sentence Rearrangement', 'Mandatory pair identification', 'medium', 'not_started', 4),
-  (p_user_id, v_sub_english, 'Phrase Replacement & Idioms', 'Phrasal verbs and common banking idioms', 'medium', 'not_started', 5);
+  (p_user_id, v_sub_english, 'Reading Comprehension', 'Passage reading and fact finding', 'high', 'not_started', 1),
+  (p_user_id, v_sub_english, 'Cloze Test', 'Fill in the blanks in a passage', 'high', 'not_started', 2),
+  (p_user_id, v_sub_english, 'Fillers', 'Single and double fillers', 'medium', 'not_started', 3),
+  (p_user_id, v_sub_english, 'Sentence Errors', 'Grammar and error detection', 'high', 'not_started', 4),
+  (p_user_id, v_sub_english, 'Vocabulary based questions', 'Synonyms, antonyms, word usage', 'medium', 'not_started', 5),
+  (p_user_id, v_sub_english, 'Sentence Improvement', 'Correcting phrases and sentences', 'medium', 'not_started', 6),
+  (p_user_id, v_sub_english, 'Jumbled Paragraph', 'Rearranging sentences', 'high', 'not_started', 7),
+  (p_user_id, v_sub_english, 'Paragraph Based Questions', 'Fillers, Conclusion, Restatement', 'high', 'not_started', 8);
 
   -- Seed General Awareness Topics
   INSERT INTO public.topics (user_id, subject_id, name, description, priority, learning_status, display_order) VALUES
-  (p_user_id, v_sub_ga, 'Monthly Current Affairs (Last 6 Months)', 'National, international, appointments, summits', 'high', 'learning', 1),
-  (p_user_id, v_sub_ga, 'Government Schemes & Portfolios', 'PMJDY, PMSBY, PMJJBY, Atal Pension Yojana', 'high', 'not_started', 2),
-  (p_user_id, v_sub_ga, 'Static GK (National Parks, Dams, Capitals)', 'Frequent states and geographical facts', 'medium', 'not_started', 3),
-  (p_user_id, v_sub_ga, 'Awards, Honours & Sports News', 'Grand Slams, Cricket World Cup, Nobel Prizes', 'low', 'not_started', 4);
+  (p_user_id, v_sub_ga, 'Banking and Financial Awareness', 'RBI, monetary policy, banking terms', 'high', 'not_started', 1),
+  (p_user_id, v_sub_ga, 'Current Affairs', 'National and international news (Last 6 Months)', 'high', 'not_started', 2),
+  (p_user_id, v_sub_ga, 'Static GK', 'National Parks, Dams, Capitals', 'medium', 'not_started', 3);
 
-  -- Seed Banking Awareness Topics
+  -- Seed Computer Aptitude Topics (Reusing Banking Awareness Subject)
   INSERT INTO public.topics (user_id, subject_id, name, description, priority, learning_status, display_order) VALUES
-  (p_user_id, v_sub_banking, 'RBI Structure & Monetary Policy', 'Repo, Reverse Repo, CRR, SLR, MSF, MPC meeting', 'high', 'learning', 1),
-  (p_user_id, v_sub_banking, 'Banking Types & Account Operations', 'Commercial, Small Finance, Payments banks, KYC', 'high', 'not_started', 2),
-  (p_user_id, v_sub_banking, 'Priority Sector Lending (PSL) & Targets', 'Agriculture, MSME, Weaker sections targets', 'high', 'not_started', 3),
-  (p_user_id, v_sub_banking, 'NPA, SARFAESI Act & IBC 2016', 'SMA categories, asset classification, DRT', 'high', 'not_started', 4),
-  (p_user_id, v_sub_banking, 'Digital Payments & Financial Systems', 'UPI, NEFT, RTGS, IMPS, CTS, BBPS, NPCI', 'medium', 'not_started', 5);
+  (p_user_id, v_sub_banking, 'Internet & Networking', 'Web, topologies, network protocols', 'medium', 'not_started', 1),
+  (p_user_id, v_sub_banking, 'Memory & Hardware', 'RAM, ROM, Storage devices', 'medium', 'not_started', 2),
+  (p_user_id, v_sub_banking, 'Keyboard Shortcuts & Abbreviations', 'Common shortcuts and IT acronyms', 'high', 'not_started', 3),
+  (p_user_id, v_sub_banking, 'Microsoft Office', 'Word, Excel, PowerPoint basics', 'high', 'not_started', 4),
+  (p_user_id, v_sub_banking, 'Computer Software & OS', 'Types of software, OS concepts', 'medium', 'not_started', 5),
+  (p_user_id, v_sub_banking, 'Computer Fundamentals & Number System', 'Generations, Binary conversions', 'low', 'not_started', 6),
+  (p_user_id, v_sub_banking, 'Basic of Logic Gates', 'AND, OR, NOT, NAND, NOR gates', 'low', 'not_started', 7);
 
-  -- Seed upcoming bank exam calendar events
-  INSERT INTO public.exam_events (user_id, exam_id, title, event_type, event_date, date_status, description) VALUES
-  (p_user_id, v_ibps_po, 'IBPS PO Prelims 2026', 'exam_date', CURRENT_DATE + INTERVAL '45 days', 'tentative', 'Tentative Prelims exam date as per annual calendar'),
-  (p_user_id, v_sbi_po, 'SBI PO Notification Release', 'application_open', CURRENT_DATE + INTERVAL '20 days', 'tentative', 'Expected release of SBI PO recruitment notification'),
-  (p_user_id, v_ibps_clerk, 'IBPS Clerk Application Deadline', 'application_deadline', CURRENT_DATE + INTERVAL '12 days', 'confirmed', 'Last date to submit online application form');
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

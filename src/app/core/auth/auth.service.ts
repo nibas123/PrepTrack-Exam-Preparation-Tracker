@@ -28,25 +28,6 @@ export class AuthService {
 
   private async initializeAuth(): Promise<void> {
     if (!this.supabaseService.isRealSupabaseConfigured) {
-      // Local fallback session check
-      const savedUser = localStorage.getItem('preptrack_mock_user');
-      if (savedUser) {
-        try {
-          const userObj = JSON.parse(savedUser) as User;
-          this.currentUserSignal.set(userObj);
-          this.currentProfileSignal.set({
-            id: userObj.id,
-            display_name: userObj.user_metadata?.['full_name'] || 'Aspirant',
-            timezone: 'Asia/Kolkata',
-            daily_target_hours: 4.0,
-            daily_target_topics: 3,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-        } catch {
-          localStorage.removeItem('preptrack_mock_user');
-        }
-      }
       this.isLoadingSignal.set(false);
       return;
     }
@@ -97,31 +78,9 @@ export class AuthService {
     this.isLoadingSignal.set(true);
 
     if (!this.supabaseService.isRealSupabaseConfigured) {
-      // Local demo fallback login
-      const mockId = 'demo-user-12345';
-      const mockUser: Partial<User> = {
-        id: mockId,
-        email: email,
-        user_metadata: { full_name: email.split('@')[0] || 'Bank Aspirant' },
-        app_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      };
-      this.currentUserSignal.set(mockUser as User);
-      this.currentProfileSignal.set({
-        id: mockId,
-        display_name: email.split('@')[0] || 'Bank Aspirant',
-        timezone: 'Asia/Kolkata',
-        daily_target_hours: 4.0,
-        daily_target_topics: 3,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-      localStorage.setItem('preptrack_mock_user', JSON.stringify(mockUser));
       this.isLoadingSignal.set(false);
-      this.toast.success(`Welcome back, ${email.split('@')[0]}!`);
-      this.router.navigate(['/dashboard']);
-      return true;
+      this.toast.error('Supabase is not configured.');
+      return false;
     }
 
     try {
@@ -155,30 +114,9 @@ export class AuthService {
     this.isLoadingSignal.set(true);
 
     if (!this.supabaseService.isRealSupabaseConfigured) {
-      const mockId = 'demo-user-12345';
-      const mockUser: Partial<User> = {
-        id: mockId,
-        email: email,
-        user_metadata: { full_name: fullName },
-        app_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      };
-      this.currentUserSignal.set(mockUser as User);
-      this.currentProfileSignal.set({
-        id: mockId,
-        display_name: fullName,
-        timezone: 'Asia/Kolkata',
-        daily_target_hours: 4.0,
-        daily_target_topics: 3,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
-      localStorage.setItem('preptrack_mock_user', JSON.stringify(mockUser));
       this.isLoadingSignal.set(false);
-      this.toast.success('Account created! Default banking syllabus seeded.');
-      this.router.navigate(['/dashboard']);
-      return true;
+      this.toast.error('Supabase is not configured.');
+      return false;
     }
 
     try {
@@ -215,7 +153,6 @@ export class AuthService {
 
   async signOut(): Promise<void> {
     if (!this.supabaseService.isRealSupabaseConfigured) {
-      localStorage.removeItem('preptrack_mock_user');
       this.currentUserSignal.set(null);
       this.currentProfileSignal.set(null);
       this.toast.info('Signed out successfully');
@@ -224,6 +161,11 @@ export class AuthService {
     }
 
     try {
+      // Clear any preptrack local cache to ensure no stale data carries over between users
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('preptrack_'))
+        .forEach(k => localStorage.removeItem(k));
+
       await this.supabaseService.clientInstance.auth.signOut();
       this.currentUserSignal.set(null);
       this.currentProfileSignal.set(null);
