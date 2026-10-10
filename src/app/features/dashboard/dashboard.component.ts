@@ -102,7 +102,7 @@ import confetti from 'canvas-confetti';
       }
 
       <!-- WIDGETS: Configurable Key Metrics Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <!-- Syllabus Progress Card -->
         @if (widgetConfig.config().showSyllabusCard) {
           <app-stat-card
@@ -154,22 +154,21 @@ import confetti from 'canvas-confetti';
           </app-stat-card>
         }
 
-        <!-- Mock Exam Card -->
-        @if (widgetConfig.config().showMockExamCard) {
-          <app-stat-card
-            title="Mock Exam Average"
-            [value]="(summary()?.averageMockPercentage || 0) + '%'"
-            [subtitle]="(summary()?.totalMockExams || 0) + ' attempts (Peak: ' + (summary()?.bestMockPercentage || 0) + '%)'"
-            iconBgColor="#f3e8ff"
-            iconColor="#7c3aed"
-          >
-            <div card-icon>
-              <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-          </app-stat-card>
-        }
+        <!-- Study Streak Card -->
+        <app-stat-card
+          title="Daily Study Streak"
+          [value]="studyStreak() + ' Days'"
+          [subtitle]="studyStreak() > 0 ? 'Consistency unlocked! Keep going' : 'Log a session today to start streak'"
+          iconBgColor="#fff1f2"
+          iconColor="#e11d48"
+        >
+          <div card-icon>
+            <svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+            </svg>
+          </div>
+        </app-stat-card>
       </div>
 
       <!-- Main Columns: Subject Progress & Today's Checklist -->
@@ -281,6 +280,47 @@ import confetti from 'canvas-confetti';
         }
       </div>
 
+      <!-- Recommended Study Tasks Panel (3 Actionable Tasks) -->
+      <div class="card p-5 space-y-3.5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 tracking-tight">3 Recommended Study Tasks</h3>
+            <p class="text-xs text-slate-500">Curated next actions based on your exam syllabus weightage and streak</p>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-100">
+            Smart Recommendations
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          @for (task of recommendedTasks(); track task.id) {
+            <a
+              [routerLink]="task.route"
+              class="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:border-brand-500 hover:shadow-xs transition-all flex flex-col justify-between space-y-2 group"
+            >
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 group-hover:border-brand-300 group-hover:text-brand-700">
+                  {{ task.badge }}
+                </span>
+                <h4 class="text-xs font-bold text-slate-900 mt-2 group-hover:text-brand-600 transition-colors">
+                  {{ task.title }}
+                </h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">
+                  {{ task.subtitle }}
+                </p>
+              </div>
+
+              <div class="flex items-center text-[11px] font-bold text-brand-600 space-x-1 pt-1">
+                <span>Start Now</span>
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+
       <!-- Bottom Row: Weekly Study Trend & Deadlines Highlights -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Weekly Trend Bar Chart -->
@@ -360,6 +400,8 @@ export class DashboardComponent implements OnInit {
   public todayTopics = signal<DailyGoalTopic[]>([]);
   public weeklyStats = signal<{ day: string; date: string; seconds: number; hours: number }[]>([]);
   public upcomingEvents = signal<ExamEvent[]>([]);
+  public studyStreak = signal<number>(0);
+  public recommendedTasks = signal<{ id: string; title: string; subtitle: string; route: string; badge: string }[]>([]);
 
   get todayFormatted(): string {
     return new Date().toLocaleDateString('en-IN', {
@@ -382,18 +424,22 @@ export class DashboardComponent implements OnInit {
     const stage = this.activeStage();
     const todayStr = new Date().toISOString().split('T')[0];
 
-    const [summaryData, subjectsData, todayData, weeklyData, eventsData] = await Promise.all([
+    const [summaryData, subjectsData, todayData, weeklyData, eventsData, streak, recTasks] = await Promise.all([
       this.analytics.getDashboardSummary(stage),
       this.analytics.getSubjectProgress(stage),
       this.dataStorage.getDailyGoal(todayStr),
       this.analytics.getWeeklyStudyStats(),
       this.dataStorage.getExamEvents(),
+      this.analytics.calculateStudyStreak(),
+      this.analytics.getRecommendedTasks()
     ]);
 
     this.summary.set(summaryData);
     this.subjectProgress.set(subjectsData);
     this.todayTopics.set(todayData.topics);
     this.weeklyStats.set(weeklyData);
+    this.studyStreak.set(streak);
+    this.recommendedTasks.set(recTasks);
 
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);

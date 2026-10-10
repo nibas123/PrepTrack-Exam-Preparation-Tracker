@@ -251,6 +251,18 @@ import confetti from 'canvas-confetti';
                 </svg>
               </a>
 
+              <!-- Practice Quiz Quick Launch -->
+              <a
+                [routerLink]="['/quizzes']"
+                [queryParams]="{ topicName: topic.name }"
+                class="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                title="Start Practice Quiz Drill on this topic"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </a>
+
               <!-- Edit Action -->
               <button
                 type="button"

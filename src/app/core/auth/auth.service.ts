@@ -176,17 +176,31 @@ export class AuthService {
     }
   }
 
-  async updateProfile(displayName: string, targetHours: number, targetTopics: number): Promise<boolean> {
+  async updateProfile(
+    displayName: string,
+    targetHours: number,
+    targetTopics: number,
+    examId?: string | null,
+    examDate?: string | null,
+    examName?: string | null,
+    onboardingCompleted?: boolean
+  ): Promise<boolean> {
     const user = this.currentUserSignal();
     if (!user) return false;
 
+    const payload: Partial<Profile> = {
+      display_name: displayName,
+      daily_target_hours: targetHours,
+      daily_target_topics: targetTopics,
+      ...(examId !== undefined && { target_exam_id: examId }),
+      ...(examDate !== undefined && { target_exam_date: examDate }),
+      ...(examName !== undefined && { target_exam_name: examName }),
+      ...(onboardingCompleted !== undefined && { onboarding_completed: onboardingCompleted }),
+      updated_at: new Date().toISOString()
+    };
+
     if (!this.supabaseService.isRealSupabaseConfigured) {
-      this.currentProfileSignal.update(p => p ? {
-        ...p,
-        display_name: displayName,
-        daily_target_hours: targetHours,
-        daily_target_topics: targetTopics
-      } : null);
+      this.currentProfileSignal.update(p => p ? { ...p, ...payload } : null);
       this.toast.success('Profile updated successfully');
       return true;
     }
@@ -194,12 +208,7 @@ export class AuthService {
     try {
       const { error } = await this.supabaseService.clientInstance
         .from('profiles')
-        .update({
-          display_name: displayName,
-          daily_target_hours: targetHours,
-          daily_target_topics: targetTopics,
-          updated_at: new Date().toISOString()
-        })
+        .update(payload)
         .eq('id', user.id);
 
       if (error) {

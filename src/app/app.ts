@@ -69,6 +69,7 @@ export class App {
     if (url.includes('/study-sessions')) return 'Study Sessions & Timer';
     if (url.includes('/mock-exams')) return 'Mock Exams';
     if (url.includes('/exam-calendar')) return 'Exam Calendar';
+    if (url.includes('/quizzes')) return 'Practice Quizzes & Previous Papers';
     if (url.includes('/settings')) return 'Settings';
     return 'Dashboard';
   });

@@ -17,8 +17,60 @@ export interface Profile {
   timezone: string;
   daily_target_hours: number;
   daily_target_topics: number;
+  target_exam_id?: string | null;
+  target_exam_date?: string | null;
+  target_exam_name?: string | null;
+  onboarding_completed?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  subject_id: string;
+  topic_id?: string | null;
+  topic_name?: string;
+  question_text: string;
+  options: string[];
+  correct_option_index: number;
+  explanation: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+}
+
+export interface QuizAttempt {
+  id: string;
+  user_id: string;
+  quiz_type: 'subject' | 'topic' | 'mixed' | 'previous_paper';
+  subject_id?: string | null;
+  topic_id?: string | null;
+  topic_name?: string | null;
+  total_questions: number;
+  correct_answers: number;
+  score_percentage: number;
+  total_time_seconds: number;
+  weak_topics?: string[];
+  answers: {
+    question_id: string;
+    selected_option_index: number | null;
+    is_correct: boolean;
+    time_spent_seconds: number;
+  }[];
+  created_at: string;
+}
+
+export interface PreviousPaper {
+  id: string;
+  exam_name: string;
+  year: number;
+  stage: 'prelims' | 'mains';
+  total_marks: number;
+  duration_minutes: number;
+  sections: {
+    subject_name: string;
+    questions_count: number;
+  }[];
+  official_source_license: string;
+  questions: QuizQuestion[];
 }
 
 export interface Exam {

@@ -195,6 +195,27 @@ import { DashboardWidgetConfig } from '../../core/models/database.types';
           </div>
 
           <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target Competitive Exam</label>
+            <select [(ngModel)]="targetExamName" class="input-field text-xs font-bold">
+              <option value="IBPS PO 2026">IBPS PO (Probationary Officer)</option>
+              <option value="IBPS Clerk 2026">IBPS Clerk (Customer Support)</option>
+              <option value="SBI PO 2026">SBI PO (State Bank of India)</option>
+              <option value="SBI Clerk 2026">SBI Clerk (Junior Associates)</option>
+              <option value="IBPS RRB Officer Scale-I 2026">IBPS RRB (Regional Rural Banks PO)</option>
+              <option value="RBI Grade B Officer 2026">RBI Grade B Officer</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Target Exam Date</label>
+            <input
+              type="date"
+              [(ngModel)]="targetExamDate"
+              class="input-field text-xs font-bold"
+            />
+          </div>
+
+          <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Daily Study Hour Target (Hours)</label>
             <input
               type="number"
@@ -288,6 +309,8 @@ export class SettingsComponent implements OnInit {
   public timezone: string = 'Asia/Kolkata';
   public dailyTargetHours: number = 4.0;
   public dailyTargetTopics: number = 3;
+  public targetExamName: string = 'IBPS PO 2026';
+  public targetExamDate: string = '2026-10-18';
 
   ngOnInit(): void {
     const profile = this.authService.currentProfile();
@@ -295,6 +318,8 @@ export class SettingsComponent implements OnInit {
     this.timezone = profile?.timezone || 'Asia/Kolkata';
     this.dailyTargetHours = profile?.daily_target_hours || 4.0;
     this.dailyTargetTopics = profile?.daily_target_topics || 3;
+    this.targetExamName = profile?.target_exam_name || 'IBPS PO 2026';
+    this.targetExamDate = profile?.target_exam_date || '2026-10-18';
   }
 
   toggleWidget(key: keyof DashboardWidgetConfig): void {
@@ -308,7 +333,15 @@ export class SettingsComponent implements OnInit {
   }
 
   async saveProfileSettings(): Promise<void> {
-    await this.authService.updateProfile(this.displayName, this.dailyTargetHours, this.dailyTargetTopics);
+    await this.authService.updateProfile(
+      this.displayName,
+      this.dailyTargetHours,
+      this.dailyTargetTopics,
+      null,
+      this.targetExamDate,
+      this.targetExamName,
+      true
+    );
   }
 
   triggerPwaInstall(): void {

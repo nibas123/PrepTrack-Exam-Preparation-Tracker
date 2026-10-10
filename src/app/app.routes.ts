@@ -17,6 +17,7 @@ export const routes: Routes = [
   { path: 'study-sessions', component: StudySessionsComponent, canActivate: [authGuard] },
   { path: 'mock-exams', component: MockExamsComponent, canActivate: [authGuard] },
   { path: 'exam-calendar', component: ExamCalendarComponent, canActivate: [authGuard] },
+  { path: 'quizzes', loadComponent: () => import('./features/quizzes/quizzes.component').then(m => m.QuizzesComponent), canActivate: [authGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'dashboard' },

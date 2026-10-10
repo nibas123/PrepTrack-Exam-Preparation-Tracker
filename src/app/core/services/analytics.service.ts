@@ -195,4 +195,85 @@ export class AnalyticsService {
 
     return result;
   }
+
+  async calculateStudyStreak(): Promise<number> {
+    const sessions = await this.dataStorage.getStudySessions();
+    if (sessions.length === 0) return 0;
+
+    const sessionDates = new Set(
+      sessions.map(s => new Date(s.started_at).toISOString().split('T')[0])
+    );
+
+    let streak = 0;
+    const checkDate = new Date();
+    // Allow today to not be recorded yet if yesterday was recorded
+    const todayStr = checkDate.toISOString().split('T')[0];
+    if (!sessionDates.has(todayStr)) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+
+    while (true) {
+      const dateStr = checkDate.toISOString().split('T')[0];
+      if (sessionDates.has(dateStr)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  }
+
+  async getRecommendedTasks(): Promise<{ id: string; title: string; subtitle: string; route: string; badge: string }[]> {
+    const [topics, sessions] = await Promise.all([
+      this.dataStorage.getTopics(),
+      this.dataStorage.getStudySessions()
+    ]);
+
+    const tasks: { id: string; title: string; subtitle: string; route: string; badge: string }[] = [];
+
+    // Task 1: High-priority unstarted or learning topic
+    const highPriorityTopic = topics.find(t => t.priority === 'high' && t.learning_status !== 'learned' && t.learning_status !== 'revision_completed');
+    if (highPriorityTopic) {
+      tasks.push({
+        id: 'rec-topic-1',
+        title: `Master ${highPriorityTopic.name}`,
+        subtitle: `${highPriorityTopic.subject?.name || 'High Priority'} • Target this for maximum exam weightage`,
+        route: '/syllabus',
+        badge: 'Priority Topic'
+      });
+    }
+
+    // Task 2: Practice Quiz recommended
+    tasks.push({
+      id: 'rec-quiz-2',
+      title: 'Take 5-Min Quantitative Aptitude Speed Drill',
+      subtitle: '5 timed questions (45s per question) with automatic scoring',
+      route: '/quizzes',
+      badge: 'Speed Drill'
+    });
+
+    // Task 3: Previous Paper or Revision
+    const learningTopic = topics.find(t => t.learning_status === 'learning');
+    if (learningTopic) {
+      tasks.push({
+        id: 'rec-rev-3',
+        title: `Review Notes for ${learningTopic.name}`,
+        subtitle: `Currently in progress • Log a focus session or complete topic`,
+        route: '/study-sessions',
+        badge: 'In Progress'
+      });
+    } else {
+      tasks.push({
+        id: 'rec-paper-3',
+        title: 'Benchmark with IBPS PO 2025 Paper',
+        subtitle: 'Review memory-based pattern & timed sectional performance',
+        route: '/quizzes',
+        badge: 'Previous Paper'
+      });
+    }
+
+    return tasks.slice(0, 3);
+  }
 }

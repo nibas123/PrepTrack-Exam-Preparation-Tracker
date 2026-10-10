@@ -290,31 +290,73 @@ import {
               <div class="flex flex-wrap gap-1.5">
                 <button
                   type="button"
-                  (click)="applyExamTemplate('IBPS RRB Officer Scale-I 2026', 'IBPS', 5500)"
+                  (click)="applyExamTemplate('IBPS PO 2026', 'IBPS', 4455, '2026-10-18', '2026-11-29', 'https://ibps.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + IBPS PO
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('SBI PO 2026', 'SBI', 2000, '2026-11-01', '2026-12-15', 'https://sbi.bank/web/careers')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + SBI PO
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('SBI Clerk 2026', 'SBI', 8283, '2026-10-25', '2026-12-06', 'https://sbi.bank/web/careers')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + SBI Clerk
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('IBPS Clerk 2026', 'IBPS', 6128, '2026-10-10', '2026-11-23', 'https://ibps.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + IBPS Clerk
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('IBPS RRB Officer Scale-I 2026', 'IBPS', 5500, '2026-08-03', '2026-09-29', 'https://ibps.in')"
                   class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
                 >
                   + IBPS RRB PO
                 </button>
                 <button
                   type="button"
-                  (click)="applyExamTemplate('IBPS RRB Clerk 2026', 'IBPS', 6000)"
+                  (click)="applyExamTemplate('IBPS RRB Clerk 2026', 'IBPS', 6000, '2026-08-10', '2026-10-06', 'https://ibps.in')"
                   class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
                 >
                   + IBPS RRB Clerk
                 </button>
                 <button
                   type="button"
-                  (click)="applyExamTemplate('RBI Grade B Officer 2026', 'RBI', 300)"
+                  (click)="applyExamTemplate('RBI Grade B Officer 2026', 'RBI', 291, '2026-09-08', '2026-10-19', 'https://opportunities.rbi.org.in')"
                   class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
                 >
                   + RBI Grade B
                 </button>
                 <button
                   type="button"
-                  (click)="applyExamTemplate('LIC AAO Recruitment 2026', 'LIC', 750)"
+                  (click)="applyExamTemplate('RBI Assistant 2026', 'RBI', 450, '2026-11-15', '2026-12-28', 'https://opportunities.rbi.org.in')"
                   class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
                 >
-                  + LIC AAO
+                  + RBI Assistant
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('IBPS SO 2026', 'IBPS', 1400, '2026-11-09', '2026-12-14', 'https://ibps.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + IBPS SO
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('NABARD Grade A 2026', 'NABARD', 150, '2026-10-20', '2026-11-30', 'https://nabard.org')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
+                >
+                  + NABARD Grade A
                 </button>
               </div>
             </div>
@@ -608,13 +650,16 @@ export class ExamCalendarComponent implements OnInit {
     this.showAnnounceExamModal.set(true);
   }
 
-  applyExamTemplate(name: string, body: string, vacancies: number): void {
+  applyExamTemplate(name: string, body: string, vacancies: number, prelims?: string, mains?: string, url?: string): void {
     this.newExamForm.name = name;
     this.newExamForm.conducting_body = body;
     this.newExamForm.vacancies = vacancies;
-    if (body === 'IBPS') this.newExamForm.official_url = 'https://ibps.in';
+    if (prelims) this.newExamForm.prelims_date = prelims;
+    if (mains) this.newExamForm.mains_date = mains;
+    if (url) this.newExamForm.official_url = url;
+    else if (body === 'IBPS') this.newExamForm.official_url = 'https://ibps.in';
     else if (body === 'RBI') this.newExamForm.official_url = 'https://opportunities.rbi.org.in';
-    else if (body === 'LIC') this.newExamForm.official_url = 'https://licindia.in/careers';
+    else if (body === 'SBI') this.newExamForm.official_url = 'https://sbi.bank/web/careers';
   }
 
   async saveAnnouncedExam(): Promise<void> {
