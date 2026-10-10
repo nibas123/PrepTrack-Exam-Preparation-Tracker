@@ -5,6 +5,7 @@ import { AnalyticsService } from '../../core/services/analytics.service';
 import { DataStorageService } from '../../core/services/data-storage.service';
 import { TimerService } from '../../core/services/timer.service';
 import { ToastService } from '../../core/services/toast.service';
+import { WidgetConfigService } from '../../core/services/widget-config.service';
 import {
   DashboardSummary,
   SubjectProgress,
@@ -21,322 +22,333 @@ import confetti from 'canvas-confetti';
   standalone: true,
   imports: [CommonModule, RouterModule, StatCardComponent, ProgressBarComponent],
   template: `
-    <div class="space-y-6">
-      <!-- Top Bar: Exam Stage Switcher & Welcome Banner -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs">
+    <div class="space-y-6 max-w-6xl mx-auto">
+      <!-- Clean Top Bar: Exam Stage Switcher & Widget Settings Shortcut -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
-          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Banking Exam Prep Headquarters</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Track your progress across IBPS PO, SBI PO, and Clerk exams</p>
+          <div class="flex items-center space-x-2">
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Banking Prep Dashboard</h2>
+            <span class="w-2 h-2 rounded-full bg-emerald-500" title="Live Synced"></span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Track your readiness for IBPS PO, SBI PO, and Clerk examinations</p>
         </div>
 
-        <!-- Stage Toggle: Prelims vs Mains -->
-        <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 self-start sm:self-auto">
-          <button
-            type="button"
-            (click)="switchStage('prelims')"
-            class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all"
-            [ngClass]="activeStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+        <div class="flex items-center space-x-2.5">
+          <!-- Stage Toggle: Prelims vs Mains -->
+          <div class="inline-flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/50">
+            <button
+              type="button"
+              (click)="switchStage('prelims')"
+              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+              [ngClass]="activeStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+            >
+              Prelims
+            </button>
+            <button
+              type="button"
+              (click)="switchStage('mains')"
+              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+              [ngClass]="activeStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+            >
+              Mains
+            </button>
+          </div>
+
+          <!-- Configure Widgets Shortcut -->
+          <a
+            routerLink="/settings"
+            class="p-2 text-slate-400 hover:text-slate-700 rounded-xl border border-slate-200/70 hover:bg-slate-50 transition-colors"
+            title="Configure Dashboard Widgets"
           >
-            Prelims (3 Subjects)
-          </button>
-          <button
-            type="button"
-            (click)="switchStage('mains')"
-            class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all"
-            [ngClass]="activeStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-          >
-            Mains (5 Subjects)
-          </button>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            </svg>
+          </a>
         </div>
       </div>
 
-      <!-- Urgent Exam Countdown Banner (if upcoming exam exists) -->
-      @if (summary()?.nextExam; as exam) {
-        <div class="bg-gradient-to-r from-brand-600 to-indigo-700 rounded-2xl p-5 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <!-- WIDGET 1: Urgent Exam Countdown Banner -->
+      @if (widgetConfig.config().showNextExamBanner && summary()?.nextExam; as exam) {
+        <div class="bg-gradient-to-r from-brand-600 via-indigo-600 to-indigo-700 rounded-2xl p-5 text-white shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
-            <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+            <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <div>
               <div class="flex items-center space-x-2">
-                <span class="text-xs uppercase tracking-wider font-semibold text-brand-200">Next Upcoming Milestone</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-medium capitalize">{{ exam.status }}</span>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-brand-200">Next Upcoming Milestone</span>
+                <span class="text-[10px] px-2 py-0.2 rounded-full bg-white/20 text-white font-medium capitalize">{{ exam.status }}</span>
               </div>
-              <h3 class="text-lg font-bold mt-0.5">{{ exam.title }}</h3>
-              <p class="text-xs text-brand-100">Scheduled on {{ exam.date }}</p>
+              <h3 class="text-base font-bold mt-0.5">{{ exam.title }}</h3>
+              <p class="text-xs text-brand-100">Target date: {{ exam.date }}</p>
             </div>
           </div>
 
           <div class="flex items-center space-x-4 self-end sm:self-auto">
             <div class="text-right">
-              <div class="text-3xl font-extrabold tracking-tight">{{ exam.daysRemaining }}</div>
-              <div class="text-[10px] uppercase tracking-wider text-brand-200 font-medium">Days Remaining</div>
+              <div class="text-2xl font-black tracking-tight">{{ exam.daysRemaining }}</div>
+              <div class="text-[9px] uppercase tracking-wider text-brand-200 font-bold">Days Left</div>
             </div>
             <a
               routerLink="/exam-calendar"
-              class="px-3.5 py-2 rounded-lg bg-white text-brand-700 text-xs font-bold hover:bg-brand-50 transition-colors shadow-sm"
+              class="px-3 py-1.5 rounded-lg bg-white text-brand-700 text-xs font-bold hover:bg-brand-50 transition-colors shadow-2xs"
             >
-              View Calendar
+              Calendar →
             </a>
           </div>
         </div>
       }
 
-      <!-- 8 Key Summary Cards Grid -->
+      <!-- WIDGETS: Configurable Key Metrics Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- 1. Overall Syllabus Progress -->
-        <app-stat-card
-          title="Syllabus Completed"
-          [value]="(summary()?.syllabusCompletionPercentage || 0) + '%'"
-          [subtitle]="(summary()?.completedTopics || 0) + ' completed / ' + (summary()?.remainingTopics || 0) + ' remaining'"
-          iconBgColor="#eff6ff"
-          iconColor="#2563eb"
-        >
-          <div card-icon>
-            <svg class="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        </app-stat-card>
+        <!-- Syllabus Progress Card -->
+        @if (widgetConfig.config().showSyllabusCard) {
+          <app-stat-card
+            title="Syllabus Mastery"
+            [value]="(summary()?.syllabusCompletionPercentage || 0) + '%'"
+            [subtitle]="(summary()?.completedTopics || 0) + ' done / ' + (summary()?.remainingTopics || 0) + ' remaining'"
+            iconBgColor="#eff6ff"
+            iconColor="#2563eb"
+          >
+            <div card-icon>
+              <svg class="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </app-stat-card>
+        }
 
-        <!-- 2. Today's Plan Progress -->
-        <app-stat-card
-          title="Today's Topics Plan"
-          [value]="(summary()?.todayCompletedTopics || 0) + ' / ' + (summary()?.todayPlannedTopics || 0)"
-          [subtitle]="((summary()?.todayPlannedTopics || 0) - (summary()?.todayCompletedTopics || 0)) + ' topics left today'"
-          iconBgColor="#f0fdf4"
-          iconColor="#16a34a"
-        >
-          <div card-icon>
-            <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-          </div>
-        </app-stat-card>
+        <!-- Today's Plan Progress Card -->
+        @if (widgetConfig.config().showTodayPlanCard) {
+          <app-stat-card
+            title="Today's Topics Plan"
+            [value]="(summary()?.todayCompletedTopics || 0) + ' / ' + (summary()?.todayPlannedTopics || 0)"
+            [subtitle]="((summary()?.todayPlannedTopics || 0) - (summary()?.todayCompletedTopics || 0)) + ' topics left today'"
+            iconBgColor="#f0fdf4"
+            iconColor="#16a34a"
+          >
+            <div card-icon>
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+          </app-stat-card>
+        }
 
-        <!-- 3. Study Hours Recorded Today -->
-        <app-stat-card
-          title="Study Time Today"
-          [value]="formatStudyTime(summary()?.todayStudySeconds || 0)"
-          [subtitle]="'Target: ' + formatStudyTime(summary()?.dailyTargetStudySeconds || 14400)"
-          iconBgColor="#fef3c7"
-          iconColor="#d97706"
-        >
-          <div card-icon>
-            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        </app-stat-card>
+        <!-- Study Time Card -->
+        @if (widgetConfig.config().showStudyTimeCard) {
+          <app-stat-card
+            title="Focus Hours Today"
+            [value]="formatStudyTime(summary()?.todayStudySeconds || 0)"
+            [subtitle]="'Target: ' + formatStudyTime(summary()?.dailyTargetStudySeconds || 14400)"
+            iconBgColor="#fef3c7"
+            iconColor="#d97706"
+          >
+            <div card-icon>
+              <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </app-stat-card>
+        }
 
-        <!-- 4. Mock Exams Attended & Avg Score -->
-        <app-stat-card
-          title="Mock Exams Average"
-          [value]="(summary()?.averageMockPercentage || 0) + '%'"
-          [subtitle]="(summary()?.totalMockExams || 0) + ' attempts (Best: ' + (summary()?.bestMockPercentage || 0) + '%)'"
-          iconBgColor="#f3e8ff"
-          iconColor="#7c3aed"
-        >
-          <div card-icon>
-            <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-          </div>
-        </app-stat-card>
+        <!-- Mock Exam Card -->
+        @if (widgetConfig.config().showMockExamCard) {
+          <app-stat-card
+            title="Mock Exam Average"
+            [value]="(summary()?.averageMockPercentage || 0) + '%'"
+            [subtitle]="(summary()?.totalMockExams || 0) + ' attempts (Peak: ' + (summary()?.bestMockPercentage || 0) + '%)'"
+            iconBgColor="#f3e8ff"
+            iconColor="#7c3aed"
+          >
+            <div card-icon>
+              <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </app-stat-card>
+        }
       </div>
 
-      <!-- Main Grid: Subject Progress & Today's Plan -->
+      <!-- Main Columns: Subject Progress & Today's Checklist -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Subject-Wise Progress (2 Cols) -->
-        <div class="lg:col-span-2 card">
-          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-            <div>
-              <h3 class="text-base font-bold text-slate-900 tracking-tight">Subject-Wise Syllabus Completion</h3>
-              <p class="text-xs text-slate-500">Calculated dynamically for {{ activeStage() | uppercase }}</p>
-            </div>
-            <a routerLink="/syllabus" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Manage Syllabus →</a>
-          </div>
-
-          <div class="mt-5 space-y-5">
-            @for (sub of subjectProgress(); track sub.subjectId) {
+        <!-- Subject Progress (2 cols) -->
+        @if (widgetConfig.config().showSubjectProgress) {
+          <div
+            class="card"
+            [ngClass]="widgetConfig.config().showTodayChecklist ? 'lg:col-span-2' : 'lg:col-span-3'"
+          >
+            <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
               <div>
-                <div class="flex items-center justify-between text-xs mb-1.5">
-                  <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 rounded-full" [style.background-color]="sub.subjectColor"></span>
-                    <span class="font-bold text-slate-800">{{ sub.subjectName }}</span>
+                <h3 class="text-sm font-bold text-slate-900 tracking-tight">Subject-Wise Completion</h3>
+                <p class="text-xs text-slate-500">Calculated for {{ activeStage() | uppercase }}</p>
+              </div>
+              <a routerLink="/syllabus" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Open Syllabus →</a>
+            </div>
+
+            <div class="mt-4 space-y-4">
+              @for (sub of subjectProgress(); track sub.subjectId) {
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <div class="flex items-center space-x-2">
+                      <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="sub.subjectColor"></span>
+                      <span class="font-bold text-slate-800">{{ sub.subjectName }}</span>
+                    </div>
+                    <div class="text-slate-500 font-medium">
+                      <span class="font-bold text-slate-800">{{ sub.completedTopics }}</span> / {{ sub.totalTopics }} topics
+                      <span class="font-bold text-slate-700 ml-1">({{ sub.percentage }}%)</span>
+                    </div>
                   </div>
-                  <div class="text-slate-500 font-medium">
-                    <span class="font-bold text-slate-800">{{ sub.completedTopics }}</span> / {{ sub.totalTopics }} topics
-                    <span class="font-bold text-slate-700 ml-1.5">({{ sub.percentage }}%)</span>
-                  </div>
+                  <app-progress-bar
+                    [percentage]="sub.percentage"
+                    [color]="sub.subjectColor"
+                    [showLabel]="false"
+                    size="sm"
+                  ></app-progress-bar>
                 </div>
-                <app-progress-bar
-                  [percentage]="sub.percentage"
-                  [color]="sub.subjectColor"
-                  [showLabel]="false"
-                  size="md"
-                ></app-progress-bar>
-              </div>
-            }
-
-            @if (subjectProgress().length === 0) {
-              <div class="py-8 text-center text-slate-400 text-xs">
-                No subjects found for this stage. Add subjects in My Syllabus.
-              </div>
-            }
+              }
+            </div>
           </div>
-        </div>
+        }
 
-        <!-- Today's Plan Checklist (1 Col) -->
-        <div class="card flex flex-col justify-between">
-          <div>
+        <!-- Today's Plan Checklist -->
+        @if (widgetConfig.config().showTodayChecklist) {
+          <div
+            class="card flex flex-col justify-between"
+            [ngClass]="widgetConfig.config().showSubjectProgress ? 'lg:col-span-1' : 'lg:col-span-3'"
+          >
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 tracking-tight">Today's Tasks</h3>
+                  <p class="text-xs text-slate-500">{{ todayFormatted }}</p>
+                </div>
+                <a routerLink="/daily-goals" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Goals →</a>
+              </div>
+
+              <!-- Checklist -->
+              <div class="mt-3 space-y-2">
+                @for (item of todayTopics(); track item.id) {
+                  <div
+                    class="flex items-center space-x-2.5 p-2 rounded-xl border transition-all text-xs"
+                    [ngClass]="item.is_completed ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50/70 border-slate-200/70'"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="item.is_completed"
+                      (change)="toggleTopicCompletion(item)"
+                      class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500 cursor-pointer"
+                    />
+                    <div class="flex-1 min-w-0">
+                      <p
+                        class="font-semibold text-slate-800 truncate"
+                        [class.line-through]="item.is_completed"
+                        [class.text-slate-400]="item.is_completed"
+                      >
+                        {{ item.topic?.name || 'Topic' }}
+                      </p>
+                      <span class="text-[10px] text-slate-400">
+                        {{ item.topic?.subject?.name }}
+                      </span>
+                    </div>
+                  </div>
+                }
+
+                @if (todayTopics().length === 0) {
+                  <div class="py-8 text-center text-xs text-slate-400">
+                    No topics scheduled today.
+                    <a routerLink="/daily-goals" class="block font-bold text-brand-600 mt-1">Pick Topics →</a>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Bottom Focus Timer Launch -->
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <a
+                routerLink="/study-sessions"
+                class="w-full btn-primary text-xs py-2 flex items-center justify-center space-x-1.5 shadow-2xs"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                </svg>
+                <span>Focus Stopwatch</span>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Bottom Row: Weekly Study Trend & Deadlines Highlights -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Weekly Trend Bar Chart -->
+        @if (widgetConfig.config().showWeeklyTrend) {
+          <div class="card">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 class="text-base font-bold text-slate-900 tracking-tight">Today's Study Plan</h3>
-                <p class="text-xs text-slate-500">{{ todayFormatted }}</p>
+                <h3 class="text-sm font-bold text-slate-900 tracking-tight">Last 7 Days Study Hours</h3>
+                <p class="text-xs text-slate-500">Consistent daily prep rhythm</p>
               </div>
-              <a routerLink="/daily-goals" class="text-xs font-semibold text-brand-600 hover:text-brand-700">All Goals →</a>
+              <a routerLink="/study-sessions" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Logs →</a>
             </div>
 
-            <!-- Checklist Items -->
-            <div class="mt-4 space-y-2.5">
-              @for (item of todayTopics(); track item.id) {
-                <div
-                  class="flex items-start space-x-3 p-2.5 rounded-xl border transition-all"
-                  [ngClass]="item.is_completed ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50/70 border-slate-200/80 hover:bg-slate-50'"
-                >
-                  <input
-                    type="checkbox"
-                    [checked]="item.is_completed"
-                    (change)="toggleTopicCompletion(item)"
-                    class="mt-1 w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500 cursor-pointer"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <p
-                      class="text-xs font-semibold text-slate-800 leading-snug"
-                      [class.line-through]="item.is_completed"
-                      [class.text-slate-400]="item.is_completed"
-                    >
-                      {{ item.topic?.name || 'Topic' }}
-                    </p>
-                    <span
-                      class="inline-block mt-0.5 text-[10px] font-medium px-2 py-0.5 rounded-md text-white"
-                      [style.background-color]="item.topic?.subject?.color || '#2563eb'"
-                    >
-                      {{ item.topic?.subject?.name || 'Subject' }}
-                    </span>
+            <div class="mt-4 flex items-end justify-between h-36 pt-2 px-2">
+              @for (day of weeklyStats(); track day.date) {
+                <div class="flex flex-col items-center flex-1 space-y-1.5">
+                  <span class="text-[10px] font-bold text-slate-700">{{ day.hours }}h</span>
+                  <div class="w-7 sm:w-8 bg-slate-100 rounded-t-lg h-24 relative flex items-end overflow-hidden">
+                    <div
+                      class="w-full bg-brand-600 rounded-t-lg transition-all duration-500"
+                      [style.height.%]="getBarHeight(day.hours)"
+                    ></div>
                   </div>
-                </div>
-              }
-
-              @if (todayTopics().length === 0) {
-                <div class="py-10 text-center">
-                  <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 mb-2">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <p class="text-xs font-medium text-slate-500">No topics planned for today yet.</p>
-                  <a
-                    routerLink="/daily-goals"
-                    class="inline-block mt-3 text-xs font-bold text-brand-600 hover:text-brand-700 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200"
-                  >
-                    + Pick Topics for Today
-                  </a>
+                  <span class="text-[10px] font-semibold text-slate-500">{{ day.day }}</span>
                 </div>
               }
             </div>
           </div>
+        }
 
-          <!-- Bottom quick button to start timer -->
-          <div class="mt-4 pt-3 border-t border-slate-100">
-            <a
-              routerLink="/study-sessions"
-              class="w-full btn-primary text-xs py-2 flex items-center justify-center space-x-2"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Launch Focus Stopwatch</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Row: Weekly Study Trend & Upcoming Important Dates -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Weekly Study Breakdown -->
-        <div class="card">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <h3 class="text-base font-bold text-slate-900 tracking-tight">Last 7 Days Study Hours</h3>
-              <p class="text-xs text-slate-500">Consistent effort builds selection confidence</p>
-            </div>
-            <a routerLink="/study-sessions" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Study Log →</a>
-          </div>
-
-          <div class="mt-6 flex items-end justify-between h-40 pt-4 px-2">
-            @for (day of weeklyStats(); track day.date) {
-              <div class="flex flex-col items-center flex-1 space-y-2">
-                <span class="text-[11px] font-bold text-slate-700">{{ day.hours }}h</span>
-                <div class="w-7 sm:w-9 bg-slate-100 rounded-t-lg h-28 relative flex items-end overflow-hidden">
-                  <div
-                    class="w-full bg-brand-600 rounded-t-lg transition-all duration-500"
-                    [style.height.%]="getBarHeight(day.hours)"
-                  ></div>
-                </div>
-                <span class="text-[11px] font-semibold text-slate-500">{{ day.day }}</span>
+        <!-- Upcoming Exam Deadlines -->
+        @if (widgetConfig.config().showUpcomingDeadlines) {
+          <div class="card">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 tracking-tight">Key Deadlines & Milestones</h3>
+                <p class="text-xs text-slate-500">Chronological schedule countdown</p>
               </div>
-            }
-          </div>
-        </div>
-
-        <!-- Upcoming Exam Calendar Highlights -->
-        <div class="card">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <h3 class="text-base font-bold text-slate-900 tracking-tight">Upcoming Key Deadlines</h3>
-              <p class="text-xs text-slate-500">Chronological exam schedule & application dates</p>
+              <a routerLink="/exam-calendar" class="text-xs font-semibold text-brand-600 hover:text-brand-700">View All →</a>
             </div>
-            <a routerLink="/exam-calendar" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Full Calendar →</a>
-          </div>
 
-          <div class="mt-4 space-y-3">
-            @for (ev of upcomingEvents(); track ev.id) {
-              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50/70 border border-slate-200/80">
-                <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center font-bold text-xs border border-brand-200">
-                    {{ getEventBadgeIcon(ev.event_type) }}
-                  </div>
+            <div class="mt-3 space-y-2">
+              @for (ev of upcomingEvents(); track ev.id) {
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/70 border border-slate-200/70 text-xs">
                   <div>
-                    <h4 class="text-xs font-bold text-slate-900">{{ ev.title }}</h4>
-                    <p class="text-[11px] text-slate-500">{{ ev.event_date }} ({{ ev.date_status }})</p>
+                    <h4 class="font-bold text-slate-800 leading-snug">{{ ev.title }}</h4>
+                    <p class="text-[11px] text-slate-400">{{ ev.event_date }}</p>
                   </div>
-                </div>
-
-                <div class="text-right">
-                  <span class="inline-block px-2.5 py-1 rounded-full text-xs font-extrabold bg-brand-100 text-brand-800">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-brand-50 text-brand-700 border border-brand-100">
                     {{ getCountdownLabel(ev.event_date) }}
                   </span>
                 </div>
-              </div>
-            }
+              }
 
-            @if (upcomingEvents().length === 0) {
-              <div class="py-8 text-center text-slate-400 text-xs">
-                No future exam events recorded. Add dates in Exam Calendar.
-              </div>
-            }
+              @if (upcomingEvents().length === 0) {
+                <div class="py-8 text-center text-slate-400 text-xs">
+                  No upcoming deadlines recorded.
+                </div>
+              }
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   `
 })
 export class DashboardComponent implements OnInit {
+  public widgetConfig = inject(WidgetConfigService);
   private analytics = inject(AnalyticsService);
   private dataStorage = inject(DataStorageService);
   private timerService = inject(TimerService);
@@ -353,8 +365,7 @@ export class DashboardComponent implements OnInit {
     return new Date().toLocaleDateString('en-IN', {
       weekday: 'short',
       day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+      month: 'short'
     });
   }
 
@@ -393,7 +404,7 @@ export class DashboardComponent implements OnInit {
         d.setHours(0, 0, 0, 0);
         return d.getTime() >= todayDate.getTime();
       })
-      .slice(0, 4);
+      .slice(0, 3);
 
     this.upcomingEvents.set(filteredEvents);
   }
@@ -402,12 +413,11 @@ export class DashboardComponent implements OnInit {
     const newStatus = !item.is_completed;
     await this.dataStorage.toggleGoalTopicCompletion(item.id, newStatus);
 
-    // If marked completed, also advance topic status in syllabus to 'learned'
     if (newStatus && item.topic_id) {
       await this.dataStorage.updateTopicStatus(item.topic_id, 'learned');
       this.toast.success(`Completed "${item.topic?.name || 'Topic'}"!`);
       try {
-        confetti({ particleCount: 50, spread: 45, origin: { y: 0.6 } });
+        confetti({ particleCount: 40, spread: 45, origin: { y: 0.6 } });
       } catch {}
     }
 
@@ -422,7 +432,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getBarHeight(hours: number): number {
-    const max = 6.0; // 6 hours scale
+    const max = 6.0;
     return Math.min(100, Math.max(8, Math.round((hours / max) * 100)));
   }
 
@@ -434,16 +444,6 @@ export class DashboardComponent implements OnInit {
     const diff = Math.round((ev.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     if (diff === 0) return 'Today!';
     if (diff === 1) return 'Tomorrow';
-    return `${diff} days`;
-  }
-
-  getEventBadgeIcon(type: string): string {
-    switch (type) {
-      case 'exam_date': return 'EXAM';
-      case 'application_open': return 'APP';
-      case 'application_deadline': return 'LAST';
-      case 'admit_card': return 'CARD';
-      default: return 'DATE';
-    }
+    return `${diff}d left`;
   }
 }

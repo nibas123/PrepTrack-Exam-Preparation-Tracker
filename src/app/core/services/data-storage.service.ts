@@ -273,6 +273,15 @@ export class DataStorageService {
       user_id: this.userId,
       name: exam.name || 'New Exam',
       description: exam.description || null,
+      conducting_body: exam.conducting_body || 'IBPS',
+      vacancies: exam.vacancies || null,
+      notification_date: exam.notification_date || null,
+      application_start_date: exam.application_start_date || null,
+      application_end_date: exam.application_end_date || null,
+      prelims_date: exam.prelims_date || null,
+      mains_date: exam.mains_date || null,
+      official_url: exam.official_url || null,
+      notification_status: exam.notification_status || 'announced',
       is_active: exam.is_active ?? true,
       display_order: exam.display_order ?? 0,
       created_at: new Date().toISOString(),
@@ -294,6 +303,148 @@ export class DataStorageService {
     else current.push(newExam);
     this.setLocal('exams', current);
     return newExam;
+  }
+
+  async announceAndTrackNewExam(examData: Partial<Exam>): Promise<Exam> {
+    const saved = await this.saveExam({
+      ...examData,
+      is_active: true,
+      notification_status: examData.notification_status || 'announced'
+    });
+
+    // Automatically create milestone calendar events for the announced exam
+    if (saved.prelims_date) {
+      await this.saveExamEvent({
+        exam_id: saved.id,
+        title: `${saved.name} Prelims Exam`,
+        event_type: 'exam_date',
+        event_date: saved.prelims_date,
+        date_status: 'tentative',
+        description: `Official preliminary examination date for ${saved.name}`,
+        reminder_enabled: true
+      });
+    }
+
+    if (saved.mains_date) {
+      await this.saveExamEvent({
+        exam_id: saved.id,
+        title: `${saved.name} Mains Exam`,
+        event_type: 'exam_date',
+        event_date: saved.mains_date,
+        date_status: 'tentative',
+        description: `Official mains examination date for ${saved.name}`,
+        reminder_enabled: true
+      });
+    }
+
+    if (saved.application_end_date) {
+      await this.saveExamEvent({
+        exam_id: saved.id,
+        title: `${saved.name} Application Deadline`,
+        event_type: 'application_deadline',
+        event_date: saved.application_end_date,
+        date_status: 'confirmed',
+        description: `Last date to submit online application & application fee for ${saved.name}`,
+        reminder_enabled: true
+      });
+    }
+
+    if (saved.application_start_date) {
+      await this.saveExamEvent({
+        exam_id: saved.id,
+        title: `${saved.name} Application Opening`,
+        event_type: 'application_open',
+        event_date: saved.application_start_date,
+        date_status: 'confirmed',
+        description: `Online registration begins for ${saved.name}`,
+        reminder_enabled: false
+      });
+    }
+
+    // Link subjects to this exam
+    const subjects = await this.getSubjects();
+    const reasoning = subjects.find(s => s.name.toLowerCase().includes('reasoning'));
+    const quant = subjects.find(s => s.name.toLowerCase().includes('quant'));
+    const english = subjects.find(s => s.name.toLowerCase().includes('english'));
+    const ga = subjects.find(s => s.name.toLowerCase().includes('general') || s.name.toLowerCase().includes('current'));
+    const banking = subjects.find(s => s.name.toLowerCase().includes('bank'));
+
+    const mappings: { subId: string; stage: 'prelims' | 'mains'; order: number }[] = [];
+    if (reasoning) {
+      mappings.push({ subId: reasoning.id, stage: 'prelims', order: 1 });
+      mappings.push({ subId: reasoning.id, stage: 'mains', order: 1 });
+    }
+    if (quant) {
+      mappings.push({ subId: quant.id, stage: 'prelims', order: 2 });
+      mappings.push({ subId: quant.id, stage: 'mains', order: 2 });
+    }
+    if (english) {
+      mappings.push({ subId: english.id, stage: 'prelims', order: 3 });
+      mappings.push({ subId: english.id, stage: 'mains', order: 3 });
+    }
+    if (ga) {
+      mappings.push({ subId: ga.id, stage: 'mains', order: 4 });
+    }
+    if (banking) {
+      mappings.push({ subId: banking.id, stage: 'mains', order: 5 });
+    }
+
+    const currentEs = this.getLocal<ExamSubject[]>('exam_subjects', []);
+    for (const m of mappings) {
+      const entry: ExamSubject = {
+        id: `es-${saved.id}-${m.subId}-${m.stage}`,
+        user_id: this.userId,
+        exam_id: saved.id,
+        subject_id: m.subId,
+        stage: m.stage,
+        display_order: m.order,
+        created_at: new Date().toISOString()
+      };
+      if (this.supabaseService.isRealSupabaseConfigured) {
+        await this.supabaseService.clientInstance.from('exam_subjects').upsert(entry);
+      } else {
+        currentEs.push(entry);
+      }
+    }
+    if (!this.supabaseService.isRealSupabaseConfigured) {
+      this.setLocal('exam_subjects', currentEs);
+    }
+
+    return saved;
+  }
+
+  async toggleExamTracking(examId: string, isActive: boolean): Promise<void> {
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      await this.supabaseService.clientInstance
+        .from('exams')
+        .update({ is_active: isActive, updated_at: new Date().toISOString() })
+        .eq('id', examId)
+        .eq('user_id', this.userId);
+      return;
+    }
+
+    const current = this.getLocal<Exam[]>('exams', []);
+    const target = current.find(e => e.id === examId);
+    if (target) {
+      target.is_active = isActive;
+      target.updated_at = new Date().toISOString();
+      this.setLocal('exams', current);
+    }
+  }
+
+  async deleteExam(examId: string): Promise<void> {
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      await this.supabaseService.clientInstance
+        .from('exams')
+        .delete()
+        .eq('id', examId)
+        .eq('user_id', this.userId);
+      return;
+    }
+
+    let current = this.getLocal<Exam[]>('exams', []);
+    current = current.filter(e => e.id !== examId);
+    this.setLocal('exams', current);
   }
 
   // --- SUBJECTS & STAGE MAPPING ---

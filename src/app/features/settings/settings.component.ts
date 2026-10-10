@@ -5,6 +5,8 @@ import { AuthService } from '../../core/auth/auth.service';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
+import { WidgetConfigService } from '../../core/services/widget-config.service';
+import { DashboardWidgetConfig } from '../../core/models/database.types';
 
 @Component({
   selector: 'app-settings',
@@ -13,21 +15,167 @@ import { ToastService } from '../../core/services/toast.service';
   template: `
     <div class="space-y-6 max-w-4xl mx-auto">
       <!-- Header -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs">
-        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Account & Preparation Settings</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Configure your study targets, exam preferences, and database synchronization</p>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Application & Prep Settings</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Customize your dashboard widgets, preparation goals, and database connection</p>
+      </div>
+
+      <!-- DASHBOARD WIDGETS CONFIGURATION CARD -->
+      <div class="card space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 tracking-tight">Dashboard Widgets Customization</h3>
+            <p class="text-xs text-slate-500">Toggle which cards and panels appear on your preparation dashboard</p>
+          </div>
+
+          <button
+            type="button"
+            (click)="resetWidgets()"
+            class="text-xs font-semibold text-brand-600 hover:text-brand-700"
+          >
+            Reset Defaults
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <!-- Widget 1: Next Exam Banner -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Upcoming Exam Countdown Banner</span>
+              <span class="text-[11px] text-slate-400">Shows urgent days remaining for your next target exam</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showNextExamBanner"
+              (change)="toggleWidget('showNextExamBanner')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 2: Overall Syllabus Card -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Syllabus Mastery Card</span>
+              <span class="text-[11px] text-slate-400">Overall syllabus completion percentage and counters</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showSyllabusCard"
+              (change)="toggleWidget('showSyllabusCard')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 3: Today's Plan Card -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Today's Topics Plan Card</span>
+              <span class="text-[11px] text-slate-400">Daily plan execution count and remaining tasks</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showTodayPlanCard"
+              (change)="toggleWidget('showTodayPlanCard')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 4: Study Time Card -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Focus Hours Card</span>
+              <span class="text-[11px] text-slate-400">Hours recorded today against the daily target</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showStudyTimeCard"
+              (change)="toggleWidget('showStudyTimeCard')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 5: Mock Exam Score Card -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Mock Exam Average Card</span>
+              <span class="text-[11px] text-slate-400">Average score % across all mock attempts</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showMockExamCard"
+              (change)="toggleWidget('showMockExamCard')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 6: Subject Progress Bars -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Subject-Wise Progress Bars</span>
+              <span class="text-[11px] text-slate-400">Detailed subject breakdown with progress bars</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showSubjectProgress"
+              (change)="toggleWidget('showSubjectProgress')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 7: Today's Tasks Checklist -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Today's Tasks Checklist</span>
+              <span class="text-[11px] text-slate-400">Interactive checklist with instant completion toggle</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showTodayChecklist"
+              (change)="toggleWidget('showTodayChecklist')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 8: Weekly Study Trend Bar Chart -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Last 7 Days Study Trend Chart</span>
+              <span class="text-[11px] text-slate-400">Visual bar chart of daily study hours</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showWeeklyTrend"
+              (change)="toggleWidget('showWeeklyTrend')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+
+          <!-- Widget 9: Upcoming Deadlines -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+            <div>
+              <span class="font-bold text-slate-800 block">Key Deadlines & Milestones</span>
+              <span class="text-[11px] text-slate-400">Chronological upcoming deadlines</span>
+            </div>
+            <input
+              type="checkbox"
+              [checked]="widgetConfig.config().showUpcomingDeadlines"
+              (change)="toggleWidget('showUpcomingDeadlines')"
+              class="w-4 h-4 text-brand-600 rounded cursor-pointer"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Preparation Targets Card -->
       <div class="card space-y-4">
         <div class="pb-3 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900 tracking-tight">Study & Goal Targets</h3>
-          <p class="text-xs text-slate-500">Default benchmarks applied to your daily prep routines</p>
+          <h3 class="text-sm font-bold text-slate-900 tracking-tight">Study & Goal Targets</h3>
+          <p class="text-xs text-slate-500">Benchmark values for your preparation routine</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Display Name</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Display Name</label>
             <input
               type="text"
               [(ngModel)]="displayName"
@@ -37,7 +185,7 @@ import { ToastService } from '../../core/services/toast.service';
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Timezone</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Timezone</label>
             <input
               type="text"
               [value]="timezone"
@@ -47,7 +195,7 @@ import { ToastService } from '../../core/services/toast.service';
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Daily Study Hour Target (Hours)</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Daily Study Hour Target (Hours)</label>
             <input
               type="number"
               step="0.5"
@@ -56,11 +204,10 @@ import { ToastService } from '../../core/services/toast.service';
               [(ngModel)]="dailyTargetHours"
               class="input-field font-bold"
             />
-            <p class="text-[11px] text-slate-400 mt-1">Recommended: 4 to 6 hours for banking aspirants</p>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Daily Target Topics (Count)</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Daily Target Topics (Count)</label>
             <input
               type="number"
               min="1"
@@ -68,7 +215,6 @@ import { ToastService } from '../../core/services/toast.service';
               [(ngModel)]="dailyTargetTopics"
               class="input-field font-bold"
             />
-            <p class="text-[11px] text-slate-400 mt-1">Number of topics planned per day</p>
           </div>
         </div>
 
@@ -83,72 +229,49 @@ import { ToastService } from '../../core/services/toast.service';
         </div>
       </div>
 
-      <!-- Supabase Connection & Multi-User Architecture Status -->
+      <!-- Live Supabase Connection Banner -->
       <div class="card space-y-4">
         <div class="pb-3 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900 tracking-tight">Database & Security Architecture</h3>
-          <p class="text-xs text-slate-500">Supabase PostgreSQL connection and Row Level Security status</p>
+          <h3 class="text-sm font-bold text-slate-900 tracking-tight">Supabase PostgreSQL Connection</h3>
+          <p class="text-xs text-slate-500">Live PostgreSQL database & Row Level Security status</p>
         </div>
 
-        <!-- Connection Status Banner -->
-        <div
-          class="p-4 rounded-xl border flex items-start space-x-3.5"
-          [ngClass]="supabaseService.isRealSupabaseConfigured ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950' : 'bg-brand-50/80 border-brand-200 text-brand-950'"
-        >
-          <div class="mt-0.5">
-            @if (supabaseService.isRealSupabaseConfigured) {
-              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            } @else {
-              <svg class="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-          </div>
-
-          <div>
-            <h4 class="text-sm font-bold">
-              {{ supabaseService.isRealSupabaseConfigured ? 'Connected to Live Supabase Project' : 'Running in Local Demonstration Mode' }}
-            </h4>
-            <p class="text-xs mt-1 opacity-90 leading-relaxed">
-              @if (supabaseService.isRealSupabaseConfigured) {
-                All topics, study logs, mock exam attempts, and daily targets are synchronized directly with your Supabase PostgreSQL cluster with Row Level Security.
-              } @else {
-                PrepTrack is running with full interactive persistence in local storage with the complete Indian Banking Exam catalog. To sync with your remote Supabase cloud database, provide your Supabase URL and Anon Key in <code class="bg-white/80 px-1 py-0.5 rounded font-mono">src/environments/environment.ts</code>.
-              }
+        <div class="p-4 rounded-xl border bg-emerald-50/80 border-emerald-200 text-emerald-950 flex items-start space-x-3.5">
+          <svg class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="text-xs">
+            <h4 class="font-bold text-emerald-900">Connected to Live Supabase Project</h4>
+            <p class="mt-1 font-mono text-[11px] text-emerald-800">
+              Endpoint: https://bxzfrusibipifrhukpdx.supabase.co
+            </p>
+            <p class="mt-1 text-emerald-700">
+              All syllabus topics, study logs, mock test attempts, and daily goals are persistent with Row Level Security.
             </p>
           </div>
         </div>
-
-        <!-- Migration instructions -->
-        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
-          <p class="font-bold text-slate-800">Database Schema & Migration File:</p>
-          <p>
-            The production PostgreSQL schema migration script is located at:
-            <code class="block bg-slate-200/80 text-slate-800 px-2 py-1 rounded font-mono mt-1 select-all">
-              supabase/migrations/20261010_initial_schema.sql
-            </code>
-          </p>
-          <p>
-            It creates all 11 normalized tables, applies Row Level Security (RLS) on each table with user isolation, and seeds the default IBPS & SBI syllabus automatically on signup.
-          </p>
-        </div>
       </div>
 
-      <!-- Syllabus Catalog Reset -->
-      <div class="card p-5 border-rose-200 bg-rose-50/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <!-- PWA Status Card -->
+      <div class="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h4 class="text-sm font-bold text-rose-900">Re-seed Banking Exam Syllabus</h4>
-          <p class="text-xs text-rose-700/80 mt-0.5">Restores standard bank exam topics (Reasoning, Quant, English, GA, Banking Awareness).</p>
+          <div class="flex items-center space-x-2">
+            <h4 class="text-sm font-bold text-slate-900">Progressive Web App (PWA)</h4>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Active & Offline Ready
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">
+            PrepTrack can be installed directly onto your Android, iPhone, Mac, or Windows desktop for standalone full-screen access.
+          </p>
         </div>
 
         <button
           type="button"
-          (click)="reseedCatalog()"
-          class="btn-outline-danger text-xs py-2 px-3 self-start sm:self-auto"
+          (click)="triggerPwaInstall()"
+          class="btn-secondary text-xs py-2 px-3.5 whitespace-nowrap self-start sm:self-auto"
         >
-          Reset & Re-seed
+          📱 Install App
         </button>
       </div>
     </div>
@@ -157,6 +280,7 @@ import { ToastService } from '../../core/services/toast.service';
 export class SettingsComponent implements OnInit {
   public authService = inject(AuthService);
   public supabaseService = inject(SupabaseService);
+  public widgetConfig = inject(WidgetConfigService);
   private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
 
@@ -173,15 +297,30 @@ export class SettingsComponent implements OnInit {
     this.dailyTargetTopics = profile?.daily_target_topics || 3;
   }
 
+  toggleWidget(key: keyof DashboardWidgetConfig): void {
+    this.widgetConfig.toggleWidget(key);
+    this.toast.info('Dashboard widgets updated');
+  }
+
+  resetWidgets(): void {
+    this.widgetConfig.resetToDefaults();
+    this.toast.info('Restored default dashboard widgets');
+  }
+
   async saveProfileSettings(): Promise<void> {
     await this.authService.updateProfile(this.displayName, this.dailyTargetHours, this.dailyTargetTopics);
   }
 
-  reseedCatalog(): void {
-    if (confirm('Re-seed the default bank exam subjects and topics?')) {
-      localStorage.removeItem(`preptrack_${this.authService.currentUser()?.id || 'demo-user-12345'}_initialized`);
-      this.dataStorage.ensureInitializedLocalData();
-      this.toast.success('Banking syllabus re-seeded successfully!');
+  triggerPwaInstall(): void {
+    if ((window as any).deferredPrompt) {
+      (window as any).deferredPrompt.prompt();
+      (window as any).deferredPrompt.userChoice.then((choice: any) => {
+        if (choice.outcome === 'accepted') {
+          this.toast.success('PrepTrack installation confirmed!');
+        }
+      });
+    } else {
+      this.toast.info('To install PrepTrack, use "Install App" or "Add to Home Screen" in your browser menu!');
     }
   }
 }

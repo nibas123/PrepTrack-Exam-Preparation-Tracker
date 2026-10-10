@@ -26,6 +26,15 @@ export interface Exam {
   user_id: string;
   name: string;
   description?: string | null;
+  conducting_body?: string | null;
+  vacancies?: number | null;
+  notification_date?: string | null;
+  application_start_date?: string | null;
+  application_end_date?: string | null;
+  prelims_date?: string | null;
+  mains_date?: string | null;
+  official_url?: string | null;
+  notification_status?: 'announced' | 'expected' | 'application_open' | 'completed';
   is_active: boolean;
   display_order: number;
   created_at?: string;
@@ -188,4 +197,16 @@ export interface SubjectProgress {
   totalTopics: number;
   completedTopics: number;
   percentage: number;
+}
+
+export interface DashboardWidgetConfig {
+  showNextExamBanner: boolean;
+  showSyllabusCard: boolean;
+  showTodayPlanCard: boolean;
+  showStudyTimeCard: boolean;
+  showMockExamCard: boolean;
+  showSubjectProgress: boolean;
+  showTodayChecklist: boolean;
+  showWeeklyTrend: boolean;
+  showUpcomingDeadlines: boolean;
 }
