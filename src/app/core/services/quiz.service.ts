@@ -443,6 +443,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
         const questionsArray = Array.isArray(parsed) ? parsed : (parsed.questions || []);
 
         if (Array.isArray(questionsArray) && questionsArray.length > 0) {
+          const nowIso = new Date().toISOString();
           const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => ({
             id: `gemini-${Date.now()}-${idx}`,
             subject_id: subjectFilter || 'sub-ai',
@@ -451,10 +452,14 @@ Output MUST be a valid JSON array of objects conforming to this schema:
             options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['A', 'B', 'C', 'D'],
             correct_option_index: typeof q.correct_option_index === 'number' && q.correct_option_index >= 0 && q.correct_option_index <= 3 ? q.correct_option_index : 0,
             explanation: q.explanation || 'Detailed explanation will be updated shortly.',
-            difficulty: q.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty)
+            difficulty: q.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty),
+            created_at: nowIso,
+            correct_count: 0,
+            incorrect_count: 0,
+            last_attempted_at: undefined
           }));
 
-          // Cache newly generated questions to local storage for instant offline retrieval
+          // Cache newly generated questions to persistent bank
           this.cacheGeneratedQuestions(formattedQuestions);
           return formattedQuestions.slice(0, count);
         }
@@ -468,17 +473,80 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     return this.getFallbackQuestions(subjectFilter, topicFilter, count);
   }
 
-  private cacheGeneratedQuestions(questions: QuizQuestion[]): void {
+  // --- PERSISTENT QUESTION BANK WITH PERFORMANCE LEDGER ---
+  public getStoredQuestionBank(): QuizQuestion[] {
     try {
       const cacheKey = 'preptrack_gemini_questions_cache';
       const existingStr = localStorage.getItem(cacheKey);
-      const existing: QuizQuestion[] = existingStr ? JSON.parse(existingStr) : [];
-      const updated = [...questions, ...existing].slice(0, 100); // keep recent 100
+      return existingStr ? JSON.parse(existingStr) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private cacheGeneratedQuestions(questions: QuizQuestion[]): void {
+    try {
+      const cacheKey = 'preptrack_gemini_questions_cache';
+      const existing = this.getStoredQuestionBank();
+      // Deduplicate by question text to avoid repetitive copies
+      const textSet = new Set(existing.map(q => q.question_text.trim().toLowerCase()));
+      const novel = questions.filter(q => !textSet.has(q.question_text.trim().toLowerCase()));
+      const updated = [...novel, ...existing].slice(0, 300); // keep recent 300 curated questions
       localStorage.setItem(cacheKey, JSON.stringify(updated));
     } catch {}
   }
 
-  // --- ASSEMBLE QUIZ QUESTIONS (Supports AI + Offline Fallback) ---
+  /**
+   * Update correct / incorrect performance counters and timestamps for questions
+   * called when a user finishes a quiz.
+   */
+  public updateQuestionPerformanceCounters(
+    answers: { question_id: string; is_correct: boolean }[]
+  ): void {
+    try {
+      const bank = this.getStoredQuestionBank();
+      if (bank.length === 0) return;
+
+      const answerMap = new Map(answers.map(a => [a.question_id, a.is_correct]));
+      let modified = false;
+
+      const updatedBank = bank.map(q => {
+        if (answerMap.has(q.id)) {
+          modified = true;
+          const isCorrect = answerMap.get(q.id)!;
+          return {
+            ...q,
+            correct_count: (q.correct_count || 0) + (isCorrect ? 1 : 0),
+            incorrect_count: (q.incorrect_count || 0) + (!isCorrect ? 1 : 0),
+            last_attempted_at: new Date().toISOString()
+          };
+        }
+        return q;
+      });
+
+      if (modified) {
+        localStorage.setItem('preptrack_gemini_questions_cache', JSON.stringify(updatedBank));
+      }
+    } catch (e) {
+      console.warn('Failed to update question performance counters:', e);
+    }
+  }
+
+  /**
+   * SPACED REPETITION & ADAPTIVE AI ALGORITHM:
+   * 1. Inspect the existing bank for the requested subject / topic.
+   * 2. Filter out "Mastered" questions:
+   *    - If correct_count >= 2 and incorrect_count === 0, user has mastered it => skip to avoid repetition.
+   * 3. Prioritize "Needs Review" questions:
+   *    - If user answered incorrectly (incorrect_count > 0 and correct_count < incorrect_count + 1),
+   *      and at least 10 minutes have elapsed since last attempt, re-surface it!
+   * 4. Smart AI Trigger:
+   *    - Call Gemini ONLY if:
+   *      a) Eligible questions in the bank are fewer than requested count (need fresh content), OR
+   *      b) Mastered ratio > 65% of the bank (user practiced almost everything in the bank), OR
+   *      c) Explicitly requested fresh AI drill.
+   *    - Otherwise, serve eligible review + unattempted bank questions without wasting API calls!
+   */
   async getQuestions(
     subjectFilter?: string,
     topicFilter?: string,
@@ -486,40 +554,95 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed',
     useAi: boolean = true
   ): Promise<QuizQuestion[]> {
-    if (useAi && navigator.onLine) {
-      try {
-        const aiQuestions = await this.generateGeminiQuestions(subjectFilter, topicFilter, count, difficulty);
-        if (aiQuestions && aiQuestions.length >= count) {
-          return aiQuestions;
+    const bank = this.getStoredQuestionBank();
+    const filter = (subjectFilter || '').toLowerCase();
+    const now = Date.now();
+
+    // Matching questions from stored bank
+    const matching = bank.filter(q => {
+      const matchSub = !filter || filter === 'all' || q.subject_id?.toLowerCase().includes(filter);
+      const matchTopic = !topicFilter || (q.topic_name && q.topic_name.toLowerCase().includes(topicFilter.toLowerCase()));
+      const matchDiff = difficulty === 'mixed' || !q.difficulty || q.difficulty === difficulty;
+      return matchSub && matchTopic && matchDiff;
+    });
+
+    // Score & categorize eligible questions
+    // - Unattempted (correct_count === 0 && incorrect_count === 0)
+    // - Needs review (incorrect_count > 0, attempted at least 5 mins ago)
+    // - Mastered (correct_count >= 2 and last_attempt was correct): excluded unless bank is exhausted
+    const unattempted: QuizQuestion[] = [];
+    const reviewNeeded: QuizQuestion[] = [];
+    const mastered: QuizQuestion[] = [];
+
+    for (const q of matching) {
+      const corrects = q.correct_count || 0;
+      const incorrects = q.incorrect_count || 0;
+      const lastAttemptMs = q.last_attempted_at ? new Date(q.last_attempted_at).getTime() : 0;
+      const timeSinceAttemptMs = now - lastAttemptMs;
+
+      if (corrects === 0 && incorrects === 0) {
+        unattempted.push(q);
+      } else if (incorrects > corrects) {
+        // Needs review - spaced out by at least 3 minutes
+        if (timeSinceAttemptMs > 3 * 60 * 1000) {
+          reviewNeeded.push(q);
         }
-      } catch (err) {
-        console.warn('Gemini generation failed, falling back:', err);
+      } else if (corrects >= 2) {
+        mastered.push(q);
+      } else {
+        // Attempted once correctly, can be re-tested after 15 mins
+        if (timeSinceAttemptMs > 15 * 60 * 1000) {
+          reviewNeeded.push(q);
+        }
       }
     }
 
-    return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+    // Eligible candidates without mastered questions
+    const eligiblePool = [...this.shuffle(reviewNeeded), ...this.shuffle(unattempted)];
+
+    // SMART AI TRIGGER RULE:
+    // Only invoke AI if:
+    // 1) Online AND useAi is true AND
+    // 2) We don't have enough eligible questions in the bank (less than requested count)
+    //    OR the bank is saturated with mastered questions (> 65% mastered ratio)
+    const totalMatching = matching.length;
+    const isBankSaturated = totalMatching >= 5 && (mastered.length / totalMatching) > 0.65;
+    const needsFreshAi = eligiblePool.length < count || isBankSaturated;
+
+    if (useAi && navigator.onLine && needsFreshAi) {
+      try {
+        const neededFromAi = count;
+        const aiQuestions = await this.generateGeminiQuestions(subjectFilter, topicFilter, neededFromAi, difficulty);
+        if (aiQuestions && aiQuestions.length > 0) {
+          // If we have some spaced review questions, blend 1-2 review questions with the fresh AI questions!
+          if (reviewNeeded.length > 0 && aiQuestions.length >= count) {
+            const blended = [
+              reviewNeeded[0],
+              ...aiQuestions.slice(0, count - 1)
+            ];
+            return this.shuffle(blended);
+          }
+          return aiQuestions.slice(0, count);
+        }
+      } catch (err) {
+        console.warn('Smart AI generation fallback to bank:', err);
+      }
+    }
+
+    // If we have enough eligible unattempted / review questions, return them directly!
+    if (eligiblePool.length >= count) {
+      return eligiblePool.slice(0, count);
+    }
+
+    // Otherwise, supplement with standard built-in dynamic math / syllabus fallbacks
+    const fallbackBank = this.getFallbackQuestions(subjectFilter, topicFilter, count);
+    const combined = [...eligiblePool, ...fallbackBank];
+    return this.shuffle(combined).slice(0, count);
   }
 
   public getFallbackQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): QuizQuestion[] {
     let pool: QuizQuestion[] = [];
     const filter = (subjectFilter || '').toLowerCase();
-
-    // 1. Include previously AI-generated questions from local question bank cache
-    try {
-      const cacheKey = 'preptrack_gemini_questions_cache';
-      const stored = localStorage.getItem(cacheKey);
-      if (stored) {
-        const cachedBank: QuizQuestion[] = JSON.parse(stored);
-        const matchingCached = cachedBank.filter(q => {
-          if (!filter) return true;
-          return (
-            q.subject_id?.toLowerCase().includes(filter) ||
-            q.topic_name?.toLowerCase().includes(filter)
-          );
-        });
-        pool = pool.concat(matchingCached);
-      }
-    } catch {}
 
     // Check if filter matches Quant or is empty
     if (!filter || filter.includes('quant') || filter.includes('aptitude') || filter.includes('sub-quant')) {
@@ -649,6 +772,11 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       answers: attempt.answers || [],
       created_at: new Date().toISOString()
     };
+
+    // Update question bank performance counters (correct/incorrect counters & timestamps)
+    if (newAttempt.answers && newAttempt.answers.length > 0) {
+      this.updateQuestionPerformanceCounters(newAttempt.answers);
+    }
 
     // Cache to IndexedDB / local ledger immediately
     const existing = await this.getQuizAttempts();

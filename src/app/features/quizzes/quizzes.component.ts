@@ -337,15 +337,19 @@ import confetti from 'canvas-confetti';
 
             <!-- Quiz Features & Tips (Right Column) -->
             <div class="card p-5 space-y-4">
-              <h4 class="text-sm font-bold text-slate-900">Drill Rules & Accuracy</h4>
+              <h4 class="text-sm font-bold text-slate-900">Adaptive Mastery & Drill Rules</h4>
               <ul class="text-xs text-slate-600 space-y-3">
                 <li class="flex items-start space-x-2">
                   <span class="text-brand-600 font-bold">•</span>
                   <span><strong>45 Seconds Per Question:</strong> Trains sectional speed necessary for IBPS and SBI Prelims.</span>
                 </li>
                 <li class="flex items-start space-x-2">
-                  <span class="text-brand-600 font-bold">•</span>
-                  <span><strong>Dynamic Math Formulas:</strong> Quantitative Aptitude questions use randomized numerical seeds with mathematically computed answers.</span>
+                  <span class="text-indigo-600 font-bold">•</span>
+                  <span><strong>Spaced Repetition & Mastery:</strong> Questions solved correctly increment your mastery counter and are retired. Mistakes are rescheduled for review after a cooldown interval.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-600 font-bold">•</span>
+                  <span><strong>Frugal AI Generation:</strong> Gemini AI is only triggered when you need fresh questions or have exhausted your active bank, preserving your API quota.</span>
                 </li>
                 <li class="flex items-start space-x-2">
                   <span class="text-brand-600 font-bold">•</span>

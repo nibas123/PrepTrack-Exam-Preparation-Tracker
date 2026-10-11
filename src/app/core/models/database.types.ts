@@ -35,6 +35,10 @@ export interface QuizQuestion {
   correct_option_index: number;
   explanation: string;
   difficulty?: 'easy' | 'medium' | 'hard';
+  created_at?: string;
+  correct_count?: number;
+  incorrect_count?: number;
+  last_attempted_at?: string;
 }
 
 export interface QuizAttempt {
