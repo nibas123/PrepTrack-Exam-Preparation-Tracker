@@ -61,9 +61,22 @@ import confetti from 'canvas-confetti';
           <!-- Top Quiz Progress Bar & Timer Header -->
           <div class="flex items-center justify-between pb-4 border-b border-slate-100">
             <div>
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Question {{ currentQuestionIndex() + 1 }} of {{ activeQuestions().length }}
-              </span>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Question {{ currentQuestionIndex() + 1 }} of {{ activeQuestions().length }}
+                </span>
+                @if (activeQuestions()[currentQuestionIndex()]?.difficulty; as diff) {
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700 border border-emerald-200': diff === 'easy',
+                      'bg-amber-50 text-amber-700 border border-amber-200': diff === 'medium',
+                      'bg-rose-50 text-rose-700 border border-rose-200': diff === 'hard'
+                    }"
+                  >
+                    {{ diff }}
+                  </span>
+                }
+              </div>
               <h3 class="text-base font-bold text-slate-900 mt-0.5">
                 {{ activeQuestions()[currentQuestionIndex()]?.topic_name || 'Speed Drill' }}
               </h3>
@@ -236,6 +249,44 @@ import confetti from 'canvas-confetti';
                 </div>
               </div>
 
+              <!-- AI Question Generator Toggle & Difficulty Selector -->
+              <div class="p-4 rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50/70 via-brand-50/40 to-white space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-xs">
+                      ✨
+                    </span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">Gemini AI Adaptive Generator</h4>
+                      <p class="text-[11px] text-slate-500">Synthesizes brand-new bank exam questions using Gemini 3.1 Flash</p>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" [(ngModel)]="aiPowered" class="sr-only peer">
+                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
+
+                @if (aiPowered()) {
+                  <div class="pt-2 border-t border-indigo-100/80">
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">Question Difficulty</label>
+                    <div class="grid grid-cols-4 gap-2 text-xs">
+                      @for (diff of difficulties; track diff.value) {
+                        <button
+                          type="button"
+                          (click)="selectedDifficulty.set(diff.value)"
+                          class="py-2 px-2.5 rounded-lg border text-center font-bold transition-all text-xs flex flex-col items-center justify-center"
+                          [ngClass]="selectedDifficulty() === diff.value ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
+                        >
+                          <span>{{ diff.label }}</span>
+                          <span class="text-[9px] font-normal opacity-80">{{ diff.desc }}</span>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
               <!-- Question Count Selection (5 or 10) -->
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Questions Count</label>
@@ -265,12 +316,21 @@ import confetti from 'canvas-confetti';
                 <button
                   type="button"
                   (click)="startQuiz()"
-                  class="btn-primary text-xs py-2.5 px-6 font-bold shadow-xs flex items-center space-x-1.5"
+                  [disabled]="isGeneratingQuestions()"
+                  class="btn-primary text-xs py-2.5 px-6 font-bold shadow-xs flex items-center space-x-1.5 disabled:opacity-75"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  </svg>
-                  <span>Start {{ questionCount() }}-Question Drill</span>
+                  @if (isGeneratingQuestions()) {
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Generating Questions...</span>
+                  } @else {
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    </svg>
+                    <span>Start {{ questionCount() }}-Question Drill</span>
+                  }
                 </button>
               </div>
             </div>
@@ -407,6 +467,16 @@ export class QuizzesComponent implements OnInit {
   public selectedSubjectId = signal<string>('all');
   public selectedTopicName = signal<string>('');
   public questionCount = signal<number>(5);
+  public aiPowered = signal<boolean>(true);
+  public selectedDifficulty = signal<'easy' | 'medium' | 'hard' | 'mixed'>('mixed');
+  public isGeneratingQuestions = signal<boolean>(false);
+
+  public readonly difficulties: { value: 'easy' | 'medium' | 'hard' | 'mixed'; label: string; desc: string }[] = [
+    { value: 'mixed', label: 'Mixed', desc: 'Real Exam' },
+    { value: 'easy', label: 'Easy', desc: 'Foundation' },
+    { value: 'medium', label: 'Medium', desc: 'Moderate' },
+    { value: 'hard', label: 'Hard', desc: 'Advanced' },
+  ];
 
   // Active quiz state
   public quizActive = signal<boolean>(false);
@@ -448,22 +518,37 @@ export class QuizzesComponent implements OnInit {
   async startQuiz(): Promise<void> {
     const selectedSub = this.subjects().find(s => s.id === this.selectedSubjectId());
     const subFilter = this.selectedSubjectId() === 'all' ? undefined : (selectedSub?.name || this.selectedSubjectId());
-    const questions = await this.quizService.getQuestions(subFilter, this.selectedTopicName() || undefined, this.questionCount());
+    
+    this.isGeneratingQuestions.set(true);
+    try {
+      const questions = await this.quizService.getQuestions(
+        subFilter,
+        this.selectedTopicName() || undefined,
+        this.questionCount(),
+        this.selectedDifficulty(),
+        this.aiPowered()
+      );
 
-    if (questions.length === 0) {
-      this.toast.error('Could not assemble questions for this selection.');
-      return;
+      if (!questions || questions.length === 0) {
+        this.toast.error('Could not assemble questions for this selection.');
+        return;
+      }
+
+      this.activeQuestions.set(questions);
+      this.currentQuestionIndex.set(0);
+      this.selectedOptionIndex.set(null);
+      this.recordedAnswers = [];
+      this.quizStartTime = Date.now();
+      this.quizCompleted.set(false);
+      this.quizActive.set(true);
+
+      this.startQuestionTimer();
+    } catch (err) {
+      console.error('Quiz start error:', err);
+      this.toast.error('An error occurred while preparing your quiz.');
+    } finally {
+      this.isGeneratingQuestions.set(false);
     }
-
-    this.activeQuestions.set(questions);
-    this.currentQuestionIndex.set(0);
-    this.selectedOptionIndex.set(null);
-    this.recordedAnswers = [];
-    this.quizStartTime = Date.now();
-    this.quizCompleted.set(false);
-    this.quizActive.set(true);
-
-    this.startQuestionTimer();
   }
 
   startPreviousPaper(paper: PreviousPaper): void {

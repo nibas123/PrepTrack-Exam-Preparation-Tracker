@@ -3,6 +3,7 @@ import { QuizQuestion, QuizAttempt, PreviousPaper } from '../models/database.typ
 import { SupabaseService } from './supabase.service';
 import { AuthService } from '../auth/auth.service';
 import { OfflineSyncService } from './offline-sync.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -356,8 +357,150 @@ export class QuizService {
     ];
   }
 
-  // --- ASSEMBLE QUIZ QUESTIONS ---
-  async getQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): Promise<QuizQuestion[]> {
+  // --- GEMINI AI QUESTION GENERATION ---
+  async generateGeminiQuestions(
+    subjectFilter?: string,
+    topicFilter?: string,
+    count: number = 5,
+    difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed'
+  ): Promise<QuizQuestion[]> {
+    const primaryKey = (environment as any).geminiApiKey;
+    const fallbackKey = (environment as any).geminiApiKeyFallback;
+
+    const keysToTry = [primaryKey, fallbackKey].filter(Boolean);
+    if (keysToTry.length === 0) {
+      console.warn('No Gemini API key configured, falling back to built-in questions.');
+      return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+    }
+
+    const subjectContext = subjectFilter && subjectFilter !== 'all' ? subjectFilter : 'Indian Banking Exams (Quantitative Aptitude, Reasoning, English Language, General Awareness, Computer Aptitude)';
+    const topicContext = topicFilter ? `Topic: ${topicFilter}` : 'Mixed exam syllabus topics';
+    const difficultyGuide = difficulty === 'mixed'
+      ? 'Include a balanced mix of Easy (30%), Medium (50%), and Hard (20%) questions.'
+      : `All questions must strictly be of ${difficulty.toUpperCase()} difficulty level.`;
+
+    const prompt = `You are a premier senior question paper setter for Indian Banking examinations (IBPS PO/Clerk, SBI PO/Clerk, RRB, RBI Grade B).
+Generate exactly ${count} distinct, high-quality multiple choice practice questions.
+
+Subject / Domain: ${subjectContext}
+${topicContext}
+Target Difficulty: ${difficultyGuide}
+
+Format & Rules:
+1. Each question must strictly have exactly 4 options.
+2. Exactly one option must be correct.
+3. The correct_option_index must be the 0-based index (0, 1, 2, or 3) of that correct option in the options array.
+4. Provide a clear, step-by-step mathematical or logical explanation.
+5. Realistic exam patterns:
+   - For Quantitative Aptitude: Include realistic bank arithmetic, speed math, percentage, profit/loss, simple/compound interest, time & work, or number series.
+   - For Reasoning: Include syllogism, inequalities, blood relations, direction sense, or coding-decoding.
+   - For English: Include error spotting, cloze test, vocabulary, fillers, or idioms.
+   - For Banking / GA / Computer: Include RBI monetary policy, digital banking, cybersecurity, MS Office, or current financial terms.
+
+Output MUST be a valid JSON array of objects conforming to this schema:
+[
+  {
+    "question_text": "Question statement here",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correct_option_index": 0,
+    "explanation": "Detailed step-by-step solution here",
+    "difficulty": "${difficulty === 'mixed' ? 'medium' : difficulty}",
+    "topic_name": "${topicFilter || 'Banking Exam Prep'}"
+  }
+]`;
+
+    for (let i = 0; i < keysToTry.length; i++) {
+      const apiKey = keysToTry[i];
+      const keyLabel = i === 0 ? 'Primary' : 'Fallback';
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: 0.7
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.warn(`Gemini ${keyLabel} key returned HTTP ${response.status}: ${errText}`);
+          continue; // Try fallback key
+        }
+
+        const data = await response.json();
+        const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!jsonText) {
+          console.warn(`Gemini ${keyLabel} returned empty candidates`);
+          continue;
+        }
+
+        const parsed = JSON.parse(jsonText);
+        const questionsArray = Array.isArray(parsed) ? parsed : (parsed.questions || []);
+
+        if (Array.isArray(questionsArray) && questionsArray.length > 0) {
+          const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => ({
+            id: `gemini-${Date.now()}-${idx}`,
+            subject_id: subjectFilter || 'sub-ai',
+            topic_name: q.topic_name || topicFilter || 'AI Practice',
+            question_text: q.question_text || q.question || '',
+            options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['A', 'B', 'C', 'D'],
+            correct_option_index: typeof q.correct_option_index === 'number' && q.correct_option_index >= 0 && q.correct_option_index <= 3 ? q.correct_option_index : 0,
+            explanation: q.explanation || 'Detailed explanation will be updated shortly.',
+            difficulty: q.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty)
+          }));
+
+          // Cache newly generated questions to local storage for instant offline retrieval
+          this.cacheGeneratedQuestions(formattedQuestions);
+          return formattedQuestions.slice(0, count);
+        }
+      } catch (err) {
+        console.warn(`Error generating questions with Gemini ${keyLabel} key:`, err);
+      }
+    }
+
+    // If both keys fail or network is down, gracefully fallback to code-based generator
+    console.info('Falling back to built-in dynamic generators');
+    return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+  }
+
+  private cacheGeneratedQuestions(questions: QuizQuestion[]): void {
+    try {
+      const cacheKey = 'preptrack_gemini_questions_cache';
+      const existingStr = localStorage.getItem(cacheKey);
+      const existing: QuizQuestion[] = existingStr ? JSON.parse(existingStr) : [];
+      const updated = [...questions, ...existing].slice(0, 100); // keep recent 100
+      localStorage.setItem(cacheKey, JSON.stringify(updated));
+    } catch {}
+  }
+
+  // --- ASSEMBLE QUIZ QUESTIONS (Supports AI + Offline Fallback) ---
+  async getQuestions(
+    subjectFilter?: string,
+    topicFilter?: string,
+    count: number = 5,
+    difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed',
+    useAi: boolean = true
+  ): Promise<QuizQuestion[]> {
+    if (useAi && navigator.onLine) {
+      try {
+        const aiQuestions = await this.generateGeminiQuestions(subjectFilter, topicFilter, count, difficulty);
+        if (aiQuestions && aiQuestions.length >= count) {
+          return aiQuestions;
+        }
+      } catch (err) {
+        console.warn('Gemini generation failed, falling back:', err);
+      }
+    }
+
+    return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+  }
+
+  public getFallbackQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): QuizQuestion[] {
     let pool: QuizQuestion[] = [];
     const filter = (subjectFilter || '').toLowerCase();
 
