@@ -131,7 +131,11 @@ export class AuthService {
       });
 
       if (error) {
-        this.toast.error(error.message, 'Registration Failed');
+        if (error.message.includes('Database error saving new user')) {
+          this.toast.error('Database setup required: Please run fix_signup_database_error.sql in your Supabase SQL Editor.', 'Registration Failed');
+        } else {
+          this.toast.error(error.message, 'Registration Failed');
+        }
         return false;
       }
 
