@@ -81,12 +81,12 @@ import confetti from 'canvas-confetti';
           <!-- Question Content -->
           <div class="space-y-4">
             <p class="text-base font-semibold text-slate-800 whitespace-pre-line leading-relaxed">
-              {{ activeQuestions()[currentQuestionIndex()].question_text }}
+              {{ activeQuestions()[currentQuestionIndex()]?.question_text }}
             </p>
 
             <!-- Options Radio List -->
             <div class="space-y-2.5 pt-2">
-              @for (opt of activeQuestions()[currentQuestionIndex()].options; track $index) {
+              @for (opt of activeQuestions()[currentQuestionIndex()]?.options || []; track $index) {
                 <button
                   type="button"
                   (click)="selectAnswer($index)"
