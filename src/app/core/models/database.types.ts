@@ -41,6 +41,22 @@ export interface QuizQuestion {
   last_attempted_at?: string;
 }
 
+export interface ManualQuestionLog {
+  id: string;
+  user_id: string;
+  subject_name: string;
+  topic_name: string;
+  section_part: 'Arithmetic' | 'DI' | 'Puzzles' | 'Seating Arrangement' | 'Grammar' | 'Reading Comprehension' | 'Static Banking' | 'Current Affairs' | 'Computer' | 'General';
+  source_type: 'offline_book' | 'mock_platform' | 'coaching_class' | 'newspaper' | 'telegram_quiz' | 'other';
+  questions_count: number;
+  correct_count: number;
+  incorrect_count: number;
+  time_spent_minutes?: number;
+  notes?: string;
+  logged_at: string; // ISO date
+  created_at?: string;
+}
+
 export interface QuizAttempt {
   id: string;
   user_id: string;

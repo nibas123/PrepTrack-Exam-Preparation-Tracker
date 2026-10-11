@@ -52,6 +52,12 @@ import confetti from 'canvas-confetti';
           >
             Quiz History ({{ pastAttempts().length }})
           </button>
+          <a
+            routerLink="/growth-stats"
+            class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-indigo-700 hover:text-indigo-900 hover:bg-white/60 flex items-center space-x-1"
+          >
+            <span>📈 Growth & Outside Stats</span>
+          </a>
         </div>
       </div>
 

@@ -8,6 +8,7 @@ import { StudySessionsComponent } from './features/study-sessions/study-sessions
 import { MockExamsComponent } from './features/mock-exams/mock-exams.component';
 import { ExamCalendarComponent } from './features/exam-calendar/exam-calendar.component';
 import { QuizzesComponent } from './features/quizzes/quizzes.component';
+import { GrowthStatsComponent } from './features/growth-stats/growth-stats.component';
 import { SettingsComponent } from './features/settings/settings.component';
 
 export const routes: Routes = [
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'mock-exams', component: MockExamsComponent, canActivate: [authGuard] },
   { path: 'exam-calendar', component: ExamCalendarComponent, canActivate: [authGuard] },
   { path: 'quizzes', component: QuizzesComponent, canActivate: [authGuard] },
+  { path: 'growth-stats', component: GrowthStatsComponent, canActivate: [authGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'dashboard' },

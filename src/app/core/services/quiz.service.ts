@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { QuizQuestion, QuizAttempt, PreviousPaper } from '../models/database.types';
+import { QuizQuestion, QuizAttempt, PreviousPaper, ManualQuestionLog } from '../models/database.types';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from '../auth/auth.service';
 import { OfflineSyncService } from './offline-sync.service';
@@ -824,6 +824,86 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     }
 
     return [];
+  }
+
+  // --- MANUAL OUTSIDE QUESTION LOGGING & GROWTH TRACKING ---
+  async saveManualQuestionLog(log: Partial<ManualQuestionLog>): Promise<ManualQuestionLog> {
+    const totalCount = log.questions_count || 0;
+    const correctCount = Math.min(log.correct_count || 0, totalCount);
+    const incorrectCount = Math.max(0, totalCount - correctCount);
+
+    const newLog: ManualQuestionLog = {
+      id: log.id || `manual-log-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      user_id: this.userId,
+      subject_name: log.subject_name || 'Quantitative Aptitude',
+      topic_name: log.topic_name || 'General',
+      section_part: log.section_part || 'Arithmetic',
+      source_type: log.source_type || 'offline_book',
+      questions_count: totalCount,
+      correct_count: correctCount,
+      incorrect_count: incorrectCount,
+      time_spent_minutes: log.time_spent_minutes || 0,
+      notes: log.notes || '',
+      logged_at: log.logged_at || new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
+
+    // Cache locally to IndexedDB/local ledger immediately
+    const existing = await this.getManualQuestionLogs();
+    existing.unshift(newLog);
+    await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, existing);
+
+    // Save to Supabase or queue for sync
+    if (this.supabaseService.isRealSupabaseConfigured && navigator.onLine) {
+      try {
+        await this.supabaseService.clientInstance
+          .from('manual_question_logs')
+          .insert(newLog);
+      } catch (err) {
+        await this.offlineSync.enqueueSync('manual_question_logs', 'insert', newLog);
+      }
+    } else {
+      await this.offlineSync.enqueueSync('manual_question_logs', 'insert', newLog);
+    }
+
+    return newLog;
+  }
+
+  async getManualQuestionLogs(): Promise<ManualQuestionLog[]> {
+    const cached = await this.offlineSync.getCached<ManualQuestionLog[]>(`manual_question_logs_${this.userId}`);
+    if (cached && cached.length > 0) return cached;
+
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      try {
+        const { data, error } = await this.supabaseService.clientInstance
+          .from('manual_question_logs')
+          .select('*')
+          .eq('user_id', this.userId)
+          .order('logged_at', { ascending: false });
+
+        if (!error && data) {
+          await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, data);
+          return data as ManualQuestionLog[];
+        }
+      } catch {}
+    }
+
+    return [];
+  }
+
+  async deleteManualQuestionLog(id: string): Promise<void> {
+    const existing = await this.getManualQuestionLogs();
+    const updated = existing.filter(l => l.id !== id);
+    await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, updated);
+
+    if (this.supabaseService.isRealSupabaseConfigured && navigator.onLine) {
+      try {
+        await this.supabaseService.clientInstance
+          .from('manual_question_logs')
+          .delete()
+          .eq('id', id);
+      } catch {}
+    }
   }
 
   private shuffle<T>(arr: T[]): T[] {
