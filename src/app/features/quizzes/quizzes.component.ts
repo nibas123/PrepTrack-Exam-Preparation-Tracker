@@ -446,7 +446,8 @@ export class QuizzesComponent implements OnInit {
   }
 
   async startQuiz(): Promise<void> {
-    const subFilter = this.selectedSubjectId() === 'all' ? undefined : this.selectedSubjectId();
+    const selectedSub = this.subjects().find(s => s.id === this.selectedSubjectId());
+    const subFilter = this.selectedSubjectId() === 'all' ? undefined : (selectedSub?.name || this.selectedSubjectId());
     const questions = await this.quizService.getQuestions(subFilter, this.selectedTopicName() || undefined, this.questionCount());
 
     if (questions.length === 0) {

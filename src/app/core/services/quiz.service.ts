@@ -359,28 +359,50 @@ export class QuizService {
   // --- ASSEMBLE QUIZ QUESTIONS ---
   async getQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): Promise<QuizQuestion[]> {
     let pool: QuizQuestion[] = [];
+    const filter = (subjectFilter || '').toLowerCase();
 
-    if (!subjectFilter || subjectFilter.includes('quant')) {
-      pool = pool.concat(this.generateDynamicQuantQuestions(count, topicFilter));
+    // Check if filter matches Quant or is empty
+    if (!filter || filter.includes('quant') || filter.includes('aptitude') || filter.includes('sub-quant')) {
+      pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 10), topicFilter));
     }
-    if (!subjectFilter || subjectFilter.includes('reasoning')) {
+    // Check if filter matches Reasoning or is empty
+    if (!filter || filter.includes('reas') || filter.includes('reasoning') || filter.includes('sub-reasoning')) {
       pool = pool.concat(this.getReasoningQuestionPool());
     }
-    if (!subjectFilter || subjectFilter.includes('english')) {
+    // Check if filter matches English or is empty
+    if (!filter || filter.includes('eng') || filter.includes('english') || filter.includes('sub-english')) {
       pool = pool.concat(this.getEnglishQuestionPool());
     }
-    if (!subjectFilter || subjectFilter.includes('ga') || subjectFilter.includes('banking')) {
+    // Check if filter matches General Awareness or Banking or is empty
+    if (!filter || filter.includes('ga') || filter.includes('bank') || filter.includes('general') || filter.includes('awareness') || filter.includes('sub-ga')) {
       pool = pool.concat(this.getBankingAwarenessQuestionPool());
     }
-    if (!subjectFilter || subjectFilter.includes('computer')) {
+    // Check if filter matches Computer or is empty
+    if (!filter || filter.includes('comp') || filter.includes('computer') || filter.includes('sub-computer')) {
       pool = pool.concat(this.getComputerKnowledgeQuestionPool());
+    }
+
+    // If still empty (e.g. custom subject UUID), generate quant questions as guaranteed baseline
+    if (pool.length === 0) {
+      pool = pool.concat(this.generateDynamicQuantQuestions(count, topicFilter));
+      pool = pool.concat(this.getReasoningQuestionPool());
     }
 
     if (topicFilter) {
       const topicMatches = pool.filter(q => q.topic_name?.toLowerCase().includes(topicFilter.toLowerCase()));
-      if (topicMatches.length >= count) {
-        return this.shuffle(topicMatches).slice(0, count);
+      if (topicMatches.length > 0) {
+        if (topicMatches.length >= count) {
+          return this.shuffle(topicMatches).slice(0, count);
+        }
+        // If specific topic has fewer questions than count, pad with remaining pool
+        const others = pool.filter(q => !topicMatches.includes(q));
+        return this.shuffle(topicMatches.concat(others)).slice(0, count);
       }
+    }
+
+    // If pool has fewer questions than requested count (e.g. 10 asked, 5 available), duplicate dynamic questions
+    if (pool.length < count) {
+      pool = pool.concat(this.generateDynamicQuantQuestions(count - pool.length, topicFilter));
     }
 
     return this.shuffle(pool).slice(0, count);
