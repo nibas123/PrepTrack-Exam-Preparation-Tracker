@@ -1,5 +1,5 @@
 // PrepTrack Progressive Web App Service Worker
-const CACHE_NAME = 'preptrack-v1.0';
+const CACHE_NAME = 'preptrack-v2.0';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -32,15 +32,21 @@ self.addEventListener('fetch', (event) => {
   // Only intercept GET requests
   if (event.request.method !== 'GET') return;
 
-  // Let Supabase REST/Auth API requests go directly to network
-  if (event.request.url.includes('supabase.co')) return;
+  // Let external APIs, SSO, and Supabase bypass service worker
+  if (
+    event.request.url.includes('supabase.co') ||
+    event.request.url.includes('vercel.com') ||
+    event.request.url.includes('sso-api')
+  ) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached and update in background (Stale-While-Revalidate)
+        // Revalidate in background
         fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
           }
         }).catch(() => {});
@@ -49,11 +55,16 @@ self.addEventListener('fetch', (event) => {
 
       return fetch(event.request).then((networkResponse) => {
         return networkResponse;
-      }).catch(() => {
-        // Fallback to cached index for navigation
+      }).catch(async () => {
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          const fallback = await caches.match('/index.html') || await caches.match('/');
+          if (fallback) return fallback;
         }
+        return new Response('Network error occurred', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: new Headers({ 'Content-Type': 'text/plain' })
+        });
       });
     })
   );
