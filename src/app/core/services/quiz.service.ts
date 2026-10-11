@@ -504,6 +504,23 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     let pool: QuizQuestion[] = [];
     const filter = (subjectFilter || '').toLowerCase();
 
+    // 1. Include previously AI-generated questions from local question bank cache
+    try {
+      const cacheKey = 'preptrack_gemini_questions_cache';
+      const stored = localStorage.getItem(cacheKey);
+      if (stored) {
+        const cachedBank: QuizQuestion[] = JSON.parse(stored);
+        const matchingCached = cachedBank.filter(q => {
+          if (!filter) return true;
+          return (
+            q.subject_id?.toLowerCase().includes(filter) ||
+            q.topic_name?.toLowerCase().includes(filter)
+          );
+        });
+        pool = pool.concat(matchingCached);
+      }
+    } catch {}
+
     // Check if filter matches Quant or is empty
     if (!filter || filter.includes('quant') || filter.includes('aptitude') || filter.includes('sub-quant')) {
       pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 10), topicFilter));
