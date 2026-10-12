@@ -2,6 +2,7 @@ import { Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { PwaService } from '../../../core/services/pwa.service';
 
 interface NavItem {
   label: string;
@@ -72,6 +73,22 @@ interface NavItem {
             <span>{{ item.label }}</span>
           </a>
         }
+
+        <!-- PWA Install Button in Sidebar -->
+        @if (pwaService.canInstall() && !pwaService.isInstalled()) {
+          <div class="pt-3 pb-1">
+            <button
+              type="button"
+              (click)="pwaService.promptInstall()"
+              class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 transition-colors shadow-xs"
+            >
+              <svg class="w-4 h-4 text-brand-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span>Install App</span>
+            </button>
+          </div>
+        }
       </nav>
 
       <!-- User footer -->
@@ -104,6 +121,7 @@ interface NavItem {
 })
 export class SidebarComponent {
   public authService = inject(AuthService);
+  public pwaService = inject(PwaService);
   public mobileOpen = input<boolean>(false);
   public closeMobile = output<void>();
 

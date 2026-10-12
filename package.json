@@ -2,11 +2,11 @@
   "name": "preptrack",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "ng": "node --experimental-require-module ./node_modules/@angular/cli/bin/ng.js",
+    "start": "node --experimental-require-module ./node_modules/@angular/cli/bin/ng.js serve",
+    "build": "node --experimental-require-module ./node_modules/@angular/cli/bin/ng.js build",
+    "watch": "node --experimental-require-module ./node_modules/@angular/cli/bin/ng.js build --watch --configuration development",
+    "test": "node --experimental-require-module ./node_modules/@angular/cli/bin/ng.js test"
   },
   "private": true,
   "packageManager": "npm@10.9.2",

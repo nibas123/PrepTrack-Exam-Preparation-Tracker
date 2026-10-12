@@ -2,25 +2,98 @@
   "name": "PrepTrack — Indian Bank Exam Tracker",
   "short_name": "PrepTrack",
   "description": "Production-ready preparation tracker for IBPS PO, SBI PO, and Indian Banking Exams",
-  "start_url": "/",
-  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "id": "/?source=pwa",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "dir": "ltr",
   "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icons/icon.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Study Timer",
+      "short_name": "Timer",
+      "description": "Start a focused study session timer",
+      "url": "/study-sessions",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Daily Goals",
+      "short_name": "Goals",
+      "description": "View and manage today's target goals",
+      "url": "/daily-goals",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Mock Exams",
+      "short_name": "Mocks",
+      "description": "Record and analyze mock exam results",
+      "url": "/mock-exams",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Practice Quizzes",
+      "short_name": "Quizzes",
+      "description": "Take rapid bank exam quiz questions",
+      "url": "/quizzes",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TimerService } from '../../../core/services/timer.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { PwaService } from '../../../core/services/pwa.service';
 
 @Component({
   selector: 'app-navbar',
@@ -27,8 +28,49 @@ import { AuthService } from '../../../core/auth/auth.service';
         </div>
       </div>
 
-      <!-- Right side: Running Timer Badge & User Profile Shortcut -->
-      <div class="flex items-center space-x-3 sm:space-x-4">
+      <!-- Right side: Status Indicators, Timer Badge & User Profile Shortcut -->
+      <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+        <!-- Offline Warning Badge -->
+        @if (!pwaService.isOnline()) {
+          <span
+            class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+            title="App is operating in offline mode. Local syllabus and cached data remain available."
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>Offline</span>
+          </span>
+        }
+
+        <!-- PWA Update Available Notification Button -->
+        @if (pwaService.isUpdateAvailable()) {
+          <button
+            type="button"
+            (click)="pwaService.applyUpdate()"
+            class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs animate-pulse"
+            title="Click to reload with latest version"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Update Ready</span>
+          </button>
+        }
+
+        <!-- PWA Quick Install Button in Header -->
+        @if (pwaService.canInstall() && !pwaService.isInstalled()) {
+          <button
+            type="button"
+            (click)="pwaService.promptInstall()"
+            class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100 transition-colors shadow-xs"
+            title="Install PrepTrack as a standalone Progressive Web App"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span class="hidden sm:inline">Install App</span>
+          </button>
+        }
+
         <!-- Active Timer Indicator Pill -->
         @if (timerService.activeTimer(); as timer) {
           <a
@@ -74,6 +116,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 export class NavbarComponent {
   public timerService = inject(TimerService);
   public authService = inject(AuthService);
+  public pwaService = inject(PwaService);
 
   public title = input<string>('Dashboard');
   public toggleMobile = output<void>();

@@ -7,6 +7,7 @@ import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WidgetConfigService } from '../../core/services/widget-config.service';
 import { DashboardWidgetConfig } from '../../core/models/database.types';
+import { PwaService } from '../../core/services/pwa.service';
 
 @Component({
   selector: 'app-settings',
@@ -274,26 +275,81 @@ import { DashboardWidgetConfig } from '../../core/models/database.types';
       </div>
 
       <!-- PWA Status Card -->
-      <div class="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center space-x-2">
-            <h4 class="text-sm font-bold text-slate-900">Progressive Web App (PWA)</h4>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Active & Offline Ready
-            </span>
+      <div class="card p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+          <div>
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <h4 class="text-sm font-bold text-slate-900">Progressive Web App (PWA)</h4>
+              @if (pwaService.isInstalled()) {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Installed Standalone
+                </span>
+              } @else if (pwaService.canInstall()) {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Ready to Install
+                </span>
+              } @else {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  Browser Mode
+                </span>
+              }
+
+              @if (!pwaService.isOnline()) {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  Offline
+                </span>
+              } @else {
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Online
+                </span>
+              }
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+              PrepTrack can be installed directly onto your Android, iPhone, Mac, or Windows desktop for standalone full-screen access.
+            </p>
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">
-            PrepTrack can be installed directly onto your Android, iPhone, Mac, or Windows desktop for standalone full-screen access.
-          </p>
+
+          <div class="flex items-center space-x-2">
+            @if (pwaService.isUpdateAvailable()) {
+              <button
+                type="button"
+                (click)="pwaService.applyUpdate()"
+                class="btn-primary text-xs py-2 px-3.5 whitespace-nowrap bg-indigo-600 hover:bg-indigo-700"
+              >
+                🔄 Apply Update
+              </button>
+            }
+
+            @if (!pwaService.isInstalled()) {
+              <button
+                type="button"
+                (click)="triggerPwaInstall()"
+                class="btn-secondary text-xs py-2 px-3.5 whitespace-nowrap self-start sm:self-auto"
+              >
+                📱 Install App
+              </button>
+            } @else {
+              <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+                ✓ Installed
+              </span>
+            }
+          </div>
         </div>
 
-        <button
-          type="button"
-          (click)="triggerPwaInstall()"
-          class="btn-secondary text-xs py-2 px-3.5 whitespace-nowrap self-start sm:self-auto"
-        >
-          📱 Install App
-        </button>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
+            <span class="font-semibold text-slate-700 block">Offline Cache</span>
+            <span class="text-slate-500 text-[11px]">Service Worker v3.0 active with dynamic asset caching</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
+            <span class="font-semibold text-slate-700 block">Display Mode</span>
+            <span class="text-slate-500 text-[11px]">{{ pwaService.isInstalled() ? 'Standalone Full Screen' : 'Browser View' }}</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
+            <span class="font-semibold text-slate-700 block">Local Storage</span>
+            <span class="text-slate-500 text-[11px]">IndexedDB Offline Sync active</span>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -302,6 +358,7 @@ export class SettingsComponent implements OnInit {
   public authService = inject(AuthService);
   public supabaseService = inject(SupabaseService);
   public widgetConfig = inject(WidgetConfigService);
+  public pwaService = inject(PwaService);
   private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
 
@@ -345,15 +402,6 @@ export class SettingsComponent implements OnInit {
   }
 
   triggerPwaInstall(): void {
-    if ((window as any).deferredPrompt) {
-      (window as any).deferredPrompt.prompt();
-      (window as any).deferredPrompt.userChoice.then((choice: any) => {
-        if (choice.outcome === 'accepted') {
-          this.toast.success('PrepTrack installation confirmed!');
-        }
-      });
-    } else {
-      this.toast.info('To install PrepTrack, use "Install App" or "Add to Home Screen" in your browser menu!');
-    }
+    this.pwaService.promptInstall();
   }
 }
