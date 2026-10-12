@@ -47,13 +47,65 @@ export class DataStorageService {
 
   // --- INITIAL SEEDING FOR NEW / LOCAL USERS ---
   public ensureInitializedLocalData(): void {
-    const initialized = this.getLocal<boolean>('initialized', false);
-    if (initialized) return;
+    const existingSubs = this.getLocal<Subject[]>('subjects', []);
+    if (existingSubs && existingSubs.length > 0) return;
 
-    this.setLocal('exams', []);
-    this.setLocal('subjects', []);
-    this.setLocal('exam_subjects', []);
-    this.setLocal('topics', []);
+    const defaultSubjects: Subject[] = [
+      { id: 'sub-reasoning', user_id: this.userId, name: 'Reasoning Ability', color: '#2563eb', display_order: 1 },
+      { id: 'sub-quant', user_id: this.userId, name: 'Quantitative Aptitude', color: '#0891b2', display_order: 2 },
+      { id: 'sub-english', user_id: this.userId, name: 'English Language', color: '#7c3aed', display_order: 3 },
+      { id: 'sub-ga', user_id: this.userId, name: 'General & Banking Awareness', color: '#d97706', display_order: 4 },
+      { id: 'sub-computer', user_id: this.userId, name: 'Computer Aptitude', color: '#059669', display_order: 5 }
+    ];
+
+    const defaultTopics: Topic[] = [
+      // Reasoning
+      { id: 'top-reas-1', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Puzzles & Seating Arrangement', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: 'top-reas-2', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Syllogisms', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: 'top-reas-3', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Inequalities', priority: 'medium', learning_status: 'not_started', display_order: 3 },
+      { id: 'top-reas-4', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Blood Relations', priority: 'medium', learning_status: 'not_started', display_order: 4 },
+      { id: 'top-reas-5', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Direction & Distance', priority: 'medium', learning_status: 'not_started', display_order: 5 },
+      { id: 'top-reas-6', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Coding & Decoding', priority: 'medium', learning_status: 'not_started', display_order: 6 },
+      { id: 'top-reas-7', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Alphanumeric Series', priority: 'low', learning_status: 'not_started', display_order: 7 },
+      { id: 'top-reas-8', user_id: this.userId, subject_id: 'sub-reasoning', name: 'Machine Input-Output', priority: 'high', learning_status: 'not_started', display_order: 8 },
+      // Quant
+      { id: 'top-quant-1', user_id: this.userId, subject_id: 'sub-quant', name: 'Simplification & Approximation', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: 'top-quant-2', user_id: this.userId, subject_id: 'sub-quant', name: 'Number Series (Missing & Wrong)', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: 'top-quant-3', user_id: this.userId, subject_id: 'sub-quant', name: 'Quadratic Equations', priority: 'high', learning_status: 'not_started', display_order: 3 },
+      { id: 'top-quant-4', user_id: this.userId, subject_id: 'sub-quant', name: 'Data Interpretation (Table, Bar, Pie)', priority: 'high', learning_status: 'not_started', display_order: 4 },
+      { id: 'top-quant-5', user_id: this.userId, subject_id: 'sub-quant', name: 'Profit & Loss, Discount', priority: 'high', learning_status: 'not_started', display_order: 5 },
+      { id: 'top-quant-6', user_id: this.userId, subject_id: 'sub-quant', name: 'Simple & Compound Interest', priority: 'medium', learning_status: 'not_started', display_order: 6 },
+      { id: 'top-quant-7', user_id: this.userId, subject_id: 'sub-quant', name: 'Time, Speed & Distance / Trains', priority: 'high', learning_status: 'not_started', display_order: 7 },
+      { id: 'top-quant-8', user_id: this.userId, subject_id: 'sub-quant', name: 'Time & Work / Pipes & Cisterns', priority: 'high', learning_status: 'not_started', display_order: 8 },
+      { id: 'top-quant-9', user_id: this.userId, subject_id: 'sub-quant', name: 'Mixtures & Alligation', priority: 'medium', learning_status: 'not_started', display_order: 9 },
+      { id: 'top-quant-10', user_id: this.userId, subject_id: 'sub-quant', name: 'Ratio, Proportion & Ages', priority: 'medium', learning_status: 'not_started', display_order: 10 },
+      // English
+      { id: 'top-eng-1', user_id: this.userId, subject_id: 'sub-english', name: 'Reading Comprehension', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: 'top-eng-2', user_id: this.userId, subject_id: 'sub-english', name: 'Error Spotting & Grammar', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: 'top-eng-3', user_id: this.userId, subject_id: 'sub-english', name: 'Cloze Test', priority: 'high', learning_status: 'not_started', display_order: 3 },
+      { id: 'top-eng-4', user_id: this.userId, subject_id: 'sub-english', name: 'Para Jumbles', priority: 'high', learning_status: 'not_started', display_order: 4 },
+      { id: 'top-eng-5', user_id: this.userId, subject_id: 'sub-english', name: 'Double Fillers', priority: 'medium', learning_status: 'not_started', display_order: 5 },
+      { id: 'top-eng-6', user_id: this.userId, subject_id: 'sub-english', name: 'Sentence Improvement', priority: 'medium', learning_status: 'not_started', display_order: 6 },
+      // GA
+      { id: 'top-ga-1', user_id: this.userId, subject_id: 'sub-ga', name: 'Banking & Financial Awareness', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: 'top-ga-2', user_id: this.userId, subject_id: 'sub-ga', name: 'RBI Monetary Policy & Inflation', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: 'top-ga-3', user_id: this.userId, subject_id: 'sub-ga', name: 'Current Affairs (National & International)', priority: 'high', learning_status: 'not_started', display_order: 3 },
+      { id: 'top-ga-4', user_id: this.userId, subject_id: 'sub-ga', name: 'Static Banking & Economy', priority: 'medium', learning_status: 'not_started', display_order: 4 },
+      // Computer
+      { id: 'top-comp-1', user_id: this.userId, subject_id: 'sub-computer', name: 'Computer Hardware & Memory', priority: 'medium', learning_status: 'not_started', display_order: 1 },
+      { id: 'top-comp-2', user_id: this.userId, subject_id: 'sub-computer', name: 'Networking & Cyber Security', priority: 'medium', learning_status: 'not_started', display_order: 2 },
+      { id: 'top-comp-3', user_id: this.userId, subject_id: 'sub-computer', name: 'Keyboard Shortcuts & MS Office', priority: 'high', learning_status: 'not_started', display_order: 3 }
+    ];
+
+    const defaultExams: Exam[] = [
+      { id: 'exam-ibps-po', user_id: this.userId, name: 'IBPS PO 2026', description: 'Probationary Officer exam by IBPS', is_active: true, display_order: 1 },
+      { id: 'exam-sbi-po', user_id: this.userId, name: 'SBI PO 2026', description: 'Probationary Officer exam by State Bank of India', is_active: true, display_order: 2 },
+      { id: 'exam-ibps-clerk', user_id: this.userId, name: 'IBPS Clerk 2026', description: 'Clerical Cadre recruitment exam', is_active: true, display_order: 3 }
+    ];
+
+    this.setLocal('exams', defaultExams);
+    this.setLocal('subjects', defaultSubjects);
+    this.setLocal('topics', defaultTopics);
     this.setLocal('daily_goals', []);
     this.setLocal('daily_goal_topics', []);
     this.setLocal('study_sessions', []);

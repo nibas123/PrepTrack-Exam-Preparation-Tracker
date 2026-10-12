@@ -48,8 +48,8 @@ import {
               <div>
                 <label class="block text-[11px] font-semibold text-slate-400 uppercase text-left mb-1">Subject</label>
                 <select
-                  [(ngModel)]="selectedSubjectId"
-                  (ngModelChange)="onSubjectSelect()"
+                  [ngModel]="selectedSubjectId()"
+                  (ngModelChange)="onSubjectSelect($event)"
                   class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-brand-500 focus:outline-none"
                 >
                   @for (sub of subjects(); track sub.id) {
@@ -61,10 +61,11 @@ import {
               <div>
                 <label class="block text-[11px] font-semibold text-slate-400 uppercase text-left mb-1">Topic (Optional)</label>
                 <select
-                  [(ngModel)]="selectedTopicId"
+                  [ngModel]="selectedTopicId()"
+                  (ngModelChange)="selectedTopicId.set($event)"
                   class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-brand-500 focus:outline-none"
                 >
-                  <option [value]="null">No specific topic</option>
+                  <option [ngValue]="null">No specific topic (General)</option>
                   @for (top of filteredTopics(); track top.id) {
                     <option [value]="top.id">{{ top.name }}</option>
                   }
@@ -198,7 +199,7 @@ import {
 
           <!-- Subject Filter -->
           <div class="w-full sm:w-56">
-            <select [(ngModel)]="historySubjectFilter" class="input-field text-xs py-1.5">
+            <select [ngModel]="historySubjectFilter()" (ngModelChange)="historySubjectFilter.set($event)" class="input-field text-xs py-1.5">
               <option value="all">All Subjects</option>
               @for (sub of subjects(); track sub.id) {
                 <option [value]="sub.id">{{ sub.name }}</option>
@@ -290,8 +291,8 @@ import {
               <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Subject *</label>
                 <select
-                  [(ngModel)]="manualForm.subject_id"
-                  (ngModelChange)="onManualSubjectChange()"
+                  [ngModel]="manualSubjectId()"
+                  (ngModelChange)="onManualSubjectChange($event)"
                   class="input-field"
                 >
                   @for (sub of subjects(); track sub.id) {
@@ -302,8 +303,12 @@ import {
 
               <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Topic (Optional)</label>
-                <select [(ngModel)]="manualForm.topic_id" class="input-field">
-                  <option [value]="null">None</option>
+                <select
+                  [ngModel]="manualTopicId()"
+                  (ngModelChange)="manualTopicId.set($event)"
+                  class="input-field"
+                >
+                  <option [ngValue]="null">None</option>
                   @for (top of manualTopics(); track top.id) {
                     <option [value]="top.id">{{ top.name }}</option>
                   }
@@ -313,7 +318,12 @@ import {
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Date</label>
-                  <input type="date" [(ngModel)]="manualForm.date" class="input-field text-xs" />
+                  <input
+                    type="date"
+                    [ngModel]="manualDate()"
+                    (ngModelChange)="manualDate.set($event)"
+                    class="input-field text-xs"
+                  />
                 </div>
 
                 <div>
@@ -322,7 +332,8 @@ import {
                     type="number"
                     min="5"
                     max="720"
-                    [(ngModel)]="manualForm.durationMinutes"
+                    [ngModel]="manualDurationMinutes()"
+                    (ngModelChange)="manualDurationMinutes.set($event)"
                     class="input-field text-xs font-bold"
                   />
                 </div>
@@ -331,7 +342,8 @@ import {
               <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Notes / Description</label>
                 <textarea
-                  [(ngModel)]="manualForm.notes"
+                  [ngModel]="manualNotes()"
+                  (ngModelChange)="manualNotes.set($event)"
                   rows="2"
                   placeholder="e.g. Practiced 50 arithmetic questions from R.S. Aggarwal"
                   class="input-field text-xs"
@@ -359,30 +371,32 @@ export class StudySessionsComponent implements OnInit {
   public allTopics = signal<Topic[]>([]);
   public sessions = signal<StudySession[]>([]);
 
-  public selectedSubjectId: string = '';
-  public selectedTopicId: string | null = null;
-  public historySubjectFilter: string = 'all';
+  public selectedSubjectId = signal<string>('');
+  public selectedTopicId = signal<string | null>(null);
+  public historySubjectFilter = signal<string>('all');
 
-  // Manual modal
+  // Manual modal state signals
   public showManualModal = signal<boolean>(false);
-  public manualForm = {
-    subject_id: '',
-    topic_id: null as string | null,
-    date: new Date().toISOString().split('T')[0],
-    durationMinutes: 60,
-    notes: ''
-  };
+  public manualSubjectId = signal<string>('');
+  public manualTopicId = signal<string | null>(null);
+  public manualDate = signal<string>(new Date().toISOString().split('T')[0]);
+  public manualDurationMinutes = signal<number>(60);
+  public manualNotes = signal<string>('');
 
   public filteredTopics = computed(() => {
-    return this.allTopics().filter(t => t.subject_id === this.selectedSubjectId);
+    const subId = this.selectedSubjectId();
+    if (!subId) return [];
+    return this.allTopics().filter(t => t.subject_id === subId);
   });
 
   public manualTopics = computed(() => {
-    return this.allTopics().filter(t => t.subject_id === this.manualForm.subject_id);
+    const subId = this.manualSubjectId();
+    if (!subId) return [];
+    return this.allTopics().filter(t => t.subject_id === subId);
   });
 
   public filteredSessions = computed(() => {
-    const filter = this.historySubjectFilter;
+    const filter = this.historySubjectFilter();
     if (filter === 'all') return this.sessions();
     return this.sessions().filter(s => s.subject_id === filter);
   });
@@ -444,10 +458,10 @@ export class StudySessionsComponent implements OnInit {
     // Check query params if navigated from Daily Goals
     this.route.queryParams.subscribe(params => {
       if (params['subjectId']) {
-        this.selectedSubjectId = params['subjectId'];
+        this.selectedSubjectId.set(params['subjectId']);
       }
       if (params['topicId']) {
-        this.selectedTopicId = params['topicId'];
+        this.selectedTopicId.set(params['topicId']);
       }
     });
   }
@@ -463,21 +477,23 @@ export class StudySessionsComponent implements OnInit {
     this.allTopics.set(topics);
     this.sessions.set(sess);
 
-    if (!this.selectedSubjectId && subs.length > 0) {
-      this.selectedSubjectId = subs[0].id;
+    if (!this.selectedSubjectId() && subs.length > 0) {
+      this.selectedSubjectId.set(subs[0].id);
     }
   }
 
-  onSubjectSelect(): void {
-    this.selectedTopicId = null;
+  onSubjectSelect(newSubId: string): void {
+    this.selectedSubjectId.set(newSubId);
+    this.selectedTopicId.set(null);
   }
 
   startTimer(): void {
-    if (!this.selectedSubjectId) {
+    const subId = this.selectedSubjectId();
+    if (!subId) {
       this.toast.error('Please choose a subject');
       return;
     }
-    this.timerService.startTimer(this.selectedSubjectId, this.selectedTopicId);
+    this.timerService.startTimer(subId, this.selectedTopicId());
   }
 
   async finishSession(): Promise<void> {
@@ -497,41 +513,42 @@ export class StudySessionsComponent implements OnInit {
 
   openManualModal(): void {
     const subId = this.subjects()[0]?.id || '';
-    this.manualForm = {
-      subject_id: subId,
-      topic_id: null,
-      date: new Date().toISOString().split('T')[0],
-      durationMinutes: 60,
-      notes: ''
-    };
+    this.manualSubjectId.set(subId);
+    this.manualTopicId.set(null);
+    this.manualDate.set(new Date().toISOString().split('T')[0]);
+    this.manualDurationMinutes.set(60);
+    this.manualNotes.set('');
     this.showManualModal.set(true);
   }
 
-  onManualSubjectChange(): void {
-    this.manualForm.topic_id = null;
+  onManualSubjectChange(newSubId: string): void {
+    this.manualSubjectId.set(newSubId);
+    this.manualTopicId.set(null);
   }
 
   async saveManualSession(): Promise<void> {
-    if (!this.manualForm.subject_id || this.manualForm.durationMinutes <= 0) {
+    const subId = this.manualSubjectId();
+    const duration = this.manualDurationMinutes();
+    if (!subId || duration <= 0) {
       this.toast.error('Please specify subject and duration in minutes');
       return;
     }
 
-    const durationSeconds = Math.round(this.manualForm.durationMinutes * 60);
-    const dateObj = new Date(this.manualForm.date);
+    const durationSeconds = Math.round(duration * 60);
+    const dateObj = new Date(this.manualDate());
     const startTime = new Date(dateObj.getTime() + 10 * 3600000); // 10:00 AM on that date
     const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 
     await this.dataStorage.saveStudySession({
-      subject_id: this.manualForm.subject_id,
-      topic_id: this.manualForm.topic_id,
+      subject_id: subId,
+      topic_id: this.manualTopicId(),
       started_at: startTime.toISOString(),
       ended_at: endTime.toISOString(),
       duration_seconds: durationSeconds,
-      notes: this.manualForm.notes || null
+      notes: this.manualNotes() || null
     });
 
-    this.toast.success(`Logged ${this.manualForm.durationMinutes} mins study session!`);
+    this.toast.success(`Logged ${duration} mins study session!`);
     this.showManualModal.set(false);
     await this.loadData();
   }
