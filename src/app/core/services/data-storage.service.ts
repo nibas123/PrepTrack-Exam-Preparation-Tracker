@@ -11,6 +11,9 @@ import {
   StudySession,
   MockExam,
   ExamEvent,
+  QuestionPattern,
+  MockExamBlueprint,
+  MockExamAttempt,
 } from '../models/database.types';
 
 @Injectable({
@@ -826,5 +829,62 @@ export class DataStorageService {
     let current = this.getLocal<ExamEvent[]>('exam_events', []);
     current = current.filter(e => e.id !== eventId);
     this.setLocal('exam_events', current);
+  }
+
+  // --- QUESTION PATTERNS & BLUEPRINTS ---
+  async getQuestionPatterns(): Promise<QuestionPattern[]> {
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      const { data, error } = await this.supabaseService.clientInstance
+        .from('question_patterns')
+        .select('*')
+        .order('subject_code', { ascending: true });
+      if (!error && data && data.length > 0) return data as QuestionPattern[];
+    }
+    return this.getLocal<QuestionPattern[]>('preptrack_question_patterns', []);
+  }
+
+  async saveQuestionPattern(pattern: Partial<QuestionPattern>): Promise<QuestionPattern> {
+    const item: QuestionPattern = {
+      id: pattern.id || `pattern-${Date.now()}`,
+      user_id: this.userId,
+      subject_code: pattern.subject_code || 'quant',
+      topic_name: pattern.topic_name || 'General',
+      pattern_code: pattern.pattern_code || `PAT_${Date.now()}`,
+      pattern_type: pattern.pattern_type || 'parametric_numeric',
+      difficulty: pattern.difficulty || 'medium',
+      exam_stage: pattern.exam_stage || 'prelims',
+      template_config: pattern.template_config || {},
+      explanation_template: pattern.explanation_template || '',
+      is_active: pattern.is_active ?? true,
+      created_at: new Date().toISOString()
+    };
+
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      const { data } = await this.supabaseService.clientInstance
+        .from('question_patterns')
+        .upsert(item)
+        .select()
+        .single();
+      if (data) return data as QuestionPattern;
+    }
+
+    const current = this.getLocal<QuestionPattern[]>('preptrack_question_patterns', []);
+    const idx = current.findIndex(p => p.id === item.id);
+    if (idx >= 0) current[idx] = item;
+    else current.push(item);
+    this.setLocal('preptrack_question_patterns', current);
+    return item;
+  }
+
+  async getMockExamSimulatorAttempts(): Promise<MockExamAttempt[]> {
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      const { data, error } = await this.supabaseService.clientInstance
+        .from('mock_exam_attempts')
+        .select('*')
+        .eq('user_id', this.userId)
+        .order('completed_at', { ascending: false });
+      if (!error && data) return data as MockExamAttempt[];
+    }
+    return this.getLocal<MockExamAttempt[]>('preptrack_mock_exam_simulator_attempts', []);
   }
 }

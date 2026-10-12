@@ -282,3 +282,125 @@ export interface DashboardWidgetConfig {
   showWeeklyTrend: boolean;
   showUpcomingDeadlines: boolean;
 }
+
+// -------------------------------------------------------------
+// Interactive Mock Exam Simulator & Question Pattern Engine
+// -------------------------------------------------------------
+
+export type ExamSubjectCode = 'quant' | 'reasoning' | 'english' | 'ga' | 'computer';
+
+export type ExamPaletteStatus =
+  | 'not_visited'       // Gray
+  | 'not_answered'      // Red
+  | 'answered'          // Green
+  | 'marked_review'     // Purple
+  | 'answered_marked';  // Purple with small green indicator
+
+export interface QuestionPattern {
+  id: string;
+  user_id?: string | null;
+  subject_code: ExamSubjectCode;
+  topic_name: string;
+  pattern_code: string;
+  pattern_type: 'parametric_numeric' | 'logic_deduction' | 'grammar_cloze' | 'puzzle_grid' | 'caselet' | 'static_mcq';
+  difficulty: 'easy' | 'medium' | 'hard';
+  exam_stage: 'prelims' | 'mains' | 'both';
+  template_config?: Record<string, any>;
+  explanation_template?: string;
+  is_active: boolean;
+  created_at?: string;
+}
+
+export interface MockExamSectionConfig {
+  code: string;
+  name: string;
+  subjectCode: ExamSubjectCode;
+  questionsCount: number;
+  durationMinutes: number;
+  marksPerQuestion: number;
+  negativeMarks: number;
+  cutoffEstimate?: number;
+}
+
+export interface MockExamBlueprint {
+  id: string;
+  title: string;
+  description?: string;
+  exam_category: 'IBPS_PO' | 'SBI_PO' | 'IBPS_CLERK' | 'RRB_PO' | 'MIXED_SPRINT';
+  exam_stage: 'prelims' | 'mains';
+  total_duration_minutes: number;
+  has_sectional_timing: boolean;
+  total_marks: number;
+  negative_marking: number;
+  sections_config: MockExamSectionConfig[];
+  target_cutoff?: number;
+  is_active: boolean;
+}
+
+export interface ExamQuestionItem {
+  id: string;
+  sectionCode: string;
+  sectionName: string;
+  questionNumber: number;
+  subjectCode: ExamSubjectCode;
+  topicName: string;
+  patternCode?: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  passageText?: string;
+  questionText: string;
+  options: string[]; // exactly 5 options (A, B, C, D, E)
+  correctOptionIndex: number; // 0..4
+  explanation: string;
+  marks: number;
+  negativeMarks: number;
+}
+
+export interface ExamUserResponse {
+  questionId: string;
+  selectedOptionIndex: number | null;
+  status: ExamPaletteStatus;
+  isVisited: boolean;
+  timeSpentSeconds: number;
+  markedAt?: string;
+}
+
+export interface MockExamAttemptSectionBreakdown {
+  sectionCode: string;
+  sectionName: string;
+  totalQuestions: number;
+  attempted: number;
+  correct: number;
+  incorrect: number;
+  marksObtained: number;
+  maximumMarks: number;
+  accuracy: number;
+  timeSpentSeconds: number;
+  sectionalCutoff?: number;
+  cutoffCleared?: boolean;
+}
+
+export interface MockExamAttempt {
+  id: string;
+  user_id?: string;
+  blueprint_id: string;
+  mock_name: string;
+  exam_stage: 'prelims' | 'mains';
+  started_at: string;
+  completed_at: string;
+  total_score: number;
+  maximum_marks: number;
+  total_questions: number;
+  attempted_questions: number;
+  correct_answers: number;
+  incorrect_answers: number;
+  accuracy_percentage: number;
+  percentile_estimate?: number;
+  time_spent_seconds: number;
+  cutoff_status?: 'cleared' | 'missed';
+  target_cutoff?: number;
+  section_breakdown: MockExamAttemptSectionBreakdown[];
+  questions_payload?: ExamQuestionItem[];
+  user_responses: Record<string, ExamUserResponse>;
+  created_at?: string;
+}
+
