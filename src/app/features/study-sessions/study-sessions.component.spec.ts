@@ -134,4 +134,20 @@ describe('StudySessionsComponent', () => {
     component.historySubjectFilter.set('all');
     expect(component.filteredSessions().length).toBe(2);
   });
+
+  it('should reactively compute formattedTimerDisplay and activeSubjectName when timer runs', async () => {
+    await component.loadData();
+    expect(component.formattedTimerDisplay()).toBe('00:00:00');
+
+    // Start timer for sub-quant
+    component.onSubjectSelect('sub-quant');
+    component.startTimer();
+
+    expect(component.timerService.isRunning()).toBe(true);
+    expect(component.activeSubjectName()).toBe('Quantitative Aptitude');
+
+    // Clean up timer
+    component.timerService.discardTimer();
+    expect(component.timerService.isRunning()).toBe(false);
+  });
 });

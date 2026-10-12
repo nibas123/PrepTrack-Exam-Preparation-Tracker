@@ -28,9 +28,26 @@ export class TimerService {
   public readonly elapsedSeconds = this.elapsedSecondsSignal.asReadonly();
   public readonly isSaving = this.isSavingSignal.asReadonly();
   public readonly isRunning = computed(() => !!this.timerStateSignal()?.isRunning);
+  public readonly formattedElapsed = computed(() => {
+    const totalSecs = this.elapsedSecondsSignal();
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  });
 
   constructor() {
     this.restoreTimerState();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          const current = this.timerStateSignal();
+          if (current) {
+            this.updateDerivedElapsed(current);
+          }
+        }
+      });
+    }
   }
 
   private restoreTimerState(): void {
@@ -38,6 +55,10 @@ export class TimerService {
       const saved = localStorage.getItem('preptrack_active_timer');
       if (saved) {
         const state: ActiveTimerState = JSON.parse(saved);
+        if (!state || typeof state.startedAtTimestamp !== 'number' || isNaN(state.startedAtTimestamp) || isNaN(state.accumulatedSeconds)) {
+          localStorage.removeItem('preptrack_active_timer');
+          return;
+        }
         this.timerStateSignal.set(state);
         this.updateDerivedElapsed(state);
 
@@ -151,8 +172,8 @@ export class TimerService {
       this.updateDerivedElapsed(current);
       const totalDuration = this.elapsedSecondsSignal();
 
-      if (totalDuration < 10) {
-        this.toast.warning('Session was too short (< 10 seconds) and was discarded.');
+      if (totalDuration < 5) {
+        this.toast.warning('Session was too short (< 5 seconds) and was discarded.');
         this.reset();
         return false;
       }

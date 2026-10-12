@@ -76,16 +76,16 @@ import {
             <!-- Active Subject / Topic Banner -->
             <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 text-brand-200 text-xs font-semibold mb-6 border border-white/15">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>Studying: {{ activeSubjectName }}</span>
-              @if (activeTopicName) {
-                <span class="opacity-75">• {{ activeTopicName }}</span>
+              <span>Studying: {{ activeSubjectName() }}</span>
+              @if (activeTopicName()) {
+                <span class="opacity-75">• {{ activeTopicName() }}</span>
               }
             </div>
           }
 
           <!-- Digital Clock Display -->
           <div class="text-5xl sm:text-7xl font-mono font-black tracking-widest my-4 text-white drop-shadow-sm select-none">
-            {{ formattedTimerDisplay }}
+            {{ formattedTimerDisplay() }}
           </div>
 
           <!-- Status line -->
@@ -430,32 +430,34 @@ export class StudySessionsComponent implements OnInit {
       .reduce((sum, s) => sum + s.duration_seconds, 0);
   });
 
-  get formattedTimerDisplay(): string {
-    const totalSecs = this.timerService.elapsedSeconds();
-    const hrs = Math.floor(totalSecs / 3600);
-    const mins = Math.floor((totalSecs % 3600) / 60);
-    const secs = totalSecs % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+  public formattedTimerDisplay = computed(() => {
+    return this.timerService.formattedElapsed();
+  });
 
-  get activeSubjectName(): string {
+  public activeSubjectName = computed(() => {
     const active = this.timerService.activeTimer();
     if (!active) return '';
     const sub = this.subjects().find(s => s.id === active.subjectId);
     return sub?.name || 'Subject';
-  }
+  });
 
-  get activeTopicName(): string | null {
+  public activeTopicName = computed(() => {
     const active = this.timerService.activeTimer();
     if (!active || !active.topicId) return null;
     const top = this.allTopics().find(t => t.id === active.topicId);
     return top?.name || null;
-  }
+  });
 
   async ngOnInit(): Promise<void> {
-    await this.loadData();
+    // Read snapshot query params immediately
+    const snap = this.route.snapshot.queryParams;
+    if (snap['subjectId']) {
+      this.selectedSubjectId.set(snap['subjectId']);
+    }
+    if (snap['topicId']) {
+      this.selectedTopicId.set(snap['topicId']);
+    }
 
-    // Check query params if navigated from Daily Goals
     this.route.queryParams.subscribe(params => {
       if (params['subjectId']) {
         this.selectedSubjectId.set(params['subjectId']);
@@ -464,6 +466,8 @@ export class StudySessionsComponent implements OnInit {
         this.selectedTopicId.set(params['topicId']);
       }
     });
+
+    await this.loadData();
   }
 
   async loadData(): Promise<void> {
