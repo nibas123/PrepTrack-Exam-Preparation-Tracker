@@ -302,13 +302,20 @@ export class DataStorageService {
   // --- SUBJECTS & STAGE MAPPING ---
   async getSubjects(): Promise<Subject[]> {
     if (this.supabaseService.isRealSupabaseConfigured) {
-      const { data, error } = await this.supabaseService.clientInstance
-        .from('subjects')
-        .select('*')
-        .eq('user_id', this.userId)
-        .is('archived_at', null)
-        .order('display_order', { ascending: true });
-      if (!error && data) return data as Subject[];
+      try {
+        const { data, error } = await this.supabaseService.clientInstance
+          .from('subjects')
+          .select('*')
+          .eq('user_id', this.userId)
+          .is('archived_at', null)
+          .order('display_order', { ascending: true });
+        if (!error && data && data.length > 0) {
+          this.setLocal('subjects', data);
+          return data as Subject[];
+        }
+      } catch (err) {
+        console.warn('Network issue fetching subjects, using local cache:', err);
+      }
     }
     this.ensureInitializedLocalData();
     return this.getLocal<Subject[]>('subjects', []).filter(s => !s.archived_at);
@@ -326,30 +333,45 @@ export class DataStorageService {
       updated_at: new Date().toISOString()
     };
 
-    if (this.supabaseService.isRealSupabaseConfigured) {
-      const { data } = await this.supabaseService.clientInstance
-        .from('subjects')
-        .upsert(newSub)
-        .select()
-        .single();
-      if (data) return data as Subject;
-    }
-
     const current = this.getLocal<Subject[]>('subjects', []);
     const idx = current.findIndex(s => s.id === newSub.id);
     if (idx >= 0) current[idx] = newSub;
     else current.push(newSub);
     this.setLocal('subjects', current);
+
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      try {
+        const { data } = await this.supabaseService.clientInstance
+          .from('subjects')
+          .upsert(newSub)
+          .select()
+          .single();
+        if (data) {
+          this.setLocal('subjects', current);
+          return data as Subject;
+        }
+      } catch (err) {
+        console.warn('Offline: saved subject locally:', err);
+      }
+    }
+
     return newSub;
   }
 
   async getExamSubjects(): Promise<ExamSubject[]> {
     if (this.supabaseService.isRealSupabaseConfigured) {
-      const { data, error } = await this.supabaseService.clientInstance
-        .from('exam_subjects')
-        .select('*, subject:subjects(*)')
-        .eq('user_id', this.userId);
-      if (!error && data) return data as ExamSubject[];
+      try {
+        const { data, error } = await this.supabaseService.clientInstance
+          .from('exam_subjects')
+          .select('*, subject:subjects(*)')
+          .eq('user_id', this.userId);
+        if (!error && data && data.length > 0) {
+          this.setLocal('exam_subjects', data);
+          return data as ExamSubject[];
+        }
+      } catch (err) {
+        console.warn('Network issue fetching exam subjects, using local cache:', err);
+      }
     }
     this.ensureInitializedLocalData();
     const es = this.getLocal<ExamSubject[]>('exam_subjects', []);
@@ -363,13 +385,20 @@ export class DataStorageService {
   // --- TOPICS ---
   async getTopics(): Promise<Topic[]> {
     if (this.supabaseService.isRealSupabaseConfigured) {
-      const { data, error } = await this.supabaseService.clientInstance
-        .from('topics')
-        .select('*, subject:subjects(*)')
-        .eq('user_id', this.userId)
-        .is('archived_at', null)
-        .order('display_order', { ascending: true });
-      if (!error && data) return data as Topic[];
+      try {
+        const { data, error } = await this.supabaseService.clientInstance
+          .from('topics')
+          .select('*, subject:subjects(*)')
+          .eq('user_id', this.userId)
+          .is('archived_at', null)
+          .order('display_order', { ascending: true });
+        if (!error && data && data.length > 0) {
+          this.setLocal('topics', data);
+          return data as Topic[];
+        }
+      } catch (err) {
+        console.warn('Network issue fetching topics, using local cache:', err);
+      }
     }
     this.ensureInitializedLocalData();
     const topics = this.getLocal<Topic[]>('topics', []).filter(t => !t.archived_at);
@@ -397,35 +426,30 @@ export class DataStorageService {
       updated_at: new Date().toISOString()
     };
 
-    if (this.supabaseService.isRealSupabaseConfigured) {
-      const { data } = await this.supabaseService.clientInstance
-        .from('topics')
-        .upsert(newTopic)
-        .select('*, subject:subjects(*)')
-        .single();
-      if (data) return data as Topic;
-    }
-
     const current = this.getLocal<Topic[]>('topics', []);
     const idx = current.findIndex(t => t.id === newTopic.id);
     if (idx >= 0) current[idx] = newTopic;
     else current.push(newTopic);
     this.setLocal('topics', current);
 
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      try {
+        const { data } = await this.supabaseService.clientInstance
+          .from('topics')
+          .upsert(newTopic)
+          .select('*, subject:subjects(*)')
+          .single();
+        if (data) return data as Topic;
+      } catch (err) {
+        console.warn('Offline: saved topic locally:', err);
+      }
+    }
+
     const subs = this.getLocal<Subject[]>('subjects', []);
     return { ...newTopic, subject: subs.find(s => s.id === newTopic.subject_id) };
   }
 
   async updateTopicStatus(topicId: string, status: Topic['learning_status']): Promise<void> {
-    if (this.supabaseService.isRealSupabaseConfigured) {
-      await this.supabaseService.clientInstance
-        .from('topics')
-        .update({ learning_status: status, updated_at: new Date().toISOString() })
-        .eq('id', topicId)
-        .eq('user_id', this.userId);
-      return;
-    }
-
     const current = this.getLocal<Topic[]>('topics', []);
     const idx = current.findIndex(t => t.id === topicId);
     if (idx >= 0) {
@@ -433,21 +457,36 @@ export class DataStorageService {
       current[idx].updated_at = new Date().toISOString();
       this.setLocal('topics', current);
     }
+
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      try {
+        await this.supabaseService.clientInstance
+          .from('topics')
+          .update({ learning_status: status, updated_at: new Date().toISOString() })
+          .eq('id', topicId)
+          .eq('user_id', this.userId);
+      } catch (err) {
+        console.warn('Offline: status updated in local storage, sync queued:', err);
+      }
+    }
   }
 
   async deleteTopic(topicId: string): Promise<void> {
-    if (this.supabaseService.isRealSupabaseConfigured) {
-      await this.supabaseService.clientInstance
-        .from('topics')
-        .delete()
-        .eq('id', topicId)
-        .eq('user_id', this.userId);
-      return;
-    }
-
     let current = this.getLocal<Topic[]>('topics', []);
     current = current.filter(t => t.id !== topicId);
     this.setLocal('topics', current);
+
+    if (this.supabaseService.isRealSupabaseConfigured) {
+      try {
+        await this.supabaseService.clientInstance
+          .from('topics')
+          .delete()
+          .eq('id', topicId)
+          .eq('user_id', this.userId);
+      } catch (err) {
+        console.warn('Offline: deleted topic locally:', err);
+      }
+    }
   }
 
   // --- DAILY GOALS ---

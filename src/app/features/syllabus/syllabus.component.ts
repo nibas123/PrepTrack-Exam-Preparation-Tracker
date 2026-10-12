@@ -18,9 +18,9 @@ import confetti from 'canvas-confetti';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="space-y-6 max-w-6xl mx-auto">
+    <div class="space-y-4 sm:space-y-6 max-w-6xl mx-auto px-1 sm:px-0">
       <!-- Clean Minimalist Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
           <div class="flex items-center space-x-2.5">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">Syllabus Tracker</h2>
@@ -32,24 +32,24 @@ import confetti from 'canvas-confetti';
         </div>
 
         <!-- Right: Actions & Stage Toggle -->
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
           <!-- Stage Switcher -->
-          <div class="inline-flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/50">
+          <div class="inline-flex w-full sm:w-auto p-1 bg-slate-100/90 rounded-xl border border-slate-200/60">
             <button
               type="button"
               (click)="selectStage('prelims')"
-              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-center"
               [ngClass]="selectedStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
             >
-              Prelims (3 Subjects)
+              Prelims (3 Sub)
             </button>
             <button
               type="button"
               (click)="selectStage('mains')"
-              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-center"
               [ngClass]="selectedStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
             >
-              Mains (5 Subjects)
+              Mains (5 Sub)
             </button>
           </div>
 
@@ -57,7 +57,7 @@ import confetti from 'canvas-confetti';
           <button
             type="button"
             (click)="openAddTopicModal()"
-            class="btn-primary text-xs py-2 px-3.5 flex items-center space-x-1.5 shadow-xs"
+            class="btn-primary text-xs py-2 px-3.5 flex items-center justify-center space-x-1.5 shadow-xs"
           >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
@@ -68,7 +68,7 @@ import confetti from 'canvas-confetti';
       </div>
 
       <!-- Stage Mastery Meter Banner (Clean & Spacious) -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Preparation Progress</span>
@@ -80,12 +80,12 @@ import confetti from 'canvas-confetti';
             </div>
           </div>
 
-          <!-- Status Quick Filter Pills -->
-          <div class="flex flex-wrap items-center gap-1.5">
+          <!-- Status Quick Filter Pills (Smooth scroll on mobile) -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap">
             <button
               type="button"
               (click)="statusFilter.set('all')"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
               [ngClass]="statusFilter() === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
             >
               All ({{ stageTopics().length }})
@@ -93,7 +93,7 @@ import confetti from 'canvas-confetti';
             <button
               type="button"
               (click)="statusFilter.set('learned')"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
               [ngClass]="statusFilter() === 'learned' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
             >
               Mastered ({{ masteredCount() }})
@@ -101,7 +101,7 @@ import confetti from 'canvas-confetti';
             <button
               type="button"
               (click)="statusFilter.set('learning')"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
               [ngClass]="statusFilter() === 'learning' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
             >
               Learning ({{ learningCount() }})
@@ -109,7 +109,7 @@ import confetti from 'canvas-confetti';
             <button
               type="button"
               (click)="statusFilter.set('not_started')"
-              class="px-3 py-1 rounded-lg text-xs font-bold transition-all"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
               [ngClass]="statusFilter() === 'not_started' ? 'bg-slate-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
             >
               Not Started ({{ notStartedCount() }})
@@ -118,7 +118,7 @@ import confetti from 'canvas-confetti';
         </div>
 
         <!-- Sleek Slim Progress Line -->
-        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-4">
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mt-4">
           <div
             class="h-full bg-brand-600 rounded-full transition-all duration-700 ease-out"
             [style.width.%]="stageCompletionPercentage()"
@@ -129,13 +129,13 @@ import confetti from 'canvas-confetti';
       <!-- Subject Tabs & Search -->
       <div class="space-y-3">
         <!-- Horizontal Subject Tabs -->
-        <div class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1.5 scrollbar-none touch-pan-x">
           @for (sub of stageSubjects(); track sub.id) {
             <button
               type="button"
               (click)="activeSubjectId.set(sub.id)"
-              class="flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border"
-              [ngClass]="activeSubjectId() === sub.id ? 'bg-white text-slate-900 border-slate-300 shadow-xs' : 'bg-white/60 text-slate-600 border-slate-200/70 hover:bg-white hover:text-slate-900'"
+              class="flex items-center space-x-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border flex-shrink-0"
+              [ngClass]="activeSubjectId() === sub.id ? 'bg-white text-slate-900 border-slate-300 shadow-xs ring-1 ring-slate-200' : 'bg-white/60 text-slate-600 border-slate-200/70 hover:bg-white hover:text-slate-900'"
             >
               <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="sub.color"></span>
               <span>{{ sub.name }}</span>
@@ -151,7 +151,7 @@ import confetti from 'canvas-confetti';
           <button
             type="button"
             (click)="openAddSubjectModal()"
-            class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-white border border-dashed border-slate-300 transition-colors whitespace-nowrap"
+            class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-white border border-dashed border-slate-300 transition-colors whitespace-nowrap flex-shrink-0"
           >
             + Add Subject
           </button>
@@ -163,27 +163,39 @@ import confetti from 'canvas-confetti';
             type="text"
             [(ngModel)]="searchQuery"
             placeholder="Filter topics in this subject (e.g. Puzzles, Simplification, Syllogism)..."
-            class="w-full bg-white border border-slate-200/80 rounded-xl px-4 py-2.5 pl-10 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-brand-500 shadow-2xs"
+            class="w-full bg-white border border-slate-200/80 rounded-xl px-4 py-2.5 pl-10 pr-9 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-brand-500 shadow-2xs"
           />
           <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
+          @if (searchQuery) {
+            <button
+              type="button"
+              (click)="searchQuery = ''"
+              class="absolute right-3 top-2.5 p-0.5 text-slate-400 hover:text-slate-600"
+              title="Clear search"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          }
         </div>
       </div>
 
-      <!-- Clean Elegant Topic Rows -->
+      <!-- Clean Elegant Topic Rows (Adaptive for Desktop & Mobile PWA) -->
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
         @for (topic of displayedSubjectTopics(); track topic.id) {
-          <div class="p-4 sm:px-6 hover:bg-slate-50/70 transition-colors flex items-center justify-between gap-4 group">
-            <!-- Left: Interactive Status Cycle Button & Title -->
-            <div class="flex items-center space-x-3.5 flex-1 min-w-0">
+          <div class="p-3.5 sm:p-4 sm:px-6 hover:bg-slate-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 group">
+            <!-- Left / Main: Status Cycle Button & Title & Notes -->
+            <div class="flex items-start sm:items-center space-x-3 sm:space-x-3.5 flex-1 min-w-0">
               <!-- Clickable Status Icon -->
               <button
                 type="button"
                 (click)="cycleTopicStatus(topic)"
-                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-transform active:scale-95 border"
+                class="mt-0.5 sm:mt-0 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-transform active:scale-95 border shadow-2xs"
                 [ngClass]="getStatusButtonClass(topic.learning_status)"
-                [title]="'Current: ' + formatStatusName(topic.learning_status) + ' (Click to change status)'"
+                [title]="'Status: ' + formatStatusName(topic.learning_status) + ' (Tap to change)'"
               >
                 @if (topic.learning_status === 'learned' || topic.learning_status === 'revision_completed') {
                   <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -197,9 +209,9 @@ import confetti from 'canvas-confetti';
               </button>
 
               <div class="flex-1 min-w-0">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h4
-                    class="text-sm font-bold text-slate-900 truncate"
+                    class="text-sm font-bold text-slate-900 leading-snug break-words"
                     [class.line-through]="topic.learning_status === 'learned' || topic.learning_status === 'revision_completed'"
                     [class.text-slate-400]="topic.learning_status === 'learned' || topic.learning_status === 'revision_completed'"
                   >
@@ -208,84 +220,87 @@ import confetti from 'canvas-confetti';
 
                   <!-- Subtle Priority Pill -->
                   <span
-                    class="text-[10px] font-bold px-2 py-0.2 rounded-full"
+                    class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
                     [ngClass]="{
-                      'bg-rose-50 text-rose-700': topic.priority === 'high',
-                      'bg-amber-50 text-amber-700': topic.priority === 'medium',
-                      'bg-slate-100 text-slate-500': topic.priority === 'low'
+                      'bg-rose-50 text-rose-700 border border-rose-200/60': topic.priority === 'high',
+                      'bg-amber-50 text-amber-700 border border-amber-200/60': topic.priority === 'medium',
+                      'bg-slate-100 text-slate-500 border border-slate-200/60': topic.priority === 'low'
                     }"
                   >
-                    {{ topic.priority | uppercase }}
+                    {{ topic.priority }}
                   </span>
                 </div>
 
                 @if (topic.description) {
-                  <p class="text-xs text-slate-500 mt-0.5 truncate">{{ topic.description }}</p>
+                  <p class="text-xs text-slate-500 mt-1 leading-normal line-clamp-2 sm:line-clamp-1">{{ topic.description }}</p>
                 }
               </div>
             </div>
 
-            <!-- Right: Status Dropdown & Actions -->
-            <div class="flex items-center space-x-3 flex-shrink-0">
+            <!-- Right / Bottom: Status Dropdown & Actions -->
+            <div class="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 pl-11 sm:pl-0 flex-shrink-0">
               <!-- Clean Status Pill Selector -->
               <select
                 [ngModel]="topic.learning_status"
                 (ngModelChange)="onStatusSelected(topic, $event)"
-                class="text-xs font-bold rounded-lg px-2.5 py-1.5 border border-slate-200/80 bg-white text-slate-700 cursor-pointer focus:ring-1 focus:ring-brand-500 focus:outline-none"
+                class="text-xs font-semibold rounded-lg px-2.5 py-1.5 border border-slate-200/90 bg-white text-slate-700 cursor-pointer focus:ring-1 focus:ring-brand-500 focus:outline-none shadow-2xs"
               >
                 <option value="not_started">⚪ Not Started</option>
                 <option value="learning">🟡 Learning</option>
                 <option value="learned">🟢 Learned</option>
-                <option value="revision_completed">🔵 Revision Completed</option>
+                <option value="revision_completed">🔵 Revision Done</option>
               </select>
 
-              <!-- Focus Stopwatch Quick Launch -->
-              <a
-                [routerLink]="['/study-sessions']"
-                [queryParams]="{ subjectId: topic.subject_id, topicId: topic.id }"
-                class="p-1.5 text-slate-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
-                title="Start Stopwatch for this topic"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </a>
+              <!-- Action Buttons with 36px touch areas for mobile PWA -->
+              <div class="flex items-center space-x-1 sm:space-x-1.5">
+                <!-- Focus Stopwatch Quick Launch -->
+                <a
+                  [routerLink]="['/study-sessions']"
+                  [queryParams]="{ subjectId: topic.subject_id, topicId: topic.id }"
+                  class="p-2 text-slate-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
+                  title="Start Stopwatch for this topic"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </a>
 
-              <!-- Practice Quiz Quick Launch -->
-              <a
-                [routerLink]="['/quizzes']"
-                [queryParams]="{ topicName: topic.name }"
-                class="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
-                title="Start Practice Quiz Drill on this topic"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </a>
+                <!-- Practice Quiz Quick Launch -->
+                <a
+                  [routerLink]="['/quizzes']"
+                  [queryParams]="{ topicName: topic.name }"
+                  class="p-2 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                  title="Start Practice Quiz Drill on this topic"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </a>
 
-              <!-- Edit Action -->
-              <button
-                type="button"
-                (click)="openEditTopicModal(topic)"
-                class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-                title="Edit Topic"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </button>
+                <!-- Edit Action -->
+                <button
+                  type="button"
+                  (click)="openEditTopicModal(topic)"
+                  class="p-2 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+                  title="Edit Topic"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
 
-              <!-- Delete Action -->
-              <button
-                type="button"
-                (click)="confirmDeleteTopic(topic)"
-                class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
-                title="Delete Topic"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
+                <!-- Delete Action -->
+                <button
+                  type="button"
+                  (click)="confirmDeleteTopic(topic)"
+                  class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                  title="Delete Topic"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         }
@@ -314,8 +329,8 @@ import confetti from 'canvas-confetti';
 
       <!-- ADD / EDIT TOPIC MODAL -->
       @if (showTopicModal()) {
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 class="text-base font-bold text-slate-900">{{ editingTopic() ? 'Edit Topic' : 'Add New Topic' }}</h3>
               <button (click)="closeTopicModal()" class="text-slate-400 hover:text-slate-600">
