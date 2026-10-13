@@ -706,6 +706,456 @@ export class QuestionPatternEngineService {
             cutoffEstimate: 10.5
           }
         ]
+      },
+      {
+        id: 'rbi-gradeb-phase1-mock-1',
+        title: 'RBI Grade B (Officers) Phase-I Comprehensive Mock #1',
+        description: 'Authentic 200-question Phase-I simulation for Officers in Grade B with GA (80 Qs), Reasoning (60 Qs), English (30 Qs), and Quant (30 Qs).',
+        exam_category: 'RBI_EXAM',
+        exam_stage: 'prelims',
+        total_duration_minutes: 120,
+        has_sectional_timing: true,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 66.75,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'ga',
+            name: 'General Awareness',
+            subjectCode: 'ga',
+            questionsCount: 80,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 20.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 60,
+            durationMinutes: 45,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 9.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 30,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 8.5
+          }
+        ]
+      },
+      {
+        id: 'nabard-gradea-phase1-mock-1',
+        title: 'NABARD Grade A (RDBS) Phase-I Comprehensive Mock #1',
+        description: 'Official 200-question Phase-I paper combining qualifying test sections (Reasoning, English, Computer, Quant) and merit sections (GA & Economic Development).',
+        exam_category: 'NABARD',
+        exam_stage: 'prelims',
+        total_duration_minutes: 120,
+        has_sectional_timing: false,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 46.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 20,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 6.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 9.0
+          },
+          {
+            code: 'computer',
+            name: 'Computer Knowledge',
+            subjectCode: 'computer',
+            questionsCount: 20,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 6.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 20,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 6.0
+          },
+          {
+            code: 'ga',
+            name: 'General Awareness & Economic Development',
+            subjectCode: 'ga',
+            questionsCount: 60,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 16.0
+          },
+          {
+            code: 'ga_ard',
+            name: 'Agriculture & Rural Development (ARD)',
+            subjectCode: 'ga',
+            questionsCount: 50,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 14.0
+          }
+        ]
+      },
+      {
+        id: 'sebi-gradea-phase1-mock-1',
+        title: 'SEBI Grade A (Assistant Manager) Phase-I Paper-1 Mock #1',
+        description: 'Securities and Exchange Board of India Phase-I Paper-1 general paper with GA, English, Quant, and Reasoning.',
+        exam_category: 'RBI_EXAM',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: false,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 30.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'ga',
+            name: 'General Awareness (Financial Sector)',
+            subjectCode: 'ga',
+            questionsCount: 25,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 8.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 25,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 8.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 25,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 8.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 25,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 8.0
+          }
+        ]
+      },
+      {
+        id: 'lic-aao-prelims-mock-1',
+        title: 'LIC AAO Prelims All-India Championship Mock #1',
+        description: 'Complete 100-question Life Insurance Corporation Assistant Administrative Officer preliminary test (Reasoning, Quant, and English).',
+        exam_category: 'INSURANCE',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: true,
+        total_marks: 70,
+        negative_marking: 0.25,
+        target_cutoff: 58.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 23.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 22.0
+          },
+          {
+            code: 'english',
+            name: 'English Language (Qualifying)',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 10.0
+          }
+        ]
+      },
+      {
+        id: 'ibps-so-prelims-mock-1',
+        title: 'IBPS SO (Specialist Officers) Prelims Mock #1',
+        description: '150-question preliminary test for Specialist Officers (IT / Marketing / HR / Agriculture) with Reasoning, English, and Quant.',
+        exam_category: 'SPECIALIST',
+        exam_stage: 'prelims',
+        total_duration_minutes: 120,
+        has_sectional_timing: true,
+        total_marks: 125,
+        negative_marking: 0.25,
+        target_cutoff: 62.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 50,
+            durationMinutes: 40,
+            marksPerQuestion: 0.5,
+            negativeMarks: 0.125,
+            cutoffEstimate: 11.5
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 50,
+            durationMinutes: 40,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 15.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 50,
+            durationMinutes: 40,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 14.0
+          }
+        ]
+      },
+      {
+        id: 'idbi-am-full-mock-1',
+        title: 'IDBI Bank Executive / Assistant Manager Full-Length Mock #1',
+        description: '200-question, 120-minute comprehensive single-tier examination with Reasoning, English, Quant, and General/Banking Awareness.',
+        exam_category: 'SPECIALIST',
+        exam_stage: 'prelims',
+        total_duration_minutes: 120,
+        has_sectional_timing: false,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 112.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Logical Reasoning & Data Analysis',
+            subjectCode: 'reasoning',
+            questionsCount: 60,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 17.5
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 40,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 12.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 13.0
+          },
+          {
+            code: 'ga',
+            name: 'General Economy & Banking Awareness',
+            subjectCode: 'ga',
+            questionsCount: 60,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 16.0
+          }
+        ]
+      },
+      {
+        id: 'sbi-clerk-mains-mock-1',
+        title: 'SBI Clerk (Junior Associates) Mains Full-Length Mock #1',
+        description: '190-question, 160-minute Phase-II Mains examination for SBI Junior Associates across GA, English, Quant, and Reasoning/Computer.',
+        exam_category: 'SBI_CLERK',
+        exam_stage: 'mains',
+        total_duration_minutes: 160,
+        has_sectional_timing: true,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 92.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'ga',
+            name: 'General / Financial Awareness',
+            subjectCode: 'ga',
+            questionsCount: 50,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 19.0
+          },
+          {
+            code: 'english',
+            name: 'General English',
+            subjectCode: 'english',
+            questionsCount: 40,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 17.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 50,
+            durationMinutes: 45,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability & Computer Aptitude',
+            subjectCode: 'reasoning',
+            questionsCount: 50,
+            durationMinutes: 45,
+            marksPerQuestion: 1.2,
+            negativeMarks: 0.3,
+            cutoffEstimate: 20.0
+          }
+        ]
+      },
+      {
+        id: 'rrb-clerk-mains-mock-1',
+        title: 'IBPS RRB Clerk (Office Assistant) Mains Mock #1',
+        description: '200-question, 120-minute Phase-II Mains paper for RRB Office Assistants with Reasoning, Computer, GA, English, and Numerical Ability.',
+        exam_category: 'RRB_CLERK',
+        exam_stage: 'mains',
+        total_duration_minutes: 120,
+        has_sectional_timing: true,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 128.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning',
+            subjectCode: 'reasoning',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1.25,
+            negativeMarks: 0.3125,
+            cutoffEstimate: 26.0
+          },
+          {
+            code: 'computer',
+            name: 'Computer Knowledge',
+            subjectCode: 'computer',
+            questionsCount: 40,
+            durationMinutes: 15,
+            marksPerQuestion: 0.5,
+            negativeMarks: 0.125,
+            cutoffEstimate: 22.0
+          },
+          {
+            code: 'ga',
+            name: 'General Awareness',
+            subjectCode: 'ga',
+            questionsCount: 40,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 20.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 40,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 20.0
+          },
+          {
+            code: 'quant',
+            name: 'Numerical Ability',
+            subjectCode: 'quant',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1.25,
+            negativeMarks: 0.3125,
+            cutoffEstimate: 24.0
+          }
+        ]
       }
     ];
   }
@@ -2920,6 +3370,90 @@ export class QuestionPatternEngineService {
         options: ['Notice Money', 'Call Money', 'Term Money', 'Treasury Bill', 'Commercial Paper'],
         correct: 0,
         explanation: 'In the money market, overnight borrowing (1 day) is Call Money, borrowing for 2 to 14 days is Notice Money, and borrowing beyond 14 days is Term Money.'
+      },
+      {
+        question: 'Which institution maintains and manages the Rural Infrastructure Development Fund (RIDF) created out of Priority Sector Lending shortfalls of commercial banks?',
+        options: ['NABARD', 'RBI', 'SIDBI', 'Ministry of Finance', 'NHB'],
+        correct: 0,
+        explanation: 'The Rural Infrastructure Development Fund (RIDF) was instituted by the Government of India in 1995-96 in NABARD to finance ongoing rural infrastructure projects.'
+      },
+      {
+        question: 'What is the foreign direct investment (FDI) ceiling permissible in the Indian insurance sector under the automatic approval route?',
+        options: ['74%', '49%', '100%', '26%', '51%'],
+        correct: 0,
+        explanation: 'The Parliament enacted the Insurance Laws (Amendment) Act increasing the FDI limit in insurance companies from 49% to 74% under the automatic route.'
+      },
+      {
+        question: 'Which apex statutory body regulates and licenses the insurance and reinsurance industry in India?',
+        options: ['IRDAI', 'SEBI', 'PFRDA', 'RBI', 'FMC'],
+        correct: 0,
+        explanation: 'The Insurance Regulatory and Development Authority of India (IRDAI), headquartered in Hyderabad, is the statutory regulator for insurance and reinsurance.'
+      },
+      {
+        question: 'Under the Kisan Credit Card (KCC) scheme, what prompt repayment incentive (interest subvention) is provided by the Central Government on short-term crop loans up to ₹3 Lakh?',
+        options: ['3% per annum', '2% per annum', '1.5% per annum', '4% per annum', '5% per annum'],
+        correct: 0,
+        explanation: 'With a normal benchmark interest rate of 7% and an additional 3% subvention for prompt repayment, the effective interest rate for farmers is 4% per annum.'
+      },
+      {
+        question: 'What is the life insurance coverage provided under the Pradhan Mantri Jeevan Jyoti Bima Yojana (PMJJBY)?',
+        options: ['₹2,00,000', '₹1,00,000', '₹5,00,000', '₹3,00,000', '₹50,000'],
+        correct: 0,
+        explanation: 'PMJJBY offers life insurance cover of ₹2 Lakh for death due to any reason to all savings bank account holders aged 18 to 50 years.'
+      },
+      {
+        question: 'What is the accidental death and full disability insurance cover under Pradhan Mantri Suraksha Bima Yojana (PMSBY)?',
+        options: ['₹2,00,000', '₹1,00,000', '₹50,000', '₹5,00,000', '₹3,00,000'],
+        correct: 0,
+        explanation: 'PMSBY provides ₹2 Lakh cover for accidental death or permanent total disability (and ₹1 Lakh for permanent partial disability) for persons aged 18 to 70 years.'
+      },
+      {
+        question: 'What is the entry age bracket for eligible Indian citizens to subscribe to the Atal Pension Yojana (APY)?',
+        options: ['18 to 40 years', '18 to 60 years', '21 to 55 years', '25 to 50 years', '18 to 50 years'],
+        correct: 0,
+        explanation: 'Subscribers can join Atal Pension Yojana (APY) between 18 and 40 years of age to receive a guaranteed monthly pension ranging from ₹1,000 to ₹5,000 from age 60.'
+      },
+      {
+        question: 'Under Priority Sector Lending (PSL) norms, what is the mandatory sub-target for lending to Small and Marginal Farmers (SMFs) for domestic commercial banks?',
+        options: ['10% of ANBC', '8% of ANBC', '12% of ANBC', '7.5% of ANBC', '15% of ANBC'],
+        correct: 0,
+        explanation: 'Within the total 18% agricultural target, domestic commercial banks have a phased mandatory sub-target of 10% of Adjusted Net Bank Credit for Small and Marginal Farmers.'
+      },
+      {
+        question: 'What is the fixed annual interest rate offered by the Reserve Bank of India on Sovereign Gold Bonds (SGB)?',
+        options: ['2.50% per annum', '3.00% per annum', '2.00% per annum', '1.75% per annum', '4.00% per annum'],
+        correct: 0,
+        explanation: 'SGB investors receive a guaranteed nominal interest of 2.50% per annum on the amount of initial investment, credited semi-annually to their bank account.'
+      },
+      {
+        question: 'The SARFAESI Act, 2002 allows banks and financial institutions in India to auction commercial or residential properties to recover loans without the intervention of:',
+        options: ['Courts of Law', 'Reserve Bank of India', 'Ministry of Finance', 'State Government', 'Registrar of Companies'],
+        correct: 0,
+        explanation: 'SARFAESI (Securitization and Reconstruction of Financial Assets and Enforcement of Security Interest) Act empowers secured creditors to seize and auction mortgaged collateral without going to court.'
+      },
+      {
+        question: 'Under the Prompt Corrective Action (PCA) framework revised by the RBI, which three parameters trigger supervisory intervention?',
+        options: ['Capital (CRAR), Asset Quality (Net NPA), and Leverage Ratio', 'Deposit Growth, Branch Network, and Profitability', 'CRR, SLR, and Cash Reserve Deficit', 'Foreign Exchange Inflow, Net Worth, and Credit Spread', 'Lending Rate, CASA Ratio, and Return on Assets'],
+        correct: 0,
+        explanation: 'The RBI revised PCA framework monitors three critical indicators: CRAR/Tier 1 Capital, Net NPA Ratio, and Tier 1 Leverage Ratio.'
+      },
+      {
+        question: 'In the context of credit underwriting in India, how many Credit Information Companies (CICs) are authorized and regulated by the Reserve Bank of India under the CICRA Act, 2005?',
+        options: ['4 (TransUnion CIBIL, Equifax, Experian, CRIF High Mark)', '2 (CIBIL and Equifax)', '5 (CIBIL, Equifax, Experian, CRISIL, ICRA)', '3 (CIBIL, Experian, ICRA)', '1 (TransUnion CIBIL only)'],
+        correct: 0,
+        explanation: 'There are 4 operating CICs registered with the RBI in India: TransUnion CIBIL, Equifax Credit Information Services, Experian Credit Information Company, and CRIF High Mark.'
+      },
+      {
+        question: 'What is the maximum loan limit eligible for financing under the Pradhan Mantri MUDRA Yojana (PMMY) under the "Tarun" category?',
+        options: ['₹10,00,000', '₹5,00,000', '₹20,00,000', '₹15,00,000', '₹7,50,000'],
+        correct: 0,
+        explanation: 'PMMY loans are classified into Shishu (up to ₹50,000), Kishor (₹50,000 to ₹5,00,000), and Tarun (above ₹5,00,000 up to ₹10,00,000).'
+      },
+      {
+        question: 'Under the Lead Bank Scheme formulated by the RBI following the Gadgil Study Group and Nariman Committee, each district in India is assigned to a Lead Bank to coordinate:',
+        options: ['District Credit Plans (DCP) and credit flow across commercial banks', 'Central bank inspections only', 'Currency chest security and coin distribution', 'Tax collection for State Treasuries', 'Foreign exchange remittances only'],
+        correct: 0,
+        explanation: 'Under the Lead Bank Scheme, designated Lead Banks coordinate with District Consultative Committees (DCC) to formulate and execute annual District Credit Plans (DCP).'
       }
     ];
 

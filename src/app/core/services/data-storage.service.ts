@@ -132,13 +132,12 @@ export class DataStorageService {
       { id: '22222222-2222-4222-8222-222222222231', user_id: this.userId, subject_id: subCompId, name: 'Keyboard Shortcuts & MS Office', priority: 'high', learning_status: 'not_started', display_order: 3 }
     ];
 
-    const defaultExams: Exam[] = [
-      { id: '33333333-3333-4333-8333-333333333301', user_id: this.userId, name: 'IBPS PO 2026', description: 'Probationary Officer exam by IBPS', is_active: true, display_order: 1 },
-      { id: '33333333-3333-4333-8333-333333333302', user_id: this.userId, name: 'SBI PO 2026', description: 'Probationary Officer exam by State Bank of India', is_active: true, display_order: 2 },
-      { id: '33333333-3333-4333-8333-333333333303', user_id: this.userId, name: 'IBPS Clerk 2026', description: 'Clerical Cadre recruitment exam', is_active: true, display_order: 3 }
-    ];
+    const defaultExams: Exam[] = this.getDefaultBankExams(this.userId);
 
-    this.setLocal('exams', defaultExams);
+    const currentExams = this.getLocal<Exam[]>('exams', []);
+    if (!currentExams || currentExams.length < defaultExams.length) {
+      this.setLocal('exams', defaultExams);
+    }
     this.setLocal('subjects', defaultSubjects);
     this.setLocal('topics', defaultTopics);
     if (!this.getLocal('initialized', false)) {
@@ -232,11 +231,234 @@ export class DataStorageService {
         ];
         await this.supabaseService.clientInstance.from('topics').insert(seedTopics);
       }
+
+      // Check if user already has exams in Supabase
+      const { count: examCount } = await this.supabaseService.clientInstance
+        .from('exams')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (!examCount || examCount === 0) {
+        const seedExams = this.getDefaultBankExams(userId).map((ex, idx) => ({
+          user_id: userId,
+          name: ex.name,
+          description: ex.description,
+          conducting_body: ex.conducting_body,
+          vacancies: ex.vacancies,
+          notification_status: ex.notification_status,
+          prelims_date: ex.prelims_date,
+          mains_date: ex.mains_date,
+          official_url: ex.official_url,
+          is_active: ex.is_active,
+          display_order: idx + 1
+        }));
+        await this.supabaseService.clientInstance.from('exams').insert(seedExams);
+      }
     } catch (e) {
       console.error('Failed to seed user database:', e);
     }
   }
 
+  public getDefaultBankExams(userId: string = this.userId): Exam[] {
+    return [
+      {
+        id: '33333333-3333-4333-8333-333333333301',
+        user_id: userId,
+        name: 'IBPS PO 2026',
+        description: 'Probationary Officer exam by Institute of Banking Personnel Selection',
+        conducting_body: 'IBPS',
+        vacancies: 4455,
+        notification_status: 'expected',
+        prelims_date: '2026-10-18',
+        mains_date: '2026-11-28',
+        official_url: 'https://www.ibps.in',
+        is_active: true,
+        display_order: 1
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333302',
+        user_id: userId,
+        name: 'SBI PO 2026',
+        description: 'Probationary Officer recruitment by State Bank of India',
+        conducting_body: 'SBI',
+        vacancies: 2000,
+        notification_status: 'expected',
+        prelims_date: '2026-11-01',
+        mains_date: '2026-12-15',
+        official_url: 'https://sbi.co.in/careers',
+        is_active: true,
+        display_order: 2
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333303',
+        user_id: userId,
+        name: 'IBPS Clerk 2026',
+        description: 'Clerical Cadre recruitment across Public Sector Banks',
+        conducting_body: 'IBPS',
+        vacancies: 6128,
+        notification_status: 'expected',
+        prelims_date: '2026-08-29',
+        mains_date: '2026-10-04',
+        official_url: 'https://www.ibps.in',
+        is_active: true,
+        display_order: 3
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333304',
+        user_id: userId,
+        name: 'SBI Clerk (Junior Associates) 2026',
+        description: 'Junior Associates (Customer Support & Sales) in State Bank of India',
+        conducting_body: 'SBI',
+        vacancies: 8283,
+        notification_status: 'announced',
+        prelims_date: '2026-06-15',
+        mains_date: '2026-08-10',
+        official_url: 'https://sbi.co.in/careers',
+        is_active: true,
+        display_order: 4
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333305',
+        user_id: userId,
+        name: 'IBPS RRB Officer Scale-I (RRB PO) 2026',
+        description: 'Group A Officers in Regional Rural Banks',
+        conducting_body: 'IBPS',
+        vacancies: 3583,
+        notification_status: 'expected',
+        prelims_date: '2026-08-01',
+        mains_date: '2026-09-20',
+        official_url: 'https://www.ibps.in',
+        is_active: true,
+        display_order: 5
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333306',
+        user_id: userId,
+        name: 'IBPS RRB Office Assistant (RRB Clerk) 2026',
+        description: 'Group B Multipurpose Office Assistant in Regional Rural Banks',
+        conducting_body: 'IBPS',
+        vacancies: 5585,
+        notification_status: 'expected',
+        prelims_date: '2026-08-08',
+        mains_date: '2026-10-05',
+        official_url: 'https://www.ibps.in',
+        is_active: true,
+        display_order: 6
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333307',
+        user_id: userId,
+        name: 'RBI Grade B (Officers) 2026',
+        description: 'Direct Recruitment for Officers in Grade B (General / DEPR / DSIM)',
+        conducting_body: 'RBI',
+        vacancies: 291,
+        notification_status: 'expected',
+        prelims_date: '2026-09-12',
+        mains_date: '2026-10-19',
+        official_url: 'https://opportunities.rbi.org.in',
+        is_active: true,
+        display_order: 7
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333308',
+        user_id: userId,
+        name: 'RBI Assistant 2026',
+        description: 'Assistant recruitment across RBI regional offices nationwide',
+        conducting_body: 'RBI',
+        vacancies: 450,
+        notification_status: 'expected',
+        prelims_date: '2026-04-20',
+        mains_date: '2026-06-10',
+        official_url: 'https://opportunities.rbi.org.in',
+        is_active: true,
+        display_order: 8
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333309',
+        user_id: userId,
+        name: 'NABARD Grade A (Assistant Manager - RDBS) 2026',
+        description: 'National Bank for Agriculture and Rural Development Officer recruitment',
+        conducting_body: 'NABARD',
+        vacancies: 150,
+        notification_status: 'expected',
+        prelims_date: '2026-09-25',
+        mains_date: '2026-11-05',
+        official_url: 'https://www.nabard.org',
+        is_active: true,
+        display_order: 9
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333310',
+        user_id: userId,
+        name: 'SEBI Grade A (Assistant Manager) 2026',
+        description: 'Securities and Exchange Board of India General & IT Stream Officers',
+        conducting_body: 'SEBI',
+        vacancies: 97,
+        notification_status: 'expected',
+        prelims_date: '2026-07-27',
+        mains_date: '2026-08-31',
+        official_url: 'https://www.sebi.gov.in',
+        is_active: true,
+        display_order: 10
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333311',
+        user_id: userId,
+        name: 'SIDBI Grade A (Assistant Manager) 2026',
+        description: 'Small Industries Development Bank of India General Stream Officer recruitment',
+        conducting_body: 'SIDBI',
+        vacancies: 100,
+        notification_status: 'expected',
+        prelims_date: '2026-12-10',
+        mains_date: null,
+        official_url: 'https://www.sidbi.in',
+        is_active: true,
+        display_order: 11
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333312',
+        user_id: userId,
+        name: 'IBPS SO (Specialist Officers) 2026',
+        description: 'Specialist Officer recruitment (IT Officer, AFO, HR, Law & Marketing)',
+        conducting_body: 'IBPS',
+        vacancies: 1402,
+        notification_status: 'expected',
+        prelims_date: '2026-12-28',
+        mains_date: '2027-01-25',
+        official_url: 'https://www.ibps.in',
+        is_active: true,
+        display_order: 12
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333313',
+        user_id: userId,
+        name: 'LIC AAO (Assistant Administrative Officer) 2026',
+        description: 'Life Insurance Corporation of India Generalist Officer Cadre',
+        conducting_body: 'LIC',
+        vacancies: 300,
+        notification_status: 'expected',
+        prelims_date: '2026-05-18',
+        mains_date: '2026-07-02',
+        official_url: 'https://licindia.in',
+        is_active: true,
+        display_order: 13
+      },
+      {
+        id: '33333333-3333-4333-8333-333333333314',
+        user_id: userId,
+        name: 'IDBI Bank Executive / Assistant Manager 2026',
+        description: 'Recruitment of Executives and Assistant Managers in IDBI Bank',
+        conducting_body: 'IDBI',
+        vacancies: 1300,
+        notification_status: 'expected',
+        prelims_date: '2026-06-28',
+        mains_date: null,
+        official_url: 'https://www.idbibank.in',
+        is_active: true,
+        display_order: 14
+      }
+    ];
+  }
 
   // --- EXAMS ---
   async getExams(): Promise<Exam[]> {
@@ -247,7 +469,7 @@ export class DataStorageService {
         .select('*')
         .eq('user_id', uid)
         .order('display_order', { ascending: true });
-      if (!error && data) return data as Exam[];
+      if (!error && data && data.length > 0) return data as Exam[];
     }
     this.ensureInitializedLocalData();
     return this.getLocal<Exam[]>('exams', []);

@@ -848,6 +848,65 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           ...this.getReasoningQuestionPool(),
           ...this.generateDynamicQuantQuestions(5)
         ]
+      },
+      {
+        id: 'paper-sebi-gradea-2025',
+        exam_name: 'SEBI Grade A Phase-I Paper-1 Benchmark 2025',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 100,
+        duration_minutes: 60,
+        official_source_license: 'Capital Markets Regulatory Exam Framework',
+        sections: [
+          { subject_name: 'General Awareness (Financial Focus)', questions_count: 25 },
+          { subject_name: 'English Language', questions_count: 25 },
+          { subject_name: 'Quantitative Aptitude', questions_count: 25 },
+          { subject_name: 'Reasoning Ability', questions_count: 25 }
+        ],
+        questions: [
+          ...this.getBankingAwarenessQuestionPool(),
+          ...this.getEnglishQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5),
+          ...this.getReasoningQuestionPool()
+        ]
+      },
+      {
+        id: 'paper-lic-aao-2025',
+        exam_name: 'LIC AAO Prelims Official Pattern Paper 2025',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 70,
+        duration_minutes: 60,
+        official_source_license: 'Licensed Insurance Recruitment Standard Pattern',
+        sections: [
+          { subject_name: 'Reasoning Ability', questions_count: 35 },
+          { subject_name: 'Quantitative Aptitude', questions_count: 35 },
+          { subject_name: 'English Language (Qualifying)', questions_count: 30 }
+        ],
+        questions: [
+          ...this.getReasoningQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5),
+          ...this.getEnglishQuestionPool()
+        ]
+      },
+      {
+        id: 'paper-ibps-so-2025',
+        exam_name: 'IBPS SO Prelims (Specialist Officers) Standard Paper 2025',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 125,
+        duration_minutes: 120,
+        official_source_license: 'Licensed Specialist Banking Recruitment Pattern',
+        sections: [
+          { subject_name: 'English Language', questions_count: 50 },
+          { subject_name: 'Reasoning Ability', questions_count: 50 },
+          { subject_name: 'Quantitative Aptitude', questions_count: 50 }
+        ],
+        questions: [
+          ...this.getEnglishQuestionPool(),
+          ...this.getReasoningQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5)
+        ]
       }
     ];
   }

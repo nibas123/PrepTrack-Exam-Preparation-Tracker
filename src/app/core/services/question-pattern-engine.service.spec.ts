@@ -55,6 +55,44 @@ describe('QuestionPatternEngineService', () => {
     expect(questions.some(q => q.subjectCode === 'ga')).toBe(true);
   });
 
+  it('should generate an authentic 200-question RBI Grade B Phase-I exam paper with 80 GA questions', () => {
+    const rbi = service.getDefaultBlueprints().find(b => b.id === 'rbi-gradeb-phase1-mock-1');
+    expect(rbi).toBeDefined();
+    expect(rbi?.exam_category).toBe('RBI_EXAM');
+    const questions = service.generateExamQuestions(rbi!);
+    expect(questions.length).toBe(200);
+    const gaQuestions = questions.filter(q => q.subjectCode === 'ga');
+    expect(gaQuestions.length).toBe(80);
+    expect(questions.filter(q => q.subjectCode === 'reasoning').length).toBe(60);
+    expect(questions.filter(q => q.subjectCode === 'english').length).toBe(30);
+    expect(questions.filter(q => q.subjectCode === 'quant').length).toBe(30);
+  });
+
+  it('should generate an authentic 200-question NABARD Grade A Phase-I exam paper', () => {
+    const nabard = service.getDefaultBlueprints().find(b => b.id === 'nabard-gradea-phase1-mock-1');
+    expect(nabard).toBeDefined();
+    expect(nabard?.exam_category).toBe('NABARD');
+    const questions = service.generateExamQuestions(nabard!);
+    expect(questions.length).toBe(200);
+    expect(questions.some(q => q.subjectCode === 'computer')).toBe(true);
+  });
+
+  it('should generate an authentic 100-question LIC AAO Prelims exam paper', () => {
+    const lic = service.getDefaultBlueprints().find(b => b.id === 'lic-aao-prelims-mock-1');
+    expect(lic).toBeDefined();
+    expect(lic?.exam_category).toBe('INSURANCE');
+    const questions = service.generateExamQuestions(lic!);
+    expect(questions.length).toBe(100);
+  });
+
+  it('should generate an authentic 150-question IBPS SO Specialist Officer Prelims exam paper', () => {
+    const so = service.getDefaultBlueprints().find(b => b.id === 'ibps-so-prelims-mock-1');
+    expect(so).toBeDefined();
+    expect(so?.exam_category).toBe('SPECIALIST');
+    const questions = service.generateExamQuestions(so!);
+    expect(questions.length).toBe(150);
+  });
+
   it('should return question patterns library with quant, reasoning, english, ga, and computer', () => {
     const library = service.getPatternsLibrary();
     expect(library.length).toBeGreaterThanOrEqual(14);

@@ -163,7 +163,15 @@ import confetti from 'canvas-confetti';
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
                   [ngClass]="blueprintFilter() === 'rrb_rbi' ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
                 >
-                  RRB & RBI
+                  RRB & Regulatory
+                </button>
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('specialist_insurance')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'specialist_insurance' ? 'bg-indigo-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Specialist & Insurance
                 </button>
                 <button
                   type="button"
@@ -192,6 +200,9 @@ import confetti from 'canvas-confetti';
                               'bg-emerald-50 text-emerald-700 border border-emerald-200': bp.exam_category === 'IBPS_CLERK' || bp.exam_category === 'SBI_CLERK',
                               'bg-teal-50 text-teal-700 border border-teal-200': bp.exam_category === 'RRB_PO' || bp.exam_category === 'RRB_CLERK',
                               'bg-rose-50 text-rose-700 border border-rose-200': bp.exam_category === 'RBI_EXAM',
+                              'bg-green-50 text-green-700 border border-green-200': bp.exam_category === 'NABARD',
+                              'bg-orange-50 text-orange-700 border border-orange-200': bp.exam_category === 'INSURANCE',
+                              'bg-indigo-50 text-indigo-700 border border-indigo-200': bp.exam_category === 'SPECIALIST',
                               'bg-amber-50 text-amber-700 border border-amber-200': bp.exam_category === 'MIXED_SPRINT' || bp.exam_category === 'SECTIONAL'
                             }">
                         {{ bp.exam_category.replace('_', ' ') }} • {{ bp.exam_stage | uppercase }}
@@ -769,7 +780,7 @@ export class MockExamsComponent implements OnInit {
   readonly activeTab = signal<'simulator' | 'analytics' | 'patterns'>('simulator');
   readonly strictSectionalMode = signal<boolean>(true);
   readonly selectedBlueprintForModal = signal<MockExamBlueprint | null>(null);
-  readonly blueprintFilter = signal<'all' | 'prelims' | 'mains' | 'rrb_rbi' | 'sectional'>('all');
+  readonly blueprintFilter = signal<'all' | 'prelims' | 'mains' | 'rrb_rbi' | 'specialist_insurance' | 'sectional'>('all');
 
   readonly blueprints = signal<MockExamBlueprint[]>([]);
   readonly questionPatterns = signal<QuestionPattern[]>([]);
@@ -784,7 +795,9 @@ export class MockExamsComponent implements OnInit {
       case 'mains':
         return list.filter(bp => bp.exam_stage === 'mains');
       case 'rrb_rbi':
-        return list.filter(bp => bp.exam_category === 'RRB_PO' || bp.exam_category === 'RRB_CLERK' || bp.exam_category === 'RBI_EXAM');
+        return list.filter(bp => bp.exam_category === 'RRB_PO' || bp.exam_category === 'RRB_CLERK' || bp.exam_category === 'RBI_EXAM' || bp.exam_category === 'NABARD');
+      case 'specialist_insurance':
+        return list.filter(bp => bp.exam_category === 'SPECIALIST' || bp.exam_category === 'INSURANCE');
       case 'sectional':
         return list.filter(bp => bp.exam_category === 'MIXED_SPRINT' || bp.exam_category === 'SECTIONAL');
       default:
