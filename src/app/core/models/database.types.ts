@@ -326,7 +326,7 @@ export interface MockExamBlueprint {
   id: string;
   title: string;
   description?: string;
-  exam_category: 'IBPS_PO' | 'SBI_PO' | 'IBPS_CLERK' | 'RRB_PO' | 'MIXED_SPRINT';
+  exam_category: 'IBPS_PO' | 'SBI_PO' | 'IBPS_CLERK' | 'SBI_CLERK' | 'RRB_PO' | 'RRB_CLERK' | 'RBI_EXAM' | 'MIXED_SPRINT' | 'SECTIONAL';
   exam_stage: 'prelims' | 'mains';
   total_duration_minutes: number;
   has_sectional_timing: boolean;

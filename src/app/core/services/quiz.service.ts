@@ -733,6 +733,82 @@ Output MUST be a valid JSON array of objects conforming to this schema:
         ]
       },
       {
+        id: 'paper-ibps-clerk-2025',
+        exam_name: 'IBPS Clerk Prelims 2025 Shift-1 Memory Paper',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 100,
+        duration_minutes: 60,
+        official_source_license: 'Licensed Open Educational Banking Syllabus Pattern',
+        sections: [
+          { subject_name: 'English Language', questions_count: 30 },
+          { subject_name: 'Numerical Ability', questions_count: 35 },
+          { subject_name: 'Reasoning Ability', questions_count: 35 }
+        ],
+        questions: [
+          ...this.getEnglishQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5),
+          ...this.getReasoningQuestionPool()
+        ]
+      },
+      {
+        id: 'paper-sbi-clerk-2025',
+        exam_name: 'SBI Clerk (Junior Associates) Prelims 2025 Paper',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 100,
+        duration_minutes: 60,
+        official_source_license: 'Licensed Benchmark Bank Testing Corpus',
+        sections: [
+          { subject_name: 'English Language', questions_count: 30 },
+          { subject_name: 'Numerical Ability', questions_count: 35 },
+          { subject_name: 'Reasoning Ability', questions_count: 35 }
+        ],
+        questions: [
+          ...this.getEnglishQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5),
+          ...this.getReasoningQuestionPool()
+        ]
+      },
+      {
+        id: 'paper-rrb-po-2025',
+        exam_name: 'IBPS RRB PO (Officer Scale-I) Prelims 2025 Paper',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 80,
+        duration_minutes: 45,
+        official_source_license: 'Regional Rural Bank Standard Testing Pattern',
+        sections: [
+          { subject_name: 'Reasoning Ability', questions_count: 40 },
+          { subject_name: 'Quantitative Aptitude', questions_count: 40 }
+        ],
+        questions: [
+          ...this.getReasoningQuestionPool(),
+          ...this.generateDynamicQuantQuestions(10)
+        ]
+      },
+      {
+        id: 'paper-ibps-po-mains-2025',
+        exam_name: 'IBPS PO Mains 2025 (GA, Banking, Quant & Reasoning)',
+        year: 2025,
+        stage: 'mains',
+        total_marks: 200,
+        duration_minutes: 180,
+        official_source_license: 'Licensed Mains Banking Examination Corpus',
+        sections: [
+          { subject_name: 'Reasoning & Computer Aptitude', questions_count: 45 },
+          { subject_name: 'General/Economy/Banking Awareness', questions_count: 40 },
+          { subject_name: 'English Language', questions_count: 35 },
+          { subject_name: 'Data Analysis & Interpretation', questions_count: 35 }
+        ],
+        questions: [
+          ...this.getBankingAwarenessQuestionPool(),
+          ...this.getReasoningQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5),
+          ...this.getEnglishQuestionPool()
+        ]
+      },
+      {
         id: 'paper-rbi-gradeb-2025',
         exam_name: 'RBI Grade B Phase-I General Awareness & Quant 2025',
         year: 2025,
@@ -749,6 +825,27 @@ Output MUST be a valid JSON array of objects conforming to this schema:
         questions: [
           ...this.getBankingAwarenessQuestionPool(),
           ...this.getComputerKnowledgeQuestionPool(),
+          ...this.generateDynamicQuantQuestions(5)
+        ]
+      },
+      {
+        id: 'paper-nabard-gradea-2025',
+        exam_name: 'NABARD Grade A Phase-I (RDBS) Merit & Qualifying Paper 2025',
+        year: 2025,
+        stage: 'prelims',
+        total_marks: 200,
+        duration_minutes: 120,
+        official_source_license: 'Apex Development Bank Exam Pattern',
+        sections: [
+          { subject_name: 'Economic & Social Issues + ARD', questions_count: 80 },
+          { subject_name: 'General Awareness & Computer Knowledge', questions_count: 40 },
+          { subject_name: 'Reasoning & Quantitative Aptitude', questions_count: 40 },
+          { subject_name: 'English Language', questions_count: 40 }
+        ],
+        questions: [
+          ...this.getBankingAwarenessQuestionPool(),
+          ...this.getComputerKnowledgeQuestionPool(),
+          ...this.getReasoningQuestionPool(),
           ...this.generateDynamicQuantQuestions(5)
         ]
       }

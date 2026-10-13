@@ -130,9 +130,58 @@ import confetti from 'canvas-confetti';
               </div>
             </div>
 
+            <!-- Blueprint Category / Stage Filter Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('all')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'all' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  All Exams ({{ blueprints().length }})
+                </button>
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('prelims')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'prelims' ? 'bg-brand-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Prelims Mocks
+                </button>
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('mains')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'mains' ? 'bg-purple-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Mains Full Mocks
+                </button>
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('rrb_rbi')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'rrb_rbi' ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  RRB & RBI
+                </button>
+                <button
+                  type="button"
+                  (click)="blueprintFilter.set('sectional')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  [ngClass]="blueprintFilter() === 'sectional' ? 'bg-amber-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Sprints & Sectionals
+                </button>
+              </div>
+              <span class="text-xs font-semibold text-slate-500">
+                Showing {{ filteredBlueprints().length }} exam papers
+              </span>
+            </div>
+
             <!-- Available Blueprint Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              @for (bp of blueprints(); track bp.id) {
+              @for (bp of filteredBlueprints(); track bp.id) {
                 <div class="card p-5 hover:border-brand-500 transition-all flex flex-col justify-between space-y-4 group">
                   <div class="space-y-2">
                     <div class="flex items-center justify-between">
@@ -140,13 +189,15 @@ import confetti from 'canvas-confetti';
                             [ngClass]="{
                               'bg-brand-50 text-brand-700 border border-brand-200': bp.exam_category === 'IBPS_PO',
                               'bg-purple-50 text-purple-700 border border-purple-200': bp.exam_category === 'SBI_PO',
-                              'bg-emerald-50 text-emerald-700 border border-emerald-200': bp.exam_category === 'IBPS_CLERK',
-                              'bg-amber-50 text-amber-700 border border-amber-200': bp.exam_category === 'MIXED_SPRINT'
+                              'bg-emerald-50 text-emerald-700 border border-emerald-200': bp.exam_category === 'IBPS_CLERK' || bp.exam_category === 'SBI_CLERK',
+                              'bg-teal-50 text-teal-700 border border-teal-200': bp.exam_category === 'RRB_PO' || bp.exam_category === 'RRB_CLERK',
+                              'bg-rose-50 text-rose-700 border border-rose-200': bp.exam_category === 'RBI_EXAM',
+                              'bg-amber-50 text-amber-700 border border-amber-200': bp.exam_category === 'MIXED_SPRINT' || bp.exam_category === 'SECTIONAL'
                             }">
-                        {{ bp.exam_category }} • {{ bp.exam_stage | uppercase }}
+                        {{ bp.exam_category.replace('_', ' ') }} • {{ bp.exam_stage | uppercase }}
                       </span>
                       <span class="text-xs font-bold text-slate-500">
-                        {{ bp.total_duration_minutes }} Mins
+                        {{ getBlueprintTotalQuestions(bp) }} Qs • {{ bp.total_duration_minutes }} Mins
                       </span>
                     </div>
 
@@ -161,7 +212,7 @@ import confetti from 'canvas-confetti';
                     <div class="flex flex-wrap gap-1.5 pt-1">
                       @for (sec of bp.sections_config; track sec.code) {
                         <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-semibold">
-                          {{ sec.name }}: {{ sec.questionsCount }} Qs
+                          {{ sec.name }}: {{ sec.questionsCount }} Qs ({{ sec.durationMinutes }}m)
                         </span>
                       }
                     </div>
@@ -468,7 +519,8 @@ import confetti from 'canvas-confetti';
                           'bg-sky-50 text-sky-700 border border-sky-200': p.subject_code === 'quant',
                           'bg-purple-50 text-purple-700 border border-purple-200': p.subject_code === 'reasoning',
                           'bg-amber-50 text-amber-700 border border-amber-200': p.subject_code === 'english',
-                          'bg-emerald-50 text-emerald-700 border border-emerald-200': p.subject_code === 'ga'
+                          'bg-emerald-50 text-emerald-700 border border-emerald-200': p.subject_code === 'ga',
+                          'bg-rose-50 text-rose-700 border border-rose-200': p.subject_code === 'computer'
                         }">
                     {{ p.subject_code | uppercase }}
                   </span>
@@ -495,7 +547,7 @@ import confetti from 'canvas-confetti';
     </div>
 
     <!-- INSTRUCTIONS MODAL (Before launching live exam) -->
-    @if (selectedBlueprintForModal()) {
+    @if (selectedBlueprintForModal(); as modalBp) {
       <div class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-slate-900">
           <div class="flex items-center space-x-3">
@@ -503,15 +555,47 @@ import confetti from 'canvas-confetti';
               📋
             </div>
             <div>
-              <h3 class="text-base font-bold text-slate-900">{{ selectedBlueprintForModal()?.title }}</h3>
+              <h3 class="text-base font-bold text-slate-900">{{ modalBp.title }}</h3>
               <p class="text-xs text-slate-500">Candidate Examination Instructions & Guidelines</p>
             </div>
           </div>
 
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2.5 text-slate-700 leading-relaxed">
-            <p>• <b>Total Questions:</b> {{ selectedBlueprintForModal()?.sections_config | json }} questions across {{ selectedBlueprintForModal()?.sections_config?.length }} sections.</p>
-            <p>• <b>Marking Scheme:</b> <b>+1.00</b> mark for each correct answer; <b>-0.25</b> negative mark for every incorrect answer.</p>
-            <p>• <b>Sectional Timing:</b> @if (strictSectionalMode()) { <b>Active (20 mins per section).</b> You cannot switch sections until the timer expires. } @else { <b>Practice Mode.</b> Free navigation allowed across all sections. }</p>
+          <!-- Clean Section Breakdown Table -->
+          <div class="overflow-hidden rounded-xl border border-slate-200">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-2 px-3">Section Name</th>
+                  <th class="py-2 px-3 text-center">Questions</th>
+                  <th class="py-2 px-3 text-center">Marks</th>
+                  <th class="py-2 px-3 text-right">Duration</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                @for (sec of modalBp.sections_config; track sec.code) {
+                  <tr>
+                    <td class="py-2 px-3 font-semibold text-slate-800">{{ sec.name }}</td>
+                    <td class="py-2 px-3 text-center font-bold text-slate-900">{{ sec.questionsCount }}</td>
+                    <td class="py-2 px-3 text-center text-slate-600">{{ sec.questionsCount * sec.marksPerQuestion }}</td>
+                    <td class="py-2 px-3 text-right font-semibold text-brand-700">{{ sec.durationMinutes }} mins</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot class="bg-slate-50 font-extrabold text-slate-900 border-t border-slate-200">
+                <tr>
+                  <td class="py-2 px-3">Total</td>
+                  <td class="py-2 px-3 text-center">{{ getBlueprintTotalQuestions(modalBp) }} Qs</td>
+                  <td class="py-2 px-3 text-center">{{ modalBp.total_marks }} Marks</td>
+                  <td class="py-2 px-3 text-right">{{ modalBp.total_duration_minutes }} mins</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 text-slate-700 leading-relaxed">
+            <p>• <b>Total Questions:</b> <b>{{ getBlueprintTotalQuestions(modalBp) }} questions</b> across <b>{{ modalBp.sections_config.length }}</b> section(s).</p>
+            <p>• <b>Marking Scheme:</b> <b>+1.00</b> mark for each correct answer; <b>-{{ modalBp.negative_marking }}</b> negative mark for every incorrect answer.</p>
+            <p>• <b>Sectional Timing:</b> @if (strictSectionalMode() && modalBp.has_sectional_timing) { <b>Active (Locked sectional timer).</b> You cannot switch sections until the section timer expires. } @else { <b>Free Navigation Mode.</b> You can switch across any section freely within {{ modalBp.total_duration_minutes }} mins. }</p>
             <p>• <b>Question Palette:</b> 🟢 Answered, 🔴 Not Answered, ⚪ Not Visited, 🟣 Marked for Review.</p>
             <p>• <b>Offline Engine:</b> 100% token-free deterministic generator. No internet or AI quota needed.</p>
           </div>
@@ -685,10 +769,28 @@ export class MockExamsComponent implements OnInit {
   readonly activeTab = signal<'simulator' | 'analytics' | 'patterns'>('simulator');
   readonly strictSectionalMode = signal<boolean>(true);
   readonly selectedBlueprintForModal = signal<MockExamBlueprint | null>(null);
+  readonly blueprintFilter = signal<'all' | 'prelims' | 'mains' | 'rrb_rbi' | 'sectional'>('all');
 
   readonly blueprints = signal<MockExamBlueprint[]>([]);
   readonly questionPatterns = signal<QuestionPattern[]>([]);
   readonly simulatorAttempts = signal<MockExamAttempt[]>([]);
+
+  readonly filteredBlueprints = computed<MockExamBlueprint[]>(() => {
+    const list = this.blueprints();
+    const filter = this.blueprintFilter();
+    switch (filter) {
+      case 'prelims':
+        return list.filter(bp => bp.exam_stage === 'prelims' && bp.exam_category !== 'MIXED_SPRINT' && bp.exam_category !== 'SECTIONAL');
+      case 'mains':
+        return list.filter(bp => bp.exam_stage === 'mains');
+      case 'rrb_rbi':
+        return list.filter(bp => bp.exam_category === 'RRB_PO' || bp.exam_category === 'RRB_CLERK' || bp.exam_category === 'RBI_EXAM');
+      case 'sectional':
+        return list.filter(bp => bp.exam_category === 'MIXED_SPRINT' || bp.exam_category === 'SECTIONAL');
+      default:
+        return list;
+    }
+  });
 
   // Existing Analytics Data
   readonly mockExams = signal<MockExam[]>([]);
@@ -773,6 +875,11 @@ export class MockExamsComponent implements OnInit {
     this.mockExams.set(mocks);
     this.exams.set(examsList);
     this.simulatorAttempts.set(attempts);
+  }
+
+  getBlueprintTotalQuestions(bp: MockExamBlueprint | null): number {
+    if (!bp || !bp.sections_config) return 0;
+    return bp.sections_config.reduce((sum, sec) => sum + (sec.questionsCount || 0), 0);
   }
 
   openInstructionsModal(bp: MockExamBlueprint): void {

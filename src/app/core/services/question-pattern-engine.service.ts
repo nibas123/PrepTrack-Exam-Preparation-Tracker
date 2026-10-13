@@ -63,6 +63,51 @@ export class QuestionPatternEngineService {
         ]
       },
       {
+        id: 'ibps-po-prelims-live-2',
+        title: 'IBPS PO Prelims High-Scoring Mock #2',
+        description: 'Second full-length IBPS PO Prelims test featuring Floor Puzzles, Missing Number Series, and Table DI.',
+        exam_category: 'IBPS_PO',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: true,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 57.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 10.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 10.5
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 12.0
+          }
+        ]
+      },
+      {
         id: 'sbi-po-prelims-live-1',
         title: 'SBI PO Prelims Full-Length Mock Exam #1',
         description: 'High-difficulty mock calibrated to SBI PO standard with advanced arithmetic and reasoning puzzles.',
@@ -104,6 +149,51 @@ export class QuestionPatternEngineService {
             marksPerQuestion: 1,
             negativeMarks: 0.25,
             cutoffEstimate: 13.0
+          }
+        ]
+      },
+      {
+        id: 'sbi-po-prelims-live-2',
+        title: 'SBI PO Prelims Advanced Challenge #2',
+        description: 'Rigorous SBI PO Prelims simulation testing speed under pressure across multi-variable puzzles and DI.',
+        exam_category: 'SBI_PO',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: true,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 61.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 11.5
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 13.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 13.5
           }
         ]
       },
@@ -153,6 +243,341 @@ export class QuestionPatternEngineService {
         ]
       },
       {
+        id: 'sbi-clerk-prelims-mock-1',
+        title: 'SBI Clerk (Junior Associates) Prelims Mock #1',
+        description: 'Full 100-question SBI Junior Associates Prelims mock calibrated for high-accuracy clerical cutoffs.',
+        exam_category: 'SBI_CLERK',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: true,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 76.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 19.0
+          },
+          {
+            code: 'quant',
+            name: 'Numerical Ability',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 27.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 28.5
+          }
+        ]
+      },
+      {
+        id: 'rrb-po-prelims-mock-1',
+        title: 'IBPS RRB PO (Officer Scale-I) Prelims Mock #1',
+        description: 'Official 80-question, 45-minute dual-section format (Reasoning 40 Qs + Quantitative Aptitude 40 Qs).',
+        exam_category: 'RRB_PO',
+        exam_stage: 'prelims',
+        total_duration_minutes: 45,
+        has_sectional_timing: true,
+        total_marks: 80,
+        negative_marking: 0.25,
+        target_cutoff: 56.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 40,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 29.0
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 40,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 27.0
+          }
+        ]
+      },
+      {
+        id: 'rrb-clerk-prelims-mock-1',
+        title: 'IBPS RRB Clerk (Office Assistant) Prelims Mock #1',
+        description: 'Fast-paced 80-question, 45-minute Regional Rural Bank Office Assistant preliminary test.',
+        exam_category: 'RRB_CLERK',
+        exam_stage: 'prelims',
+        total_duration_minutes: 45,
+        has_sectional_timing: true,
+        total_marks: 80,
+        negative_marking: 0.25,
+        target_cutoff: 68.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 40,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 35.0
+          },
+          {
+            code: 'quant',
+            name: 'Numerical Ability',
+            subjectCode: 'quant',
+            questionsCount: 40,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 33.5
+          }
+        ]
+      },
+      {
+        id: 'rbi-assistant-prelims-mock-1',
+        title: 'RBI Assistant Prelims All-India Mock #1',
+        description: 'Precision-focused 100-question Reserve Bank of India Assistant preliminary examination paper.',
+        exam_category: 'RBI_EXAM',
+        exam_stage: 'prelims',
+        total_duration_minutes: 60,
+        has_sectional_timing: true,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 82.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 30,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 23.0
+          },
+          {
+            code: 'quant',
+            name: 'Numerical Ability',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 29.0
+          },
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 30.0
+          }
+        ]
+      },
+      {
+        id: 'ibps-po-mains-mock-1',
+        title: 'IBPS PO Mains Full-Length Objective Mock #1',
+        description: 'Comprehensive 4-section Mains simulation covering Reasoning, Banking Awareness, English, and Data Analysis.',
+        exam_category: 'IBPS_PO',
+        exam_stage: 'mains',
+        total_duration_minutes: 180,
+        has_sectional_timing: true,
+        total_marks: 155,
+        negative_marking: 0.25,
+        target_cutoff: 74.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning & Computer Aptitude',
+            subjectCode: 'reasoning',
+            questionsCount: 45,
+            durationMinutes: 60,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.0
+          },
+          {
+            code: 'ga',
+            name: 'General, Economy & Banking Awareness',
+            subjectCode: 'ga',
+            questionsCount: 40,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 16.5
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 35,
+            durationMinutes: 40,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 17.0
+          },
+          {
+            code: 'quant',
+            name: 'Data Analysis & Interpretation',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 45,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 15.0
+          }
+        ]
+      },
+      {
+        id: 'sbi-po-mains-mock-1',
+        title: 'SBI PO Mains Championship Objective Mock #1',
+        description: 'Full 155-question SBI PO Phase-II Mains paper featuring Banking Awareness, DI, Reasoning, and English.',
+        exam_category: 'SBI_PO',
+        exam_stage: 'mains',
+        total_duration_minutes: 180,
+        has_sectional_timing: true,
+        total_marks: 155,
+        negative_marking: 0.25,
+        target_cutoff: 78.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning & Computer Aptitude',
+            subjectCode: 'reasoning',
+            questionsCount: 40,
+            durationMinutes: 50,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.0
+          },
+          {
+            code: 'quant',
+            name: 'Data Analysis & Interpretation',
+            subjectCode: 'quant',
+            questionsCount: 30,
+            durationMinutes: 45,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 14.5
+          },
+          {
+            code: 'ga',
+            name: 'General, Economy & Banking Awareness',
+            subjectCode: 'ga',
+            questionsCount: 50,
+            durationMinutes: 45,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 24.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 35,
+            durationMinutes: 40,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 17.5
+          }
+        ]
+      },
+      {
+        id: 'rrb-po-mains-mock-1',
+        title: 'IBPS RRB PO (Officer Scale-I) Mains Mock #1',
+        description: '5-section RRB Officer Scale-I Mains exam including Computer Knowledge and Financial Awareness.',
+        exam_category: 'RRB_PO',
+        exam_stage: 'mains',
+        total_duration_minutes: 120,
+        has_sectional_timing: true,
+        total_marks: 200,
+        negative_marking: 0.25,
+        target_cutoff: 94.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 22.0
+          },
+          {
+            code: 'computer',
+            name: 'Computer Knowledge',
+            subjectCode: 'computer',
+            questionsCount: 40,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 20.0
+          },
+          {
+            code: 'ga',
+            name: 'General / Financial Awareness',
+            subjectCode: 'ga',
+            questionsCount: 40,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.0
+          },
+          {
+            code: 'english',
+            name: 'English Language',
+            subjectCode: 'english',
+            questionsCount: 40,
+            durationMinutes: 25,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 18.5
+          },
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 16.0
+          }
+        ]
+      },
+      {
         id: 'mixed-sprint-mini-mock',
         title: 'Daily Mixed Sprint Exam (30 Qs / 20 Mins)',
         description: 'Bite-sized high-intensity mixed sprint across English (10 Qs), Quant (10 Qs), and Reasoning (10 Qs).',
@@ -196,6 +621,91 @@ export class QuestionPatternEngineService {
             cutoffEstimate: 7.5
           }
         ]
+      },
+      {
+        id: 'sectional-quant-di-booster',
+        title: 'Quant & DI Sectional Speed Booster (35 Qs / 20 Mins)',
+        description: 'Dedicated 20-minute Quantitative Aptitude sectional test with Simplification, Quadratics, Series, DI, and Arithmetic.',
+        exam_category: 'SECTIONAL',
+        exam_stage: 'prelims',
+        total_duration_minutes: 20,
+        has_sectional_timing: true,
+        total_marks: 35,
+        negative_marking: 0.25,
+        target_cutoff: 24.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'quant',
+            name: 'Quantitative Aptitude',
+            subjectCode: 'quant',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 24.0
+          }
+        ]
+      },
+      {
+        id: 'sectional-reasoning-puzzle-booster',
+        title: 'Reasoning & Puzzles Sectional Booster (35 Qs / 20 Mins)',
+        description: 'Dedicated 20-minute Reasoning Ability sectional test featuring Seating Arrangements, Floor Puzzles, and Syllogisms.',
+        exam_category: 'SECTIONAL',
+        exam_stage: 'prelims',
+        total_duration_minutes: 20,
+        has_sectional_timing: true,
+        total_marks: 35,
+        negative_marking: 0.25,
+        target_cutoff: 25.5,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'reasoning',
+            name: 'Reasoning Ability',
+            subjectCode: 'reasoning',
+            questionsCount: 35,
+            durationMinutes: 20,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 25.5
+          }
+        ]
+      },
+      {
+        id: 'sectional-ga-computer-mains',
+        title: 'Banking Awareness & Computer Mains Booster (40 Qs / 25 Mins)',
+        description: 'Rapid Mains-stage sectional paper combining 25 RBI/Banking Awareness questions and 15 Computer Knowledge questions.',
+        exam_category: 'SECTIONAL',
+        exam_stage: 'mains',
+        total_duration_minutes: 25,
+        has_sectional_timing: false,
+        total_marks: 40,
+        negative_marking: 0.25,
+        target_cutoff: 28.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'ga',
+            name: 'Banking & Financial Awareness',
+            subjectCode: 'ga',
+            questionsCount: 25,
+            durationMinutes: 15,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 17.5
+          },
+          {
+            code: 'computer',
+            name: 'Computer Knowledge',
+            subjectCode: 'computer',
+            questionsCount: 15,
+            durationMinutes: 10,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 10.5
+          }
+        ]
       }
     ];
   }
@@ -223,6 +733,9 @@ export class QuestionPatternEngineService {
           break;
         case 'ga':
           sectionQuestions = this.generateGaSection(section.questionsCount, section.code, section.name);
+          break;
+        case 'computer':
+          sectionQuestions = this.generateComputerSection(section.questionsCount, section.code, section.name);
           break;
         default:
           sectionQuestions = this.generateQuantSection(section.questionsCount, section.code, section.name);
@@ -779,14 +1292,23 @@ export class QuestionPatternEngineService {
     switch (topic) {
       case 'Profit & Loss': {
         const cp = (Math.floor(Math.random() * 6) + 4) * 100; // 400..900
-        const markup = 40; // 40% markup
-        const discount = 20; // 20% discount
-        const mp = cp * (1 + markup / 100);
-        const sp = mp * (1 - discount / 100);
-        const profit = sp - cp;
+        const markupPairs = [
+          { markup: 40, discount: 20 }, // +12%
+          { markup: 50, discount: 20 }, // +20%
+          { markup: 25, discount: 12 }, // +10%
+          { markup: 60, discount: 25 }  // +20%
+        ];
+        const pair = markupPairs[Math.floor(Math.random() * markupPairs.length)];
+        const mp = cp * (1 + pair.markup / 100);
+        const sp = mp * (1 - pair.discount / 100);
         const profitPercent = Math.round(((sp - cp) / cp) * 100);
 
-        const distractors = this.generateNumericDistractors(profitPercent, [10, 15, 14, 20]);
+        const distractors = this.generateNumericDistractors(profitPercent, [
+          profitPercent + 4,
+          profitPercent - 2,
+          pair.markup - pair.discount,
+          profitPercent + 8
+        ]);
         const fmt = this.format5Options(`${profitPercent}%`, distractors.map(d => `${d}%`));
 
         return {
@@ -798,22 +1320,22 @@ export class QuestionPatternEngineService {
           topicName: 'Profit, Loss & Discount',
           patternCode: 'QUAN_ARITH_PL',
           difficulty: 'medium',
-          questionText: `A shopkeeper marks an article ${markup}% above its cost price and allows a discount of ${discount}% on the marked price. Find his net profit percentage.`,
+          questionText: `A shopkeeper marks an article ${pair.markup}% above its cost price of ₹${cp} and allows a discount of ${pair.discount}% on the marked price. Find his net profit percentage.`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Let Cost Price (CP) = ₹100.\nMarked Price (MP) = 100 + ${markup}% of 100 = ₹${100 + markup}.\nSelling Price (SP) = MP × (100 - ${discount}) / 100 = ₹${(100 + markup) * 0.8} = ₹${100 + profitPercent}.\nNet Profit Percentage = ${profitPercent}%.`,
+          explanation: `Let Cost Price (CP) = 100 units.\nMarked Price (MP) = 100 + ${pair.markup}% of 100 = ${100 + pair.markup} units.\nSelling Price (SP) = ${100 + pair.markup} × (100 - ${pair.discount}) / 100 = ${100 + profitPercent} units.\nNet Profit Percentage = ${profitPercent}%.`,
           marks: 1,
           negativeMarks: 0.25
         };
       }
 
       case 'Simple & Compound Interest': {
-        // Difference between CI and SI for 2 years: P * (R / 100)^2
-        const p = (Math.floor(Math.random() * 5) + 3) * 2000; // 6000..14000
-        const r = 10;
+        const p = (Math.floor(Math.random() * 6) + 3) * 2000; // 6000..16000
+        const rates = [10, 15, 20];
+        const r = rates[Math.floor(Math.random() * rates.length)];
         const diff = Math.round(p * Math.pow(r / 100, 2));
 
-        const distractors = this.generateNumericDistractors(diff, [diff + 20, diff - 20, diff + 40, diff - 15]);
+        const distractors = this.generateNumericDistractors(diff, [diff + 30, diff - 25, diff + 60, diff - 15]);
         const fmt = this.format5Options(`₹${diff}`, distractors.map(d => `₹${d}`));
 
         return {
@@ -828,22 +1350,22 @@ export class QuestionPatternEngineService {
           questionText: `What is the difference between the Compound Interest (compounded annually) and Simple Interest on a sum of ₹${p.toLocaleString()} for 2 years at an interest rate of ${r}% per annum?`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Standard 2-year difference formula between CI and SI:\nDifference = P × (R / 100)²\nHere, P = ₹${p}, R = ${r}%\nDifference = ${p} × (${r} / 100)² = ${p} × (0.01) = ₹${diff}.`,
+          explanation: `Standard 2-year difference formula between CI and SI:\nDifference = P × (R / 100)²\nHere, P = ₹${p}, R = ${r}%\nDifference = ${p} × (${r} / 100)² = ₹${diff}.`,
           marks: 1,
           negativeMarks: 0.25
         };
       }
 
       case 'Time, Speed & Distance': {
-        // Train crossing a platform
-        const speedKmph = 72; // 20 m/s
-        const speedMs = 20;
-        const timeSec = 28;
-        const trainLen = 240;
-        const totalDist = speedMs * timeSec; // 560
-        const platLen = totalDist - trainLen; // 320 m
+        const speedMult = Math.floor(Math.random() * 3) + 3; // 3, 4, 5
+        const speedKmph = speedMult * 18; // 54, 72, 90 km/h
+        const speedMs = speedMult * 5; // 15, 20, 25 m/s
+        const timeSec = Math.floor(Math.random() * 10) + 22; // 22..31 s
+        const trainLen = (Math.floor(Math.random() * 4) + 3) * 50; // 150..300 m
+        const totalDist = speedMs * timeSec;
+        const platLen = totalDist - trainLen;
 
-        const distractors = this.generateNumericDistractors(platLen, [280, 360, 300, 340]);
+        const distractors = this.generateNumericDistractors(platLen, [platLen - 40, platLen + 40, platLen - 20, platLen + 60]);
         const fmt = this.format5Options(`${platLen} m`, distractors.map(d => `${d} m`));
 
         return {
@@ -858,18 +1380,53 @@ export class QuestionPatternEngineService {
           questionText: `A train ${trainLen} m long running at a uniform speed of ${speedKmph} km/h crosses a platform completely in ${timeSec} seconds. What is the length of the platform?`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Speed in m/s = ${speedKmph} × (5 / 18) = ${speedMs} m/s.\nTotal distance covered in ${timeSec} s = Speed × Time = ${speedMs} × ${timeSec} = ${totalDist} m.\nTotal distance = Length of train + Length of platform\n${totalDist} = ${trainLen} + Length of platform\nLength of platform = ${totalDist} - ${trainLen} = ${platLen} m.`,
+          explanation: `Speed in m/s = ${speedKmph} × (5 / 18) = ${speedMs} m/s.\nTotal distance covered in ${timeSec} s = Speed × Time = ${speedMs} × ${timeSec} = ${totalDist} m.\nLength of platform = Total distance - Train length = ${totalDist} - ${trainLen} = ${platLen} m.`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Boats & Streams': {
+        // Still water speed u = 12 km/h, stream v = 4 km/h => Downstream = 16, Upstream = 8
+        const mult = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+        const u = 12;
+        const v = 4;
+        const dist = 32 * mult; // 32, 64, 96 km
+        const downTime = dist / (u + v); // 2*mult
+        const upTime = dist / (u - v); // 4*mult
+        const totalHours = downTime + upTime; // 6*mult
+
+        const distractors = this.generateNumericDistractors(totalHours, [totalHours + 2, totalHours - 2, totalHours + 4, totalHours + 1]);
+        const fmt = this.format5Options(`${totalHours} hours`, distractors.map(d => `${d} hours`));
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Boats & Streams',
+          patternCode: 'QUAN_ARITH_BOATS',
+          difficulty: 'medium',
+          questionText: `The speed of a boat in still water is ${u} km/h and the speed of the current is ${v} km/h. How much total time will the boat take to row ${dist} km downstream and return ${dist} km upstream to the starting point?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Downstream speed = ${u} + ${v} = ${u + v} km/h.\nUpstream speed = ${u} - ${v} = ${u - v} km/h.\nTime downstream = ${dist} / ${u + v} = ${downTime} hours.\nTime upstream = ${dist} / ${u - v} = ${upTime} hours.\nTotal time = ${downTime} + ${upTime} = ${totalHours} hours.`,
           marks: 1,
           negativeMarks: 0.25
         };
       }
 
       case 'Time & Work': {
-        // A does work in 12 days, B in 15 days, together?
-        const aDays = 12;
-        const bDays = 15;
-        // LCM = 60, Eff A = 5, Eff B = 4 => Combined = 9 => 60/9 = 20/3 = 6 2/3 days
-        const fmt = this.format5Options('6 ⅔ days', ['7 days', '6 days', '7 ½ days', '8 days']);
+        const pairs = [
+          { a: 10, b: 15, ans: 6, lcm: 30 },
+          { a: 12, b: 24, ans: 8, lcm: 24 },
+          { a: 15, b: 30, ans: 10, lcm: 30 },
+          { a: 20, b: 30, ans: 12, lcm: 60 }
+        ];
+        const p = pairs[Math.floor(Math.random() * pairs.length)];
+        const distractors = this.generateNumericDistractors(p.ans, [p.ans + 2, p.ans - 1, p.ans + 3, p.ans + 4]);
+        const fmt = this.format5Options(`${p.ans} days`, distractors.map(d => `${d} days`));
 
         return {
           id,
@@ -880,21 +1437,53 @@ export class QuestionPatternEngineService {
           topicName: 'Time & Work',
           patternCode: 'QUAN_ARITH_WORK',
           difficulty: 'easy',
-          questionText: `A can complete a piece of work in ${aDays} days, while B can complete the same work in ${bDays} days. In how many days will both of them complete the work working together?`,
+          questionText: `A can complete a piece of work in ${p.a} days, while B can complete the same work in ${p.b} days. In how many days will both of them complete the work working together?`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Using the LCM (Unit Work) method:\nTotal Work = LCM(${aDays}, ${bDays}) = 60 units.\nEfficiency of A = 60 / ${aDays} = 5 units/day.\nEfficiency of B = 60 / ${bDays} = 4 units/day.\nCombined efficiency = 5 + 4 = 9 units/day.\nTime required = Total Work / Combined Efficiency = 60 / 9 = 20 / 3 = 6 ⅔ days.`,
+          explanation: `Total Work = LCM(${p.a}, ${p.b}) = ${p.lcm} units.\nEfficiency of A = ${p.lcm / p.a} units/day.\nEfficiency of B = ${p.lcm / p.b} units/day.\nCombined efficiency = ${(p.lcm / p.a) + (p.lcm / p.b)} units/day.\nTime required = ${p.lcm} / ${(p.lcm / p.a) + (p.lcm / p.b)} = ${p.ans} days.`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Pipes & Cisterns': {
+        // Pipe A fills in 12 hrs, Pipe B empties in 18 hrs => LCM 36, net = 3 - 2 = 1 => 36 hrs
+        const pairs = [
+          { fill: 12, empty: 18, netHours: 36 },
+          { fill: 10, empty: 15, netHours: 30 },
+          { fill: 8, empty: 12, netHours: 24 }
+        ];
+        const p = pairs[Math.floor(Math.random() * pairs.length)];
+        const distractors = this.generateNumericDistractors(p.netHours, [p.netHours - 6, p.netHours + 6, p.netHours - 4, p.netHours + 12]);
+        const fmt = this.format5Options(`${p.netHours} hours`, distractors.map(d => `${d} hours`));
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Pipes & Cisterns',
+          patternCode: 'QUAN_ARITH_PIPES',
+          difficulty: 'medium',
+          questionText: `An inlet pipe A can fill an empty cistern in ${p.fill} hours, while an outlet pipe B can empty the completely filled cistern in ${p.empty} hours. If both pipes are opened simultaneously when the cistern is empty, in how many hours will the cistern be completely filled?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Let total capacity = ${p.netHours} units.\nInlet Pipe A fills = ${p.netHours} / ${p.fill} = 3 units/hr.\nOutlet Pipe B empties = ${p.netHours} / ${p.empty} = 2 units/hr.\nNet filling rate = 3 - 2 = 1 unit/hr.\nTime to fill = ${p.netHours} / 1 = ${p.netHours} hours.`,
           marks: 1,
           negativeMarks: 0.25
         };
       }
 
       case 'Mixtures & Alligation': {
-        // 40 liters of milk and water in ratio 3:1. How much water to make 2:1?
-        const total = 40;
-        // Milk = 30, Water = 10
-        // Want 30 / (10 + x) = 2 / 1 => 20 + 2x = 30 => x = 5 liters
-        const fmt = this.format5Options('5 liters', ['4 liters', '6 liters', '8 liters', '10 liters']);
+        const mult = Math.floor(Math.random() * 4) + 1; // 1..4
+        const total = 40 * mult;
+        const milk = 30 * mult;
+        const water = 10 * mult;
+        const addedWater = 5 * mult;
+
+        const distractors = this.generateNumericDistractors(addedWater, [addedWater + 2, addedWater - 1, addedWater + 4, addedWater + 5]);
+        const fmt = this.format5Options(`${addedWater} liters`, distractors.map(d => `${d} liters`));
 
         return {
           id,
@@ -908,7 +1497,109 @@ export class QuestionPatternEngineService {
           questionText: `A vessel contains ${total} liters of a mixture of milk and water in the ratio 3 : 1. How much water must be added to this mixture so that the ratio of milk to water becomes 2 : 1?`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Initial mixture = ${total} liters.\nQuantity of Milk = (3/4) × ${total} = 30 liters.\nQuantity of Water = (1/4) × ${total} = 10 liters.\n\nLet x liters of water be added:\nMilk / Water = 30 / (10 + x) = 2 / 1\n⇒ 2(10 + x) = 30\n⇒ 20 + 2x = 30\n⇒ 2x = 10 ⇒ x = 5 liters.`,
+          explanation: `Initial mixture = ${total} liters (Milk = ${milk} L, Water = ${water} L).\nLet x liters of water be added:\n${milk} / (${water} + x) = 2 / 1\n⇒ 2(${water} + x) = ${milk} ⇒ x = ${addedWater} liters.`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Partnership': {
+        // A and B invest in ratio 3:5 for 12 months. Total profit = 8000 * k
+        const k = (Math.floor(Math.random() * 5) + 2) * 1000; // 2000..6000
+        const aInv = 3 * 10000;
+        const bInv = 5 * 10000;
+        const totalProfit = 8 * k;
+        const bShare = 5 * k;
+
+        const distractors = this.generateNumericDistractors(bShare, [3 * k, 4 * k, bShare + 1000, bShare - 1000]);
+        const fmt = this.format5Options(`₹${bShare.toLocaleString()}`, distractors.map(d => `₹${d.toLocaleString()}`));
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Partnership',
+          patternCode: 'QUAN_ARITH_PARTNER',
+          difficulty: 'easy',
+          questionText: `Rohan and Vikram started a business by investing ₹${aInv.toLocaleString()} and ₹${bInv.toLocaleString()} respectively. At the end of the year, they earned a total profit of ₹${totalProfit.toLocaleString()}. What is Vikram's share in the profit?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Ratio of investments = ${aInv} : ${bInv} = 3 : 5.\nSince both invested for 12 months, profit ratio = 3 : 5 (Total = 8 parts).\nVikram's share = (5 / 8) × ₹${totalProfit.toLocaleString()} = ₹${bShare.toLocaleString()}.`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Averages': {
+        const students = (Math.floor(Math.random() * 3) + 2) * 10; // 20, 30, 40
+        const avgAge = Math.floor(Math.random() * 4) + 14; // 14..17
+        const teacherAge = avgAge + (students + 1); // increases average by 1 year
+
+        const distractors = this.generateNumericDistractors(teacherAge, [teacherAge - 2, teacherAge + 3, teacherAge - 5, teacherAge + 5]);
+        const fmt = this.format5Options(`${teacherAge} years`, distractors.map(d => `${d} years`));
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Averages',
+          patternCode: 'QUAN_ARITH_AVG',
+          difficulty: 'easy',
+          questionText: `The average age of a class of ${students} students is ${avgAge} years. When the age of the class teacher is also included, the average age of the whole group increases by 1 year. What is the age of the teacher?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `New average for (${students} + 1) = ${students + 1} persons is ${avgAge + 1} years.\nAge of teacher = Base average + (Total members × Increase in average)\n= ${avgAge} + (${students + 1} × 1) = ${teacherAge} years.`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Mensuration': {
+        const rMult = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+        const radius = 7 * rMult; // 7, 14, 21 cm
+        const area = 154 * rMult * rMult; // 154, 616, 1386 sq cm
+
+        const distractors = this.generateNumericDistractors(area, [area + 22, area - 14, area + 44, area - 28]);
+        const fmt = this.format5Options(`${area} cm²`, distractors.map(d => `${d} cm²`));
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Mensuration (2D & 3D)',
+          patternCode: 'QUAN_ARITH_MENS',
+          difficulty: 'easy',
+          questionText: `The circumference of a circular garden is ${44 * rMult} cm. What is the area of the circular garden? (Take π = 22/7)`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Circumference = 2πr = 2 × (22/7) × r = ${44 * rMult} ⇒ r = ${radius} cm.\nArea of circle = πr² = (22/7) × ${radius} × ${radius} = ${area} cm².`,
+          marks: 1,
+          negativeMarks: 0.25
+        };
+      }
+
+      case 'Probability': {
+        const fmt = this.format5Options('5/14', ['3/14', '9/14', '1/7', '2/7']);
+
+        return {
+          id,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'quant',
+          topicName: 'Probability',
+          patternCode: 'QUAN_ARITH_PROB',
+          difficulty: 'medium',
+          questionText: `A bag contains 5 Red balls and 3 Blue balls. If 2 balls are drawn at random simultaneously from the bag, what is the probability that both balls drawn are Red?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Total balls = 5 + 3 = 8.\nTotal ways to draw 2 balls = ⁸C₂ = (8 × 7) / 2 = 28.\nFavorable ways to draw 2 Red balls = ⁵C₂ = (5 × 4) / 2 = 10.\nProbability = 10 / 28 = 5/14.`,
           marks: 1,
           negativeMarks: 0.25
         };
@@ -916,9 +1607,11 @@ export class QuestionPatternEngineService {
 
       default: {
         // Ages
-        // Ratio of present ages of A and B is 4:5. After 5 years, ratio is 5:6.
-        // Present age of A? 4x, 5x. (4x + 5)/(5x + 5) = 5/6 => 24x + 30 = 25x + 25 => x = 5. Age A = 20
-        const fmt = this.format5Options('20 years', ['25 years', '18 years', '24 years', '22 years']);
+        const x = Math.floor(Math.random() * 4) + 4; // 4, 5, 6, 7
+        const presentA = 4 * x;
+        const presentB = 5 * x;
+        const distractors = this.generateNumericDistractors(presentA, [presentB, presentA - 4, presentA + 4, presentA + 2]);
+        const fmt = this.format5Options(`${presentA} years`, distractors.map(d => `${d} years`));
 
         return {
           id,
@@ -929,10 +1622,10 @@ export class QuestionPatternEngineService {
           topicName: 'Ages & Ratios',
           patternCode: 'QUAN_ARITH_AGES',
           difficulty: 'easy',
-          questionText: `The ratio of the present ages of Amit and Bharat is 4 : 5. Five years hence, the ratio of their ages will become 5 : 6. What is Amit's present age?`,
+          questionText: `The ratio of the present ages of Amit and Bharat is 4 : 5. After ${x} years, the ratio of their ages will become 5 : 6. What is Amit's present age?`,
           options: fmt.options,
           correctOptionIndex: fmt.correctIndex,
-          explanation: `Let the present ages of Amit and Bharat be 4x and 5x years respectively.\nAccording to question:\n(4x + 5) / (5x + 5) = 5 / 6\nCross-multiplying:\n6(4x + 5) = 5(5x + 5)\n⇒ 24x + 30 = 25x + 25\n⇒ x = 5\n\nTherefore, Amit's present age = 4x = 4 × 5 = 20 years.`,
+          explanation: `Let the present ages of Amit and Bharat be 4k and 5k years.\nAfter ${x} years: (4k + ${x}) / (5k + ${x}) = 5 / 6\n⇒ 24k + ${6 * x} = 25k + ${5 * x} ⇒ k = ${x}.\nTherefore, Amit's present age = 4 × ${x} = ${presentA} years.`,
           marks: 1,
           negativeMarks: 0.25
         };
@@ -948,15 +1641,14 @@ export class QuestionPatternEngineService {
     const items: ExamQuestionItem[] = [];
     const runId = Math.random().toString(36).substring(2, 7);
 
-    // Distribution for 35 Qs:
-    // 5 Syllogisms, 5 Inequalities, 3 Direction/Distance, 3 Blood Relations,
-    // 5 Coding-Decoding, 4 Order & Ranking/Series, 10 Puzzles (2 sets of 5)
-    const syllCount = Math.min(5, Math.ceil(count * 0.15));
-    const ineqCount = Math.min(5, Math.ceil(count * 0.15));
-    const dirCount = Math.min(3, Math.ceil(count * 0.10));
-    const brCount = Math.min(3, Math.ceil(count * 0.10));
-    const codeCount = Math.min(5, Math.ceil(count * 0.15));
-    const puzzleCount = count >= 20 ? 10 : 0;
+    // Distribution for 35-45 Qs:
+    const syllCount = Math.min(5, Math.ceil(count * 0.14));
+    const ineqCount = Math.min(5, Math.ceil(count * 0.14));
+    const dirCount = Math.min(3, Math.ceil(count * 0.09));
+    const brCount = Math.min(3, Math.ceil(count * 0.09));
+    const codeCount = Math.min(5, Math.ceil(count * 0.14));
+    const puzzleSetsCount = count >= 35 ? 3 : (count >= 20 ? 2 : 0);
+    const puzzleCount = puzzleSetsCount * 5;
     const miscCount = Math.max(1, count - (syllCount + ineqCount + dirCount + brCount + codeCount + puzzleCount));
 
     for (let i = 0; i < syllCount; i++) {
@@ -979,9 +1671,12 @@ export class QuestionPatternEngineService {
       items.push(this.buildCodingDecodingQuestion(`${runId}-cd-${i}`, sectionCode, sectionName));
     }
 
-    if (puzzleCount >= 10) {
+    if (puzzleSetsCount >= 2) {
       items.push(...this.buildCircularPuzzleSet(`${runId}-puz1`, sectionCode, sectionName));
       items.push(...this.buildLinearPuzzleSet(`${runId}-puz2`, sectionCode, sectionName));
+    }
+    if (puzzleSetsCount >= 3) {
+      items.push(...this.buildFloorPuzzleSet(`${runId}-puz3`, sectionCode, sectionName));
     }
 
     for (let i = 0; i < miscCount; i++) {
@@ -1012,6 +1707,12 @@ export class QuestionPatternEngineService {
         conclusions: 'Conclusions:\nI. No circle is a triangle.\nII. Some squares are definitely not hexagons.',
         answer: 'Only conclusion II follows',
         explanation: '1. Circles and triangles have no negative relation; circle may or may not overlap triangle. Conclusion I is not definite.\n2. The squares that are triangles cannot be hexagons because no triangle is a hexagon. Hence, those squares are definitely not hexagons. Conclusion II follows.'
+      },
+      {
+        statements: 'Statements:\n• Only a few rivers are oceans.\n• All oceans are glaciers.\n• Some glaciers are mountains.',
+        conclusions: 'Conclusions:\nI. All rivers being oceans is a possibility.\nII. Some rivers are glaciers.',
+        answer: 'Only conclusion II follows',
+        explanation: '1. "Only a few rivers are oceans" means some rivers are oceans AND some rivers are definitely NOT oceans. Therefore, all rivers can never be oceans (I does not follow).\n2. Since some rivers are oceans and all oceans are glaciers, some rivers are definitely glaciers (II follows).'
       }
     ];
 
@@ -1062,6 +1763,12 @@ export class QuestionPatternEngineService {
         conclusions: 'Conclusions:\nI. M < P\nII. N > Q',
         answer: 'Neither conclusion I nor II follows',
         explanation: 'For I: M ≤ N < O ≥ P contains opposite signs (< and ≥), relation undetermined.\nFor II: N < O ≥ P > Q contains opposite signs (< and ≥), relation undetermined.\nHence, neither conclusion follows.'
+      },
+      {
+        statement: 'Statements: K ≥ L = M ≥ N; N = O',
+        conclusions: 'Conclusions:\nI. K > O\nII. K = O',
+        answer: 'Either conclusion I or II follows',
+        explanation: 'Combining the chain: K ≥ L = M ≥ N = O ⇒ K ≥ O.\nSince K ≥ O means either K > O or K = O, Conclusions I and II form a complementary "Either/Or" pair.'
       }
     ];
 
@@ -1094,8 +1801,14 @@ export class QuestionPatternEngineService {
   }
 
   private buildDirectionQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
-    // Pythagoras triplet: 6, 8 => 10
-    const fmt = this.format5Options('10 meters', ['12 meters', '14 meters', '8 meters', '15 meters']);
+    const triplets = [
+      { n1: 12, e: 8, s: 6, netN: 6, ans: 10 }, // 6, 8 -> 10
+      { n1: 15, e: 12, s: 6, netN: 9, ans: 15 }, // 9, 12 -> 15
+      { n1: 10, e: 12, s: 5, netN: 5, ans: 13 }  // 5, 12 -> 13
+    ];
+    const t = triplets[Math.floor(Math.random() * triplets.length)];
+    const distractors = this.generateNumericDistractors(t.ans, [t.ans + 2, t.ans + 4, t.ans - 2, t.ans + 5]);
+    const fmt = this.format5Options(`${t.ans} meters`, distractors.map(d => `${d} meters`));
 
     return {
       id,
@@ -1106,17 +1819,32 @@ export class QuestionPatternEngineService {
       topicName: 'Direction & Distance',
       patternCode: 'REAS_DIR_01',
       difficulty: 'easy',
-      questionText: `Rohan starts walking from point A towards North. After walking 12 meters, he turns right and walks 8 meters. He then turns right again and walks 6 meters to reach point B. What is the shortest straight-line distance between point A and point B?`,
+      questionText: `Rohan starts walking from point A towards North. After walking ${t.n1} meters, he turns right and walks ${t.e} meters. He then turns right again and walks ${t.s} meters to reach point B. What is the shortest straight-line distance between point A and point B?`,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
-      explanation: `Net displacement:\nNorth-South displacement = 12 m (North) - 6 m (South) = 6 m North.\nEast-West displacement = 8 m East.\nShortest distance = √(6² + 8²) = √(36 + 64) = √100 = 10 meters.`,
+      explanation: `Net displacement:\nNorth-South displacement = ${t.n1} m (North) - ${t.s} m (South) = ${t.netN} m North.\nEast-West displacement = ${t.e} m East.\nShortest distance = √(${t.netN}² + ${t.e}²) = ${t.ans} meters.`,
       marks: 1,
       negativeMarks: 0.25
     };
   }
 
   private buildBloodRelationQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
-    const fmt = this.format5Options('Uncle', ['Brother', 'Father', 'Maternal Grandfather', 'Cousin']);
+    const templates = [
+      {
+        q: `Pointing to a photograph, Priya said, "He is the only son of the mother of my sister's brother." How is the person in the photograph related to Priya?`,
+        ans: 'Brother',
+        dis: ['Uncle', 'Father', 'Cousin', 'Nephew'],
+        exp: `"My sister's brother" is Priya's brother. His mother is Priya's mother. The only son of Priya's mother is Priya's brother.`
+      },
+      {
+        q: `A is the father of B. B is the sister of C. D is the mother of C. E is the father of D. How is A related to E?`,
+        ans: 'Son-in-law',
+        dis: ['Brother-in-law', 'Son', 'Nephew', 'Brother'],
+        exp: `A is the father of B & C, and D is the mother of B & C, so A is the husband of D. Since E is the father of D, A is the son-in-law of E.`
+      }
+    ];
+    const pick = templates[Math.floor(Math.random() * templates.length)];
+    const fmt = this.format5Options(pick.ans, pick.dis);
 
     return {
       id,
@@ -1127,17 +1855,17 @@ export class QuestionPatternEngineService {
       topicName: 'Blood Relations',
       patternCode: 'REAS_BR_01',
       difficulty: 'medium',
-      questionText: `Pointing to a photograph, Priya said, "He is the only son of the mother of my father's brother." How is the person in the photograph related to Priya's father?`,
+      questionText: pick.q,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
-      explanation: `Breaking down Priya's statement:\n• "My father's brother" = Priya's uncle.\n• "Mother of my father's brother" = Priya's paternal grandmother.\n• "Only son of my paternal grandmother" = Priya's father.\nWait, if the grandmother has Priya's father and his brother, the phrasing implies her uncle is one of the sons. With respect to Priya, the person is her Father or Uncle; in this question context with respect to Priya, it is Uncle.\nHence Uncle is the correct option.`,
+      explanation: pick.exp,
       marks: 1,
       negativeMarks: 0.25
     };
   }
 
   private buildCodingDecodingQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
-    const fmt = this.format5Options('tu', ['la', 'pa', 'so', 'Cannot be determined']);
+    const fmt = this.format5Options('tu', ['la', 'pa', 'so', 'ki']);
 
     return {
       id,
@@ -1170,7 +1898,6 @@ export class QuestionPatternEngineService {
 
     const items: ExamQuestionItem[] = [];
 
-    // Q1: Who sits immediate right of P?
     const q1 = this.format5Options('U', ['T', 'Q', 'V', 'R']);
     items.push({
       id: `${idPrefix}-1`,
@@ -1190,7 +1917,6 @@ export class QuestionPatternEngineService {
       negativeMarks: 0.25
     });
 
-    // Q2: Number of persons between T and W
     const q2 = this.format5Options('One', ['Two', 'Three', 'None', 'Four']);
     items.push({
       id: `${idPrefix}-2`,
@@ -1210,7 +1936,6 @@ export class QuestionPatternEngineService {
       negativeMarks: 0.25
     });
 
-    // Q3: Who sits opposite to Q?
     const q3 = this.format5Options('W', ['P', 'R', 'S', 'U']);
     items.push({
       id: `${idPrefix}-3`,
@@ -1230,7 +1955,6 @@ export class QuestionPatternEngineService {
       negativeMarks: 0.25
     });
 
-    // Q4: Immediate neighbours of S
     const q4 = this.format5Options('Q and P', ['T and U', 'W and R', 'P and V', 'R and T']);
     items.push({
       id: `${idPrefix}-4`,
@@ -1250,7 +1974,6 @@ export class QuestionPatternEngineService {
       negativeMarks: 0.25
     });
 
-    // Q5: Position of V with respect to R
     const q5 = this.format5Options('Third to the left', ['Second to the right', 'Immediate right', 'Fourth to the left', 'Opposite']);
     items.push({
       id: `${idPrefix}-5`,
@@ -1265,7 +1988,7 @@ export class QuestionPatternEngineService {
       questionText: `What is the position of V with respect to R?`,
       options: q5.options,
       correctOptionIndex: q5.correctIndex,
-      explanation: `Looking at R facing center, left is towards W and V. W is 1st left, V is 2nd or 3rd left depending on step counting. Here V is third to the left of R.`,
+      explanation: `Looking at R facing center, left is towards W and V. Here V is third to the left of R.`,
       marks: 1,
       negativeMarks: 0.25
     });
@@ -1286,7 +2009,6 @@ export class QuestionPatternEngineService {
 
     const items: ExamQuestionItem[] = [];
 
-    // Order: D, F, C, A, B, G, E  (7 positions)
     const q1 = this.format5Options('A', ['C', 'G', 'B', 'F']);
     items.push({
       id: `${idPrefix}-1`,
@@ -1385,8 +2107,122 @@ export class QuestionPatternEngineService {
     return items;
   }
 
+  private buildFloorPuzzleSet(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    // 7-Floor Building Puzzle: Floors 7 (top) down to 1 (bottom)
+    // Order from Floor 7 down to 1:
+    // Floor 7: K, Floor 6: N, Floor 5: J, Floor 4: M, Floor 3: O, Floor 2: L, Floor 1: P
+    const passage =
+      `Directions (Q. 1 to 5): Study the following information carefully and answer the questions:\n\n` +
+      `Seven executives — J, K, L, M, N, O, and P — live on seven different floors of a residential building. The lowermost floor is numbered 1, the floor above it is numbered 2, and so on until the topmost floor is numbered 7.\n` +
+      `• M lives on the 4th floor.\n` +
+      `• Only two people live between M and K.\n` +
+      `• J lives immediately above M.\n` +
+      `• Three people live between N and L, and N lives on an even-numbered floor above M.\n` +
+      `• O lives immediately above L.\n` +
+      `• P lives on the lowermost floor (Floor 1).\n`;
+
+    const items: ExamQuestionItem[] = [];
+
+    const q1 = this.format5Options('K', ['N', 'J', 'O', 'L']);
+    items.push({
+      id: `${idPrefix}-1`,
+      sectionCode,
+      sectionName,
+      questionNumber: 0,
+      subjectCode: 'reasoning',
+      topicName: 'Floor Based Puzzle',
+      patternCode: 'REAS_PUZ_FLR_01',
+      difficulty: 'hard',
+      passageText: passage,
+      questionText: `Who lives on the topmost floor (7th floor)?`,
+      options: q1.options,
+      correctOptionIndex: q1.correctIndex,
+      explanation: `Since M is on Floor 4 and P is on Floor 1, two people between M and K places K on Floor 7 (topmost floor). Final floor order (7 to 1): K(7), N(6), J(5), M(4), O(3), L(2), P(1).`,
+      marks: 1,
+      negativeMarks: 0.25
+    });
+
+    const q2 = this.format5Options('6th Floor', ['5th Floor', '3rd Floor', '2nd Floor', '7th Floor']);
+    items.push({
+      id: `${idPrefix}-2`,
+      sectionCode,
+      sectionName,
+      questionNumber: 0,
+      subjectCode: 'reasoning',
+      topicName: 'Floor Based Puzzle',
+      patternCode: 'REAS_PUZ_FLR_02',
+      difficulty: 'hard',
+      passageText: passage,
+      questionText: `On which floor does N live?`,
+      options: q2.options,
+      correctOptionIndex: q2.correctIndex,
+      explanation: `N lives on an even-numbered floor above M (Floor 4), which must be Floor 6.`,
+      marks: 1,
+      negativeMarks: 0.25
+    });
+
+    const q3 = this.format5Options('Two', ['One', 'Three', 'Four', 'None']);
+    items.push({
+      id: `${idPrefix}-3`,
+      sectionCode,
+      sectionName,
+      questionNumber: 0,
+      subjectCode: 'reasoning',
+      topicName: 'Floor Based Puzzle',
+      patternCode: 'REAS_PUZ_FLR_03',
+      difficulty: 'hard',
+      passageText: passage,
+      questionText: `How many people live between J and L?`,
+      options: q3.options,
+      correctOptionIndex: q3.correctIndex,
+      explanation: `J lives on Floor 5 and L lives on Floor 2. The people living between them are M (Floor 4) and O (Floor 3) — i.e., Two people.`,
+      marks: 1,
+      negativeMarks: 0.25
+    });
+
+    const q4 = this.format5Options('O', ['L', 'J', 'N', 'P']);
+    items.push({
+      id: `${idPrefix}-4`,
+      sectionCode,
+      sectionName,
+      questionNumber: 0,
+      subjectCode: 'reasoning',
+      topicName: 'Floor Based Puzzle',
+      patternCode: 'REAS_PUZ_FLR_04',
+      difficulty: 'hard',
+      passageText: passage,
+      questionText: `Who lives immediately below M?`,
+      options: q4.options,
+      correctOptionIndex: q4.correctIndex,
+      explanation: `M lives on Floor 4, and O lives on Floor 3 immediately below M.`,
+      marks: 1,
+      negativeMarks: 0.25
+    });
+
+    const q5 = this.format5Options('L - 2nd Floor', ['O - 5th Floor', 'J - 6th Floor', 'N - 3rd Floor', 'K - 5th Floor']);
+    items.push({
+      id: `${idPrefix}-5`,
+      sectionCode,
+      sectionName,
+      questionNumber: 0,
+      subjectCode: 'reasoning',
+      topicName: 'Floor Based Puzzle',
+      patternCode: 'REAS_PUZ_FLR_05',
+      difficulty: 'hard',
+      passageText: passage,
+      questionText: `Which of the following combinations of Person and Floor is definitely CORRECT?`,
+      options: q5.options,
+      correctOptionIndex: q5.correctIndex,
+      explanation: `From the arrangement K(7), N(6), J(5), M(4), O(3), L(2), P(1), the combination "L - 2nd Floor" is correct.`,
+      marks: 1,
+      negativeMarks: 0.25
+    });
+
+    return items;
+  }
+
   private buildAlphanumericQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
-    const fmt = this.format5Options('Three', ['Two', 'Four', 'One', 'None']);
+    const fmt = this.format5Options('Two', ['Three', 'Four', 'One', 'None']);
 
     return {
       id,
@@ -1397,10 +2233,10 @@ export class QuestionPatternEngineService {
       topicName: 'Alphanumeric & Sequence',
       patternCode: 'REAS_ALPHA_01',
       difficulty: 'easy',
-      questionText: `Study the following sequence of letters, digits, and symbols:\n\nM 4 @ K 9 # P 2 $ T 7 & B 5 % W\n\nHow many such symbols are there in the sequence, each of which is immediately preceded by a letter and immediately followed by a number?`,
+      questionText: `Study the following sequence of letters, digits, and symbols:\n\nM 4 @ K 9 # P $ 2 T & 7 B 5 % W\n\nHow many such symbols are there in the sequence, each of which is immediately preceded by a letter and immediately followed by a number?`,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
-      explanation: `Condition: [Letter] -> [Symbol] -> [Number]\nChecking instances:\n1. K # P (No, P is a letter)\n2. P $ 2 (P is letter, $ is symbol, 2 is number -> VALID #1)\n3. T & 7 (T is letter, & is symbol, 7 is number -> VALID #2)\n4. B % 5 (Wait, B 5 % W has symbol after number)\nTotal valid instances = Three instances matching the letter-symbol-number pattern.`,
+      explanation: `Condition: [Letter] -> [Symbol] -> [Number]\nChecking instances:\n1. P $ 2 (P is letter, $ is symbol, 2 is number -> VALID #1)\n2. T & 7 (T is letter, & is symbol, 7 is number -> VALID #2)\nTotal valid instances = Two.`,
       marks: 1,
       negativeMarks: 0.25
     };
@@ -1414,14 +2250,14 @@ export class QuestionPatternEngineService {
     const items: ExamQuestionItem[] = [];
     const runId = Math.random().toString(36).substring(2, 7);
 
-    // Distribution for 30 Qs:
-    // 6 Error Spotting, 5 Phrase Replacement, 5 Double Fillers, 5 Cloze Test, 5 Para Jumble, 4 Reading/Vocab
-    const errCount = Math.min(6, Math.ceil(count * 0.20));
-    const repCount = Math.min(5, Math.ceil(count * 0.17));
-    const filCount = Math.min(5, Math.ceil(count * 0.17));
+    // Distribution for 30-40 Qs:
+    const errCount = Math.min(6, Math.ceil(count * 0.18));
+    const repCount = Math.min(5, Math.ceil(count * 0.15));
+    const filCount = Math.min(5, Math.ceil(count * 0.15));
     const clozeCount = count >= 20 ? 5 : 0;
     const pjCount = count >= 25 ? 5 : 0;
-    const remCount = Math.max(1, count - (errCount + repCount + filCount + clozeCount + pjCount));
+    const rcCount = count >= 30 ? 5 : 0;
+    const remCount = Math.max(0, count - (errCount + repCount + filCount + clozeCount + pjCount + rcCount));
 
     for (let i = 0; i < errCount; i++) {
       items.push(this.buildErrorSpottingQuestion(`${runId}-err-${i}`, sectionCode, sectionName, i));
@@ -1441,6 +2277,10 @@ export class QuestionPatternEngineService {
 
     if (pjCount > 0) {
       items.push(...this.buildParaJumbleSet(`${runId}-pj`, sectionCode, sectionName));
+    }
+
+    if (rcCount > 0) {
+      items.push(...this.buildReadingComprehensionSet(`${runId}-rc`, sectionCode, sectionName));
     }
 
     for (let i = 0; i < remCount; i++) {
@@ -1498,6 +2338,15 @@ export class QuestionPatternEngineService {
         partD: 'in cashless transactions.',
         errorPart: 'E', // No error
         explanation: 'The sentence is grammatically sound with correct subject-verb agreement and prepositional usage. Hence, there is No error (E).'
+      },
+      {
+        text: 'The Reserve Bank of India has instructed / all scheduled commercial banks to strictly / comply to the revised KYC guidelines / before the end of the quarter.',
+        partA: 'The Reserve Bank of India has instructed',
+        partB: 'all scheduled commercial banks to strictly',
+        partC: 'comply to the revised KYC guidelines',
+        partD: 'before the end of the quarter.',
+        errorPart: 'C',
+        explanation: 'In part (C), "comply to" is incorrect. The verb "comply" takes the fixed preposition "with" ("comply with the revised KYC guidelines").'
       }
     ];
 
@@ -1554,6 +2403,18 @@ export class QuestionPatternEngineService {
         ],
         correct: 0,
         explanation: '"Owing to" already means "because of" and does not take another preposition "of". Hence, "owing to" is correct.'
+      },
+      {
+        sentence: 'The board of directors is looking forward *to implement* the new core banking solution next month.',
+        options: [
+          'to implementing',
+          'for implementing',
+          'to have implemented',
+          'at implementing',
+          'No correction required'
+        ],
+        correct: 0,
+        explanation: 'The phrasal expression "look forward to" has "to" as a preposition, so it must be followed by a gerund (-ing form: "to implementing").'
       }
     ];
 
@@ -1602,6 +2463,18 @@ export class QuestionPatternEngineService {
         ],
         correct: 0,
         explanation: 'The contrast word "Despite" indicates adversity in the first blank ("headwinds") followed by strength/endurance in the second blank ("resilience").'
+      },
+      {
+        sentence: 'Stringent capital adequacy norms are designed to ________ systemic risks and ________ depositor confidence in the banking sector.',
+        options: [
+          'mitigate, bolster',
+          'exacerbate, undermine',
+          'amplify, erode',
+          'ignore, weaken',
+          'provoke, shatter'
+        ],
+        correct: 0,
+        explanation: 'Capital adequacy norms reduce ("mitigate") systemic risk and strengthen ("bolster") depositor confidence.'
       }
     ];
 
@@ -1695,8 +2568,7 @@ export class QuestionPatternEngineService {
       `B. Global central banks rapidly increased their benchmark interest rates to combat multi-decade high inflation.\n` +
       `C. This aggressive monetary tightening triggered a surge in sovereign bond yields across advanced economies.\n` +
       `D. In response, domestic banking regulators implemented proactive liquidity management buffers.\n` +
-      `E. As bond yields rose, the US dollar strengthened markedly against other world currencies.\n\n` +
-      `Coherent logical order: B -> C -> E -> A -> D.`;
+      `E. As bond yields rose, the US dollar strengthened markedly against other world currencies.\n`;
 
     const pjQuestions: ExamQuestionItem[] = [
       {
@@ -1712,7 +2584,7 @@ export class QuestionPatternEngineService {
         questionText: `Which of the following should be the FIRST sentence after rearrangement?`,
         options: ['B', 'A', 'C', 'D', 'E'],
         correctOptionIndex: 0,
-        explanation: 'Sentence B introduces the root cause: global central banks raising rates to fight inflation.',
+        explanation: 'Sentence B introduces the root cause: global central banks raising rates to fight inflation. Logical sequence: B -> C -> E -> A -> D.',
         marks: 1,
         negativeMarks: 0.25
       },
@@ -1789,8 +2661,151 @@ export class QuestionPatternEngineService {
     return pjQuestions;
   }
 
+  private buildReadingComprehensionSet(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const passage =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `Central Bank Digital Currencies (CBDCs), such as the Reserve Bank of India's Digital Rupee (e₹), represent a sovereign digital legal tender issued directly by the central bank. Unlike decentralized cryptocurrencies, which exhibit extreme price volatility and lack intrinsic backing, a CBDC carries the same sovereign guarantee as physical banknotes. The RBI has bifurcated its pilot into two distinct segments: Wholesale CBDC (e₹-W), designed to streamline interbank settlements and government securities trading, and Retail CBDC (e₹-R), aimed at everyday peer-to-peer and peer-to-merchant transactions.\n\n` +
+      `A key advantage of CBDCs is the reduction in the physical cost of printing, transporting, and storing paper currency, alongside instantaneous settlement finality that reduces counterparty risk. However, policymakers remain mindful of potential disintermediation risks: if citizens convert large volumes of commercial bank deposits into risk-free central bank digital wallets during periods of financial stress, commercial banks could face liquidity constraints. Consequently, non-remunerative (zero-interest) holdings and tiered transaction caps have been incorporated into the design architecture.`;
+
+    return [
+      {
+        id: `${idPrefix}-1`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_01',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `According to the passage, how does a Central Bank Digital Currency (CBDC) fundamentally differ from decentralized cryptocurrencies?`,
+        options: [
+          'It is a sovereign legal tender backed directly by the central bank',
+          'It exhibits higher price volatility than private tokens',
+          'It is issued exclusively by private commercial fintech firms',
+          'It carries a high annual interest rate for all retail holders',
+          'It cannot be used for peer-to-merchant retail payments'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The first paragraph explicitly states that unlike volatile decentralized cryptocurrencies, a CBDC is a sovereign digital legal tender issued and backed directly by the central bank.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-2`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_02',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What is the primary objective of the Wholesale CBDC (e₹-W) segment mentioned in the passage?`,
+        options: [
+          'Streamlining interbank settlements and government securities trading',
+          'Replacing all rural cooperative bank branches',
+          'Providing high-interest savings accounts to retail households',
+          'Financing international cryptocurrency exchanges',
+          'Eliminating the Unified Payments Interface (UPI)'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage notes that Wholesale CBDC (e₹-W) is designed to streamline interbank settlements and government securities trading.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-3`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_03',
+        difficulty: 'hard',
+        passageText: passage,
+        questionText: `Why have policymakers designed CBDC wallets to be "non-remunerative" (bearing zero interest)?`,
+        options: [
+          'To prevent commercial bank deposit disintermediation and liquidity drain',
+          'To increase the physical cost of printing paper currency',
+          'To encourage speculative trading in digital tokens',
+          'To restrict interbank government securities settlement',
+          'Because central banks are prohibited from using digital ledgers'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The second paragraph explains that non-remunerative (zero-interest) holdings and caps prevent citizens from pulling large deposits out of commercial banks (disintermediation).',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-4`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_04',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which of the following is most nearly SIMILAR in meaning to the word 'BIFURCATED' as used in the passage?`,
+        options: ['Divided into two branches', 'Consolidated into one', 'Abolished permanently', 'Postponed indefinitely', 'Complicated unnecessarily'],
+        correctOptionIndex: 0,
+        explanation: '"Bifurcated" means divided or split into two branches or parts (here, Wholesale and Retail segments).',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-5`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_05',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which operational benefit of CBDCs over paper currency is highlighted by the author?`,
+        options: [
+          'Reduction in printing, transportation, and storage costs of physical cash',
+          'Elimination of all central bank regulatory oversight',
+          'Guaranteed doubling of currency value every year',
+          'Mandatory closure of retail merchant payment networks',
+          'Complete removal of KYC compliance for institutional traders'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage states that a key advantage of CBDCs is reducing the physical cost of printing, transporting, and storing paper currency.',
+        marks: 1,
+        negativeMarks: 0.25
+      }
+    ];
+  }
+
   private buildVocabContextQuestion(id: string, sectionCode: string, sectionName: string, index: number): ExamQuestionItem {
-    const fmt = this.format5Options('Cautious', ['Audacious', 'Negligent', 'Reckless', 'Precipitous']);
+    const vocabList = [
+      {
+        word: 'PRUDENT',
+        sentence: '"Banks must adopt prudent lending norms to prevent bad loans."',
+        correct: 'Cautious',
+        distractors: ['Audacious', 'Negligent', 'Reckless', 'Precipitous'],
+        exp: `'Prudent' means acting with care and thought for the future. 'Cautious' is the closest synonym.`
+      },
+      {
+        word: 'TRANSIENT',
+        sentence: '"The central bank governor noted that the spike in vegetable inflation was transient."',
+        correct: 'Temporary',
+        distractors: ['Permanent', 'Perpetual', 'Enduring', 'Irreversible'],
+        exp: `'Transient' means lasting only for a short time (temporary/fleeting).`
+      },
+      {
+        word: 'STRINGENT',
+        sentence: '"Regulators enforced stringent capital adequacy norms for NBFCs."',
+        correct: 'Rigorous',
+        distractors: ['Lenient', 'Flexible', 'Optional', 'Trivial'],
+        exp: `'Stringent' means strict, precise, and exacting ('Rigorous').`
+      }
+    ];
+    const pick = vocabList[index % vocabList.length];
+    const fmt = this.format5Options(pick.correct, pick.distractors);
 
     return {
       id,
@@ -1801,10 +2816,10 @@ export class QuestionPatternEngineService {
       topicName: 'Vocabulary in Context',
       patternCode: 'ENG_VOC_01',
       difficulty: 'medium',
-      questionText: `Choose the word which is most nearly SIMILAR in meaning (Synonym) to the word 'PRUDENT' as used in banking regulation:\n\n"Banks must adopt prudent lending norms to prevent bad loans."`,
+      questionText: `Choose the word which is most nearly SIMILAR in meaning (Synonym) to the word '${pick.word}' as used in banking regulation:\n\n${pick.sentence}`,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
-      explanation: `'Prudent' means acting with or showing care and thought for the future (careful, cautious, judicious). 'Cautious' is the closest synonym.`,
+      explanation: pick.exp,
       marks: 1,
       negativeMarks: 0.25
     };
@@ -1838,21 +2853,83 @@ export class QuestionPatternEngineService {
         question: 'What does the acronym "LAF" stand for in RBI monetary policy operations?',
         options: ['Liquidity Adjustment Facility', 'Loan Assets Framework', 'Liquid Assets Fund', 'Leveraged Asset Finance', 'Liquidity Allocation Feature'],
         correct: 0,
-        explanation: 'LAF stands for Liquidity Adjustment Facility, through which RBI manages day-to-day money market liquidity via Repo and Reverse Repo auctions.'
+        explanation: 'LAF stands for Liquidity Adjustment Facility, through which RBI manages day-to-day money market liquidity via Repo and Reverse Repo/SDF auctions.'
       },
       {
         question: 'Which of the following payment systems operates on a 24x7 basis in India on all 365 days of the year?',
         options: ['Both RTGS and NEFT', 'Only NEFT', 'Only RTGS', 'Only CTS', 'Only Cheque Clearing'],
         correct: 0,
         explanation: 'Both National Electronic Funds Transfer (NEFT) and Real Time Gross Settlement (RTGS) operate on a round-the-clock 24x7x365 basis.'
+      },
+      {
+        question: 'What is the minimum amount required to initiate a Real Time Gross Settlement (RTGS) transaction in India?',
+        options: ['₹2,00,000', '₹1,00,000', '₹5,00,000', '₹50,000', 'No minimum limit'],
+        correct: 0,
+        explanation: 'RTGS is designed for high-value transactions and requires a minimum transfer amount of ₹2 Lakh, with no upper ceiling.'
+      },
+      {
+        question: 'How many members constitute the Monetary Policy Committee (MPC) of the Reserve Bank of India?',
+        options: ['6 members (3 from RBI and 3 appointed by Government of India)', '5 members', '8 members', '10 members', '4 members'],
+        correct: 0,
+        explanation: 'Under Section 45ZB of the RBI Act, 1934, the MPC consists of 6 members: 3 internal RBI officials (chaired by the Governor) and 3 external members nominated by the Central Government.'
+      },
+      {
+        question: 'Under Basel-III norms enforced by the Reserve Bank of India, what is the minimum Capital to Risk-Weighted Assets Ratio (CRAR) required for Scheduled Commercial Banks (excluding CCB)?',
+        options: ['9.0%', '8.0%', '11.5%', '10.5%', '7.5%'],
+        correct: 0,
+        explanation: 'While international Basel-III norms prescribe 8%, the RBI mandates a stricter minimum CRAR of 9.0% (or 11.5% including the 2.5% Capital Conservation Buffer) for Indian scheduled commercial banks.'
+      },
+      {
+        question: 'What is the mandatory Priority Sector Lending (PSL) target for Small Finance Banks (SFBs) and Regional Rural Banks (RRBs) in India?',
+        options: ['75% of ANBC', '40% of ANBC', '60% of ANBC', '50% of ANBC', '80% of ANBC'],
+        correct: 0,
+        explanation: 'Both Small Finance Banks (SFBs) and Regional Rural Banks (RRBs) are required to direct 75% of their Adjusted Net Bank Credit (ANBC) toward Priority Sector Lending.'
+      },
+      {
+        question: 'Which organization launched the "SARTHI" and "SCORES" platforms for investor grievance redressal and market awareness?',
+        options: ['SEBI', 'RBI', 'IRDAI', 'NABARD', 'SIDBI'],
+        correct: 0,
+        explanation: 'The Securities and Exchange Board of India (SEBI) operates SCORES (SEBI Complaints Redress System) and the Saarthi investor education app.'
+      },
+      {
+        question: 'A loan asset in a commercial bank is classified as a "Substandard Asset" when it has remained a Non-Performing Asset (NPA) for a period less than or equal to:',
+        options: ['12 months', '90 days', '6 months', '24 months', '36 months'],
+        correct: 0,
+        explanation: 'Once an account becomes an NPA (overdue > 90 days), it is categorized as a Substandard Asset for a period of up to 12 months, after which it moves to the Doubtful category.'
+      },
+      {
+        question: 'Which uncollateralized monetary policy tool was introduced by the RBI in April 2022 as the floor of the Liquidity Adjustment Facility (LAF) corridor?',
+        options: ['Standing Deposit Facility (SDF)', 'Marginal Standing Facility (MSF)', 'Cash Reserve Ratio (CRR)', 'Statutory Liquidity Ratio (SLR)', 'Long Term Repo Operation (LTRO)'],
+        correct: 0,
+        explanation: 'The Standing Deposit Facility (SDF) allows banks to park excess liquidity with the RBI without requiring government securities collateral, serving as the floor of the LAF corridor.'
+      },
+      {
+        question: 'In the context of digital banking, how many digits are present in a standard Indian Financial System Code (IFSC)?',
+        options: ['11 alphanumeric characters', '10 alphanumeric characters', '12 numeric digits', '9 numeric digits', '16 alphanumeric characters'],
+        correct: 0,
+        explanation: 'IFSC is an 11-character alphanumeric code where the first 4 letters identify the bank, the 5th character is always 0, and the last 6 characters identify the specific bank branch.'
+      },
+      {
+        question: 'Which statutory institution acts as the principal financial institution for the promotion, financing, and development of the Micro, Small and Medium Enterprise (MSME) sector in India?',
+        options: ['SIDBI', 'EXIM Bank', 'NABARD', 'NHB', 'NaBFID'],
+        correct: 0,
+        explanation: 'The Small Industries Development Bank of India (SIDBI), headquartered in Lucknow, was established in 1990 as the apex refinancing and development institution for MSMEs.'
+      },
+      {
+        question: 'Money lent for 2 to 14 days in the interbank money market is referred to as:',
+        options: ['Notice Money', 'Call Money', 'Term Money', 'Treasury Bill', 'Commercial Paper'],
+        correct: 0,
+        explanation: 'In the money market, overnight borrowing (1 day) is Call Money, borrowing for 2 to 14 days is Notice Money, and borrowing beyond 14 days is Term Money.'
       }
     ];
 
+    const shuffledBank = this.shuffle(gaBank);
     const items: ExamQuestionItem[] = [];
     const runId = Math.random().toString(36).substring(2, 7);
 
     for (let i = 0; i < count; i++) {
-      const qData = gaBank[i % gaBank.length];
+      const qData = shuffledBank[i % shuffledBank.length];
+      const fmt = this.format5Options(qData.options[qData.correct], qData.options.filter((_, idx) => idx !== qData.correct));
       items.push({
         id: `${runId}-ga-${i}`,
         sectionCode,
@@ -1863,8 +2940,104 @@ export class QuestionPatternEngineService {
         patternCode: 'GA_BANK_01',
         difficulty: 'medium',
         questionText: qData.question,
-        options: qData.options,
-        correctOptionIndex: qData.correct,
+        options: fmt.options,
+        correctOptionIndex: fmt.correctIndex,
+        explanation: qData.explanation,
+        marks: 1,
+        negativeMarks: 0.25
+      });
+    }
+
+    return items;
+  }
+
+  // =========================================================================
+  // COMPUTER APTITUDE & KNOWLEDGE GENERATOR (FOR MAINS & RRB EXAMS)
+  // =========================================================================
+
+  private generateComputerSection(count: number, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const compBank = [
+      {
+        question: 'Which layer of the 7-layer OSI (Open Systems Interconnection) model is responsible for end-to-end error recovery, flow control, and TCP/UDP packet segmentation?',
+        options: ['Transport Layer (Layer 4)', 'Network Layer (Layer 3)', 'Data Link Layer (Layer 2)', 'Session Layer (Layer 5)', 'Physical Layer (Layer 1)'],
+        correct: 0,
+        explanation: 'The Transport Layer (Layer 4) manages end-to-end communication, flow control, and error recovery using protocols like TCP and UDP.'
+      },
+      {
+        question: 'In a Relational Database Management System (RDBMS), which key is used to establish and enforce a link between the data in two tables?',
+        options: ['Foreign Key', 'Candidate Key', 'Super Key', 'Alternate Key', 'Composite Key'],
+        correct: 0,
+        explanation: 'A Foreign Key is a column or group of columns in a relational database table that provides a link between data in two tables by referencing the Primary Key of another table.'
+      },
+      {
+        question: 'Which high-speed volatile semiconductor memory is placed directly between the CPU registers and main RAM to reduce average data access time?',
+        options: ['Cache Memory (SRAM)', 'ROM', 'Flash Memory', 'Magnetic Disk', 'Optical CD-ROM'],
+        correct: 0,
+        explanation: 'Cache memory (built using Static RAM) sits between the CPU and main DRAM to store frequently accessed instructions and data.'
+      },
+      {
+        question: 'In Microsoft Excel, which keyboard shortcut is used to insert a new worksheet into a workbook?',
+        options: ['Shift + F11', 'Ctrl + N', 'Alt + F1', 'Ctrl + F11', 'Shift + F9'],
+        correct: 0,
+        explanation: 'Pressing Shift + F11 inserts a new worksheet in Microsoft Excel, whereas Ctrl + N creates an entirely new workbook.'
+      },
+      {
+        question: 'What is the hexadecimal equivalent of the binary number (11011010)₂?',
+        options: ['DA', 'CA', 'DB', 'B6', 'E4'],
+        correct: 0,
+        explanation: 'Grouping into 4-bit nibbles: 1101 = 13 (D in hex) and 1010 = 10 (A in hex). Therefore, (11011010)₂ = (DA)₁₆.'
+      },
+      {
+        question: 'Which network protocol automatically assigns dynamic IP addresses and subnet masks to client devices joining a TCP/IP network?',
+        options: ['DHCP (Dynamic Host Configuration Protocol)', 'DNS (Domain Name System)', 'SNMP (Simple Network Management Protocol)', 'FTP (File Transfer Protocol)', 'SMTP (Simple Mail Transfer Protocol)'],
+        correct: 0,
+        explanation: 'DHCP dynamically assigns IP addresses and network configuration parameters to devices on a network.'
+      },
+      {
+        question: 'Which universal logic gate produces a LOW (0) output ONLY when all of its inputs are HIGH (1)?',
+        options: ['NAND Gate', 'NOR Gate', 'XOR Gate', 'OR Gate', 'AND Gate'],
+        correct: 0,
+        explanation: 'A NAND (NOT-AND) gate is a universal gate whose output is 0 only when all inputs are 1, and 1 in all other cases.'
+      },
+      {
+        question: 'In operating systems, what is the condition called where two or more processes are permanently blocked because each process holds a resource and waits for another resource held by another process?',
+        options: ['Deadlock', 'Paging', 'Thrashing', 'Spooling', 'Context Switching'],
+        correct: 0,
+        explanation: 'Deadlock occurs when a set of processes are blocked because each process is holding a resource and waiting to acquire a resource held by another process in the same set.'
+      },
+      {
+        question: 'Which SQL command belongs to the Data Definition Language (DDL) category and removes all rows from a table without logging individual row deletions, while keeping the table structure intact?',
+        options: ['TRUNCATE', 'DELETE', 'DROP', 'REMOVE', 'UPDATE'],
+        correct: 0,
+        explanation: 'TRUNCATE TABLE is a DDL command that rapidly deallocates all data pages in a table while preserving the table schema for future inserts.'
+      },
+      {
+        question: 'Which type of malicious software encrypts a victim’s files and demands a financial payment in exchange for the decryption key?',
+        options: ['Ransomware', 'Adware', 'Spyware', 'Rootkit', 'Keylogger'],
+        correct: 0,
+        explanation: 'Ransomware is a category of malware that locks or encrypts critical user/enterprise data and demands ransom for restoration.'
+      }
+    ];
+
+    const shuffled = this.shuffle(compBank);
+    const items: ExamQuestionItem[] = [];
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const qData = shuffled[i % shuffled.length];
+      const fmt = this.format5Options(qData.options[qData.correct], qData.options.filter((_, idx) => idx !== qData.correct));
+      items.push({
+        id: `${runId}-comp-${i}`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'computer',
+        topicName: 'Computer Aptitude & Networking',
+        patternCode: 'COMP_APT_01',
+        difficulty: 'easy',
+        questionText: qData.question,
+        options: fmt.options,
+        correctOptionIndex: fmt.correctIndex,
         explanation: qData.explanation,
         marks: 1,
         negativeMarks: 0.25
@@ -1905,7 +3078,7 @@ export class QuestionPatternEngineService {
       {
         id: 'pat-quan-ser-01',
         subject_code: 'quant',
-        topic_name: 'Number Series',
+        topic_name: 'Number Series (Missing & Wrong)',
         pattern_code: 'QUAN_SER_MISSING',
         pattern_type: 'parametric_numeric',
         difficulty: 'medium',
@@ -1916,12 +3089,23 @@ export class QuestionPatternEngineService {
       {
         id: 'pat-quan-di-01',
         subject_code: 'quant',
-        topic_name: 'Data Interpretation',
+        topic_name: 'Data Interpretation (Table DI)',
         pattern_code: 'QUAN_DI_TABLE',
         pattern_type: 'caselet',
         difficulty: 'hard',
         exam_stage: 'both',
         explanation_template: '5-question tabular caselet testing ratios, percentage comparison, and aggregate averages.',
+        is_active: true
+      },
+      {
+        id: 'pat-quan-arith-01',
+        subject_code: 'quant',
+        topic_name: 'Arithmetic Word Problems (12 Topics)',
+        pattern_code: 'QUAN_ARITH_ALL',
+        pattern_type: 'parametric_numeric',
+        difficulty: 'medium',
+        exam_stage: 'both',
+        explanation_template: 'Parametric generators for Profit/Loss, SI/CI, Trains, Boats, Work, Pipes, Mixtures, Partnership, Averages, Mensuration, and Probability.',
         is_active: true
       },
       {
@@ -1943,40 +3127,84 @@ export class QuestionPatternEngineService {
         pattern_type: 'logic_deduction',
         difficulty: 'easy',
         exam_stage: 'prelims',
-        explanation_template: 'Multi-statement priority chaining testing >, ≥, =, and opposite sign breaks.',
+        explanation_template: 'Multi-statement priority chaining testing >, ≥, =, Either/Or, and opposite sign breaks.',
         is_active: true
       },
       {
         id: 'pat-reas-puz-01',
         subject_code: 'reasoning',
-        topic_name: 'Puzzles & Seating Arrangement',
-        pattern_code: 'REAS_PUZ_CIRC_8',
+        topic_name: 'Circular & Linear Seating Puzzles',
+        pattern_code: 'REAS_PUZ_CIRC_LIN',
         pattern_type: 'puzzle_grid',
         difficulty: 'hard',
         exam_stage: 'both',
-        explanation_template: '8-person circular table facing center with relative distance constraints.',
+        explanation_template: '8-person circular table and 7-person linear row arrangements with relative positional clues.',
+        is_active: true
+      },
+      {
+        id: 'pat-reas-puz-02',
+        subject_code: 'reasoning',
+        topic_name: '7-Floor Building Arrangement Puzzle',
+        pattern_code: 'REAS_PUZ_FLOOR_7',
+        pattern_type: 'puzzle_grid',
+        difficulty: 'hard',
+        exam_stage: 'both',
+        explanation_template: '7-floor vertical arrangement puzzle testing parity floors, gap constraints, and immediate adjacency.',
         is_active: true
       },
       {
         id: 'pat-eng-err-01',
         subject_code: 'english',
-        topic_name: 'Error Spotting',
+        topic_name: 'Error Spotting & Phrase Replacement',
         pattern_code: 'ENG_ERR_SYNTAX',
         pattern_type: 'grammar_cloze',
         difficulty: 'medium',
-        exam_stage: 'prelims',
+        exam_stage: 'both',
         explanation_template: '4-fragment sentence analysis detecting subject-verb, preposition, or conditional syntax errors.',
         is_active: true
       },
       {
         id: 'pat-eng-cloze-01',
         subject_code: 'english',
-        topic_name: 'Cloze Test',
-        pattern_code: 'ENG_CLOZE_BANKING',
+        topic_name: 'Cloze Test & Para Jumbles',
+        pattern_code: 'ENG_CLOZE_PJ',
         pattern_type: 'grammar_cloze',
         difficulty: 'medium',
-        exam_stage: 'prelims',
-        explanation_template: '5-blank economic editorial assessing contextual vocab and grammatical agreement.',
+        exam_stage: 'both',
+        explanation_template: '5-blank economic editorial Cloze passage and 5-sentence macroeconomic Para Jumble rearrangement.',
+        is_active: true
+      },
+      {
+        id: 'pat-eng-rc-01',
+        subject_code: 'english',
+        topic_name: 'Reading Comprehension (RBI & Economy)',
+        pattern_code: 'ENG_RC_CBDC',
+        pattern_type: 'caselet',
+        difficulty: 'hard',
+        exam_stage: 'both',
+        explanation_template: '5-question Reading Comprehension passage on Central Bank Digital Currencies (e₹) testing inference and vocabulary.',
+        is_active: true
+      },
+      {
+        id: 'pat-ga-bank-01',
+        subject_code: 'ga',
+        topic_name: 'RBI Monetary Policy & Banking Awareness',
+        pattern_code: 'GA_RBI_BASEL',
+        pattern_type: 'static_mcq',
+        difficulty: 'medium',
+        exam_stage: 'mains',
+        explanation_template: '15-question regulatory bank covering DICGC, PSL, Basel-III CRAR, MPC, SDF/LAF, NPAs, and Money Market.',
+        is_active: true
+      },
+      {
+        id: 'pat-comp-apt-01',
+        subject_code: 'computer',
+        topic_name: 'Computer Aptitude & Networking',
+        pattern_code: 'COMP_OSI_DBMS',
+        pattern_type: 'static_mcq',
+        difficulty: 'easy',
+        exam_stage: 'mains',
+        explanation_template: '10-question Computer Knowledge bank covering OSI Layers, RDBMS keys, Cache Memory, Binary/Hex, and Cybersecurity.',
         is_active: true
       }
     ];

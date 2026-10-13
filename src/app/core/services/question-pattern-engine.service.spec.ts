@@ -46,11 +46,22 @@ describe('QuestionPatternEngineService', () => {
     expect(questions.length).toBe(30);
   });
 
-  it('should return question patterns library with quant, reasoning, and english', () => {
+  it('should generate a 200-question RRB PO Mains exam with GA and Computer sections', () => {
+    const rrbMains = service.getDefaultBlueprints().find(b => b.id === 'rrb-po-mains-mock-1');
+    expect(rrbMains).toBeDefined();
+    const questions = service.generateExamQuestions(rrbMains!);
+    expect(questions.length).toBe(200);
+    expect(questions.some(q => q.subjectCode === 'computer')).toBe(true);
+    expect(questions.some(q => q.subjectCode === 'ga')).toBe(true);
+  });
+
+  it('should return question patterns library with quant, reasoning, english, ga, and computer', () => {
     const library = service.getPatternsLibrary();
-    expect(library.length).toBeGreaterThan(5);
+    expect(library.length).toBeGreaterThanOrEqual(14);
     expect(library.some(p => p.subject_code === 'quant')).toBe(true);
     expect(library.some(p => p.subject_code === 'reasoning')).toBe(true);
     expect(library.some(p => p.subject_code === 'english')).toBe(true);
+    expect(library.some(p => p.subject_code === 'ga')).toBe(true);
+    expect(library.some(p => p.subject_code === 'computer')).toBe(true);
   });
 });
