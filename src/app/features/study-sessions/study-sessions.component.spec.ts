@@ -72,7 +72,7 @@ describe('StudySessionsComponent', () => {
         { provide: ToastService, useValue: mockToast },
         {
           provide: ActivatedRoute,
-          useValue: { queryParams: of({}) }
+          useValue: { snapshot: { queryParams: {} }, queryParams: of({}) }
         }
       ]
     }).compileComponents();
@@ -148,6 +148,26 @@ describe('StudySessionsComponent', () => {
 
     // Clean up timer
     component.timerService.discardTimer();
+    expect(component.timerService.isRunning()).toBe(false);
+  });
+
+  it('should save study session to DataStorageService when finishSession is called', async () => {
+    await component.loadData();
+    mockDataStorage.saveStudySession.mockClear();
+
+    component.onSubjectSelect('sub-quant');
+    component.selectedTopicId.set('top-1');
+    component.startTimer();
+
+    await component.finishSession();
+
+    expect(mockDataStorage.saveStudySession).toHaveBeenCalledTimes(1);
+    expect(mockDataStorage.saveStudySession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject_id: 'sub-quant',
+        topic_id: 'top-1'
+      })
+    );
     expect(component.timerService.isRunning()).toBe(false);
   });
 });

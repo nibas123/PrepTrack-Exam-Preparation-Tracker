@@ -21,9 +21,14 @@ export class AuthService {
   public readonly currentProfile = this.currentProfileSignal.asReadonly();
   public readonly isLoading = this.isLoadingSignal.asReadonly();
   public readonly isAuthenticated = computed(() => !!this.currentUserSignal());
+  private authInitPromise: Promise<void>;
 
   constructor() {
-    this.initializeAuth();
+    this.authInitPromise = this.initializeAuth();
+  }
+
+  public async waitForAuthInit(): Promise<void> {
+    await this.authInitPromise;
   }
 
   private async initializeAuth(): Promise<void> {

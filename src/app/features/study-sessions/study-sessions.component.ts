@@ -481,7 +481,7 @@ export class StudySessionsComponent implements OnInit {
     this.allTopics.set(topics);
     this.sessions.set(sess);
 
-    if (!this.selectedSubjectId() && subs.length > 0) {
+    if (subs.length > 0 && (!this.selectedSubjectId() || !subs.some(s => s.id === this.selectedSubjectId()))) {
       this.selectedSubjectId.set(subs[0].id);
     }
   }
@@ -560,7 +560,10 @@ export class StudySessionsComponent implements OnInit {
   formatHoursMinutes(seconds: number): string {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
     if (hrs > 0) return `${hrs}h ${mins}m`;
-    return `${mins}m`;
+    if (mins > 0) return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+    if (secs > 0) return `${secs}s`;
+    return '0m';
   }
 }

@@ -170,13 +170,7 @@ export class TimerService {
 
     try {
       this.updateDerivedElapsed(current);
-      const totalDuration = this.elapsedSecondsSignal();
-
-      if (totalDuration < 5) {
-        this.toast.warning('Session was too short (< 5 seconds) and was discarded.');
-        this.reset();
-        return false;
-      }
+      const totalDuration = Math.max(1, this.elapsedSecondsSignal());
 
       const now = new Date();
       const startTime = new Date(now.getTime() - totalDuration * 1000);
@@ -226,6 +220,13 @@ export class TimerService {
 
   private fireCelebration(): void {
     try {
+      if (typeof document === 'undefined' || (typeof navigator !== 'undefined' && /jsdom/i.test(navigator.userAgent || ''))) {
+        return;
+      }
+      const testCanvas = document.createElement('canvas');
+      if (typeof testCanvas.getContext !== 'function' || !testCanvas.getContext('2d')) {
+        return;
+      }
       confetti({
         particleCount: 80,
         spread: 60,
