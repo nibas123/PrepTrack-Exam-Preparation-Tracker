@@ -1,17 +1,19 @@
-// PrepTrack Progressive Web App Service Worker (v3.0)
-const STATIC_CACHE = 'preptrack-static-v3';
-const RUNTIME_CACHE = 'preptrack-runtime-v3';
+// PrepTrack Progressive Web App Service Worker (v4.0)
+const STATIC_CACHE = 'preptrack-static-v4';
+const RUNTIME_CACHE = 'preptrack-runtime-v4';
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/favicon.ico',
+  '/favicon.svg',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-maskable-192.png',
   '/icons/icon-maskable-512.png',
   '/icons/apple-touch-icon.png',
+  '/icons/favicon-48.png',
   '/icons/favicon-32.png',
   '/icons/favicon-16.png',
   '/icons/icon.svg'

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Top Sheen -->
+  <line x1="128" y1="20" x2="384" y2="20" stroke="#ffffff" stroke-opacity="0.25" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Bank Building (White with subtle drop shadow) -->
+  <g filter="url(#shadow)">
+    <!-- Roof Pediment Triangle -->
+    <path d="M256 105 L112 185 L400 185 Z" fill="#ffffff"/>
+    
+    <!-- Architrave Bar -->
+    <rect x="100" y="185" width="312" height="22" rx="5" fill="#ffffff"/>
+    
+    <!-- 3 Stately Pillars -->
+    <rect x="136" y="215" width="48" height="135" rx="6" fill="#ffffff"/>
+    <rect x="232" y="215" width="48" height="135" rx="6" fill="#ffffff"/>
+    <rect x="328" y="215" width="48" height="135" rx="6" fill="#ffffff"/>
+    
+    <!-- Base Step 1 -->
+    <rect x="108" y="350" width="296" height="26" rx="5" fill="#ffffff"/>
+    
+    <!-- Base Step 2 (Foundation) -->
+    <rect x="88" y="380" width="336" height="28" rx="6" fill="#ffffff" fill-opacity="0.95"/>
+  </g>
+
+  <!-- Green Target Verification Badge -->
+  <g filter="url(#shadow)">
+    <!-- White Border Ring -->
+    <circle cx="375" cy="135" r="63" fill="#ffffff"/>
+    <!-- Emerald Green Badge -->
+    <circle cx="375" cy="135" r="56" fill="#10b981"/>
+    <!-- White Checkmark -->
+    <path d="M350 134 L368 152 L400 120" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
