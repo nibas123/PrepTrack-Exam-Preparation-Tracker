@@ -60,6 +60,18 @@ interface StorageKeyReport {
 
           <button
             type="button"
+            (click)="openAiGenModal()"
+            class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs"
+            title="Generate fresh AI questions with Gemini and save to bank"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>+ Generate AI Questions</span>
+          </button>
+
+          <button
+            type="button"
             (click)="refreshAllDiagnostics()"
             [disabled]="isLoading()"
             class="btn-secondary text-xs py-1.5 px-3 flex items-center space-x-1.5"
@@ -149,10 +161,15 @@ interface StorageKeyReport {
                 </div>
               </div>
               <p class="text-2xl font-black text-indigo-700 font-mono">{{ aiQuestionsCount() }}</p>
-              <div class="flex items-center space-x-1.5 text-[11px] text-indigo-600 font-semibold">
-                <span>{{ aiPercentage() }}% of active pool</span>
-                <span>•</span>
-                <span>Gemini API</span>
+              <div class="flex items-center justify-between text-[11px] text-indigo-600 font-semibold pt-0.5">
+                <span>{{ aiPercentage() }}% of pool • Gemini API</span>
+                <button
+                  type="button"
+                  (click)="openAiGenModal()"
+                  class="font-bold underline hover:text-indigo-900 transition-colors"
+                >
+                  + Add AI
+                </button>
               </div>
             </div>
 
@@ -957,6 +974,17 @@ interface StorageKeyReport {
               <div class="flex items-center space-x-2 flex-wrap gap-y-2">
                 <button
                   type="button"
+                  (click)="openAiGenModal()"
+                  class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>+ Generate AI Questions</span>
+                </button>
+
+                <button
+                  type="button"
                   (click)="seedSampleQuestions()"
                   class="btn-secondary text-xs py-1.5 px-3 font-semibold"
                 >
@@ -1409,6 +1437,218 @@ interface StorageKeyReport {
           </div>
         </div>
       }
+
+      <!-- =================================================================== -->
+      <!-- AI QUESTION GENERATOR MODAL -->
+      <!-- =================================================================== -->
+      @if (showAiGenModal()) {
+        <div
+          class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+          (click)="closeAiGenModal()"
+        >
+          <div
+            class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50/60 to-indigo-50/60">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-200">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Generate AI Questions</h3>
+                  <p class="text-xs text-slate-500">Synthesize authentic bank exam questions with Gemini AI</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                (click)="closeAiGenModal()"
+                [disabled]="isGeneratingAi()"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-40"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4 text-xs">
+              <!-- Warning if AI is disabled -->
+              @if (!aiConfig.isAiGloballyEnabled()) {
+                <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start space-x-2.5">
+                  <span class="text-base">⚠️</span>
+                  <div class="space-y-1">
+                    <p class="font-bold">Gemini AI is globally disabled</p>
+                    <p class="text-[11px] text-amber-700">Please enable Gemini AI before generating questions.</p>
+                    <button
+                      type="button"
+                      (click)="toggleAiMaster()"
+                      class="mt-1 px-2.5 py-1 rounded-md bg-amber-600 text-white font-semibold text-[11px] hover:bg-amber-700"
+                    >
+                      Enable Gemini AI Now
+                    </button>
+                  </div>
+                </div>
+              }
+
+              <!-- Subject Selection -->
+              <div class="space-y-1.5">
+                <label class="font-bold text-slate-700 block">Banking Subject</label>
+                <select
+                  [ngModel]="aiGenSubject()"
+                  (ngModelChange)="onSubjectChange($event)"
+                  class="input-field text-xs w-full font-medium"
+                  [disabled]="isGeneratingAi()"
+                >
+                  <option value="Quantitative Aptitude">Quantitative Aptitude</option>
+                  <option value="Reasoning Ability">Reasoning Ability</option>
+                  <option value="English Language">English Language</option>
+                  <option value="General & Banking Awareness">General & Banking Awareness</option>
+                  <option value="Computer Aptitude">Computer Aptitude</option>
+                </select>
+              </div>
+
+              <!-- Topic Selection & Suggestions -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <label class="font-bold text-slate-700">Topic Focus (Optional)</label>
+                  <span class="text-[10px] text-slate-400">Leave blank for mixed topics</span>
+                </div>
+                <input
+                  type="text"
+                  [ngModel]="aiGenTopic()"
+                  (ngModelChange)="aiGenTopic.set($event)"
+                  placeholder="e.g. Percentage, Syllogisms, Repo Rates..."
+                  class="input-field text-xs w-full"
+                  [disabled]="isGeneratingAi()"
+                />
+
+                <!-- Quick Topic Suggestions Chips -->
+                <div class="pt-1">
+                  <span class="text-[10px] font-semibold text-slate-400 block mb-1">Recommended Topics:</span>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (topic of currentTopicSuggestions; track topic) {
+                      <button
+                        type="button"
+                        (click)="setAiTopic(topic)"
+                        [disabled]="isGeneratingAi()"
+                        class="px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors"
+                        [ngClass]="aiGenTopic() === topic ? 'bg-purple-600 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                      >
+                        {{ topic }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Difficulty and Count Grid -->
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <!-- Difficulty -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-slate-700 block">Difficulty</label>
+                  <select
+                    [ngModel]="aiGenDifficulty()"
+                    (ngModelChange)="aiGenDifficulty.set($event)"
+                    class="input-field text-xs w-full"
+                    [disabled]="isGeneratingAi()"
+                  >
+                    <option value="mixed">Mixed (Recommended)</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+
+                <!-- Number of Questions -->
+                <div class="space-y-1.5">
+                  <label class="font-bold text-slate-700 block">Number of Questions</label>
+                  <select
+                    [ngModel]="aiGenCount()"
+                    (ngModelChange)="aiGenCount.set($event)"
+                    class="input-field text-xs w-full font-mono font-semibold"
+                    [disabled]="isGeneratingAi()"
+                  >
+                    <option [ngValue]="1">1 Question (Quick test)</option>
+                    <option [ngValue]="3">3 Questions</option>
+                    <option [ngValue]="5">5 Questions (Standard batch)</option>
+                    <option [ngValue]="10">10 Questions (Full set)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Generation Result Banner -->
+              @if (aiGenResult) {
+                <div
+                  class="p-3 rounded-xl border text-xs"
+                  [ngClass]="aiGenResult.success ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'"
+                >
+                  @if (aiGenResult.success) {
+                    <div class="flex items-center space-x-2">
+                      <span class="text-base">✅</span>
+                      <div>
+                        <p class="font-bold">Successfully generated {{ aiGenResult.count }} questions!</p>
+                        <p class="text-[11px] text-emerald-600">Saved to local question bank in {{ aiGenResult.latencyMs }}ms.</p>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="flex items-start space-x-2">
+                      <span class="text-base">❌</span>
+                      <div>
+                        <p class="font-bold">Generation Failed</p>
+                        <p class="text-[11px] text-rose-700">{{ aiGenResult.error }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-[11px] text-slate-400">
+                Model: <span class="font-mono text-purple-700 font-semibold">{{ aiConfig.getEffectiveModel() }}</span>
+              </span>
+
+              <div class="flex items-center space-x-2">
+                <button
+                  type="button"
+                  (click)="closeAiGenModal()"
+                  [disabled]="isGeneratingAi()"
+                  class="btn-secondary text-xs py-2 px-3.5 font-semibold"
+                >
+                  Close
+                </button>
+
+                <button
+                  type="button"
+                  (click)="generateAiQuestionsForBank()"
+                  [disabled]="isGeneratingAi() || !aiConfig.isAiGloballyEnabled()"
+                  class="btn-primary text-xs py-2 px-4 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-200 disabled:opacity-50"
+                >
+                  @if (isGeneratingAi()) {
+                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Generating with Gemini...</span>
+                  } @else {
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Generate & Save Questions</span>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `
 })
@@ -1442,6 +1682,55 @@ export class AdminComponent implements OnInit {
   public quickTokenInput: string = '';
   public isTestingQuickToken: boolean = false;
   public quickTokenResult: { success: boolean; message: string; latencyMs: number } | null = null;
+
+  // AI Question Generation Modal
+  public showAiGenModal = signal<boolean>(false);
+  public isGeneratingAi = signal<boolean>(false);
+  public aiGenSubject = signal<string>('Quantitative Aptitude');
+  public aiGenTopic = signal<string>('Percentage & Profit/Loss');
+  public aiGenDifficulty = signal<'easy' | 'medium' | 'hard' | 'mixed'>('mixed');
+  public aiGenCount = signal<number>(5);
+  public aiGenResult: { success: boolean; count: number; latencyMs: number; error?: string } | null = null;
+
+  public subjectTopicSuggestions: Record<string, string[]> = {
+    'Quantitative Aptitude': [
+      'Percentage & Profit/Loss',
+      'Simple & Compound Interest',
+      'Time, Speed & Distance',
+      'Ratio, Proportion & Partnership',
+      'Number Series & Speed Math',
+      'Data Interpretation (DI)'
+    ],
+    'Reasoning Ability': [
+      'Syllogisms (Only a Few)',
+      'Inequalities & Logic',
+      'Blood Relations & Family Tree',
+      'Direction Sense & Distance',
+      'Coding-Decoding'
+    ],
+    'English Language': [
+      'Error Spotting & Grammar',
+      'Cloze Test & Fillers',
+      'Sentence Rearrangement (Para Jumbles)',
+      'Vocabulary & Idioms'
+    ],
+    'General & Banking Awareness': [
+      'RBI Monetary Policy & Repo Rates',
+      'PCA Framework & Basel III Accords',
+      'Union Budget & Government Schemes',
+      'Digital Banking & Payment Systems (UPI, NEFT)'
+    ],
+    'Computer Aptitude': [
+      'Computer Architecture & Memory Hierarchy',
+      'Networking Protocols & OSI Model',
+      'Cyber Security & Encryption',
+      'DBMS, SQL & MS Office Tools'
+    ]
+  };
+
+  public get currentTopicSuggestions(): string[] {
+    return this.subjectTopicSuggestions[this.aiGenSubject()] || [];
+  }
 
   // Question bank explorer
   public cachedBank = signal<QuizQuestion[]>([]);
@@ -1880,6 +2169,102 @@ export class AdminComponent implements OnInit {
     this.cachedBank.set(this.quizService.getStoredQuestionBank());
     this.calculateStorageFootprint();
     this.toast.success('Seeded 5 sample banking questions into local bank');
+  }
+
+  // --- AI QUESTION GENERATOR MODAL ACTIONS ---
+
+  public openAiGenModal(): void {
+    this.aiGenResult = null;
+    this.showAiGenModal.set(true);
+  }
+
+  public closeAiGenModal(): void {
+    if (this.isGeneratingAi()) return;
+    this.showAiGenModal.set(false);
+  }
+
+  public setAiTopic(topic: string): void {
+    this.aiGenTopic.set(topic);
+  }
+
+  public onSubjectChange(newSub: string): void {
+    this.aiGenSubject.set(newSub);
+    const suggestions = this.subjectTopicSuggestions[newSub];
+    if (suggestions && suggestions.length > 0) {
+      this.aiGenTopic.set(suggestions[0]);
+    } else {
+      this.aiGenTopic.set('');
+    }
+  }
+
+  public async generateAiQuestionsForBank(): Promise<void> {
+    if (!this.aiConfig.isAiGloballyEnabled()) {
+      this.toast.error('Gemini AI is globally disabled. Please enable it in the Gemini AI & Tokens tab.');
+      return;
+    }
+
+    const primaryKey = this.aiConfig.getEffectivePrimaryKey();
+    const fallbackKey = this.aiConfig.getEffectiveFallbackKey();
+    if (!primaryKey && !fallbackKey) {
+      this.toast.error('No Gemini API Key found. Please add an API key in the Gemini AI & Tokens tab.');
+      return;
+    }
+
+    this.isGeneratingAi.set(true);
+    this.aiGenResult = null;
+    const startTime = performance.now();
+
+    try {
+      const subject = this.aiGenSubject();
+      const topic = this.aiGenTopic().trim() || undefined;
+      const count = Number(this.aiGenCount());
+      const diff = this.aiGenDifficulty();
+
+      const questions = await this.quizService.generateGeminiQuestions(
+        subject,
+        topic,
+        count,
+        diff
+      );
+
+      const latencyMs = Math.round(performance.now() - startTime);
+
+      // Verify whether questions were AI generated
+      const aiItems = questions.filter(q => q.is_ai_generated || q.id?.startsWith('gemini-'));
+
+      if (aiItems.length > 0) {
+        // Ensure imported/cached into stored bank
+        this.quizService.importQuestionsToBank(aiItems);
+        this.cachedBank.set(this.quizService.getStoredQuestionBank());
+        this.calculateStorageFootprint();
+
+        this.aiGenResult = {
+          success: true,
+          count: aiItems.length,
+          latencyMs
+        };
+        this.toast.success(`Successfully added ${aiItems.length} fresh AI question(s) to the Question Bank! (${latencyMs}ms)`);
+      } else {
+        this.aiGenResult = {
+          success: false,
+          count: 0,
+          latencyMs,
+          error: 'Gemini request did not return valid AI questions (API quota or network issue). Check AI Telemetry for details.'
+        };
+        this.toast.error('AI question generation did not succeed. Check telemetry logs.');
+      }
+    } catch (err: any) {
+      const latencyMs = Math.round(performance.now() - startTime);
+      this.aiGenResult = {
+        success: false,
+        count: 0,
+        latencyMs,
+        error: err?.message || 'Unexpected generation error'
+      };
+      this.toast.error(`Generation error: ${err?.message || 'Failed'}`);
+    } finally {
+      this.isGeneratingAi.set(false);
+    }
   }
 
   // --- PATTERN ENGINE DRY-RUN SIMULATION ---

@@ -130,4 +130,60 @@ describe('AdminComponent', () => {
     component.deleteQuestion(firstId);
     expect(component.cachedBank().length).toBe(initialCount - 1);
   });
+
+  it('should open and close the AI question generator modal', () => {
+    expect(component.showAiGenModal()).toBe(false);
+
+    component.openAiGenModal();
+    expect(component.showAiGenModal()).toBe(true);
+
+    component.closeAiGenModal();
+    expect(component.showAiGenModal()).toBe(false);
+  });
+
+  it('should update topic suggestion when subject changes', () => {
+    component.onSubjectChange('Reasoning Ability');
+    expect(component.aiGenSubject()).toBe('Reasoning Ability');
+    expect(component.aiGenTopic()).toBe('Syllogisms (Only a Few)');
+    expect(component.currentTopicSuggestions.length).toBeGreaterThan(0);
+  });
+
+  it('should generate and add AI questions to the platform bank', async () => {
+    const quizService = TestBed.inject(QuizService);
+    aiConfig.setAiEnabled(true);
+    aiConfig.updateConfig({ primaryKey: 'test-mock-gemini-key' });
+
+    vi.spyOn(quizService, 'generateGeminiQuestions').mockResolvedValue([
+      {
+        id: 'gemini-mock-1',
+        subject_id: 'Quantitative Aptitude',
+        topic_name: 'Percentage & Profit/Loss',
+        question_text: 'What is 15% of 200?',
+        options: ['30', '40', '50', '60'],
+        correct_option_index: 0,
+        explanation: '15% of 200 is 30',
+        difficulty: 'easy',
+        is_ai_generated: true,
+        generator_type: 'gemini_ai',
+        correct_count: 0,
+        incorrect_count: 0
+      }
+    ]);
+
+    component.openAiGenModal();
+    await component.generateAiQuestionsForBank();
+
+    expect(component.aiGenResult?.success).toBe(true);
+    expect(component.aiGenResult?.count).toBe(1);
+    expect(component.cachedBank().some(q => q.id === 'gemini-mock-1')).toBe(true);
+    expect(component.aiQuestionsCount()).toBeGreaterThanOrEqual(1);
+    expect(mockToast.success).toHaveBeenCalledWith(expect.stringContaining('Successfully added 1 fresh AI question'));
+  });
+
+  it('should warn when attempting generation if AI is globally disabled', async () => {
+    aiConfig.setAiEnabled(false);
+
+    await component.generateAiQuestionsForBank();
+    expect(mockToast.error).toHaveBeenCalledWith(expect.stringContaining('Gemini AI is globally disabled'));
+  });
 });
