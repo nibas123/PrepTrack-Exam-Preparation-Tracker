@@ -7,18 +7,55 @@ import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WidgetConfigService } from '../../core/services/widget-config.service';
 import { DashboardWidgetConfig } from '../../core/models/database.types';
+import { RouterModule } from '@angular/router';
 import { PwaService } from '../../core/services/pwa.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="space-y-6 max-w-4xl mx-auto">
       <!-- Header -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Application & Prep Settings</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Customize your dashboard widgets, preparation goals, and database connection</p>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Application & Prep Settings</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Customize your dashboard widgets, preparation goals, and database connection</p>
+        </div>
+
+        <a
+          routerLink="/admin"
+          class="btn-primary text-xs py-2 px-4 font-semibold bg-purple-600 hover:bg-purple-700 flex items-center space-x-1.5 self-start sm:self-auto shadow-xs"
+        >
+          <span>🛡️ Admin & AI Console</span>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- ADMIN & QUESTION ENGINE CONSOLE SHORTCUT CARD -->
+      <div class="card p-5 bg-gradient-to-br from-purple-50/50 via-white to-indigo-50/30 border-purple-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center space-x-2">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800">
+              Admin & Diagnostics
+            </span>
+            <span class="text-xs font-bold text-slate-800">Platform Control Center</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-950">Question Bank, Algorithmic Patterns & Gemini Tokens</h3>
+          <p class="text-xs text-slate-600">
+            Monitor the offline question bank, test exam pattern generation speed, and toggle or reapply Gemini AI API tokens.
+          </p>
+        </div>
+
+        <a
+          routerLink="/admin"
+          class="btn-primary text-xs py-2 px-4 font-semibold bg-purple-600 hover:bg-purple-700 whitespace-nowrap self-start sm:self-auto shadow-xs flex items-center space-x-1.5"
+        >
+          <span>Open Admin Console</span>
+          <span>→</span>
+        </a>
       </div>
 
       <!-- DASHBOARD WIDGETS CONFIGURATION CARD -->

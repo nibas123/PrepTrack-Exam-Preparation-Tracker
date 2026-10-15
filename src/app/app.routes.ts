@@ -10,6 +10,7 @@ import { ExamCalendarComponent } from './features/exam-calendar/exam-calendar.co
 import { QuizzesComponent } from './features/quizzes/quizzes.component';
 import { GrowthStatsComponent } from './features/growth-stats/growth-stats.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { AdminComponent } from './features/admin/admin.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'quizzes', component: QuizzesComponent, canActivate: [authGuard] },
   { path: 'growth-stats', component: GrowthStatsComponent, canActivate: [authGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'dashboard' },
 ];

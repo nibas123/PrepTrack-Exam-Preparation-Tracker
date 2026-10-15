@@ -3,6 +3,7 @@ import { QuizQuestion, QuizAttempt, PreviousPaper, ManualQuestionLog } from '../
 import { SupabaseService } from './supabase.service';
 import { AuthService } from '../auth/auth.service';
 import { OfflineSyncService } from './offline-sync.service';
+import { AiConfigService } from './ai-config.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -12,6 +13,7 @@ export class QuizService {
   private supabaseService = inject(SupabaseService);
   private authService = inject(AuthService);
   private offlineSync = inject(OfflineSyncService);
+  public aiConfig = inject(AiConfigService);
 
   private get userId(): string {
     return this.authService.currentUser()?.id || '';
@@ -364,8 +366,15 @@ export class QuizService {
     count: number = 5,
     difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed'
   ): Promise<QuizQuestion[]> {
-    const primaryKey = (environment as any).geminiApiKey;
-    const fallbackKey = (environment as any).geminiApiKeyFallback;
+    if (!this.aiConfig.isAiGloballyEnabled()) {
+      console.info('Gemini AI is globally disabled in Admin settings. Using built-in generator.');
+      return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+    }
+
+    const primaryKey = this.aiConfig.getEffectivePrimaryKey();
+    const fallbackKey = this.aiConfig.getEffectiveFallbackKey();
+    const model = this.aiConfig.getEffectiveModel();
+    const temperature = this.aiConfig.getTemperature();
 
     const keysToTry = [primaryKey, fallbackKey].filter(Boolean);
     if (keysToTry.length === 0) {
@@ -413,7 +422,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       const apiKey = keysToTry[i];
       const keyLabel = i === 0 ? 'Primary' : 'Fallback';
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -421,7 +430,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
               response_mime_type: 'application/json',
-              temperature: 0.7
+              temperature: temperature
             }
           })
         });
@@ -484,6 +493,38 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     }
   }
 
+  public deleteQuestionFromBank(questionId: string): boolean {
+    try {
+      const cacheKey = 'preptrack_gemini_questions_cache';
+      const bank = this.getStoredQuestionBank();
+      const filtered = bank.filter(q => q.id !== questionId);
+      if (filtered.length !== bank.length) {
+        localStorage.setItem(cacheKey, JSON.stringify(filtered));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  public clearQuestionBank(): void {
+    try {
+      const cacheKey = 'preptrack_gemini_questions_cache';
+      localStorage.removeItem(cacheKey);
+    } catch {}
+  }
+
+  public exportQuestionBankJson(): string {
+    return JSON.stringify(this.getStoredQuestionBank(), null, 2);
+  }
+
+  public importQuestionsToBank(questions: QuizQuestion[]): { added: number } {
+    if (!Array.isArray(questions)) return { added: 0 };
+    this.cacheGeneratedQuestions(questions);
+    return { added: questions.length };
+  }
+
   private cacheGeneratedQuestions(questions: QuizQuestion[]): void {
     try {
       const cacheKey = 'preptrack_gemini_questions_cache';
@@ -491,7 +532,8 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       // Deduplicate by question text to avoid repetitive copies
       const textSet = new Set(existing.map(q => q.question_text.trim().toLowerCase()));
       const novel = questions.filter(q => !textSet.has(q.question_text.trim().toLowerCase()));
-      const updated = [...novel, ...existing].slice(0, 300); // keep recent 300 curated questions
+      const maxLimit = this.aiConfig.getMaxCacheSize();
+      const updated = [...novel, ...existing].slice(0, maxLimit);
       localStorage.setItem(cacheKey, JSON.stringify(updated));
     } catch {}
   }
@@ -608,8 +650,9 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     const totalMatching = matching.length;
     const isBankSaturated = totalMatching >= 5 && (mastered.length / totalMatching) > 0.65;
     const needsFreshAi = eligiblePool.length < count || isBankSaturated;
+    const effectivelyUseAi = useAi && this.aiConfig.isAiGloballyEnabled();
 
-    if (useAi && navigator.onLine && needsFreshAi) {
+    if (effectivelyUseAi && navigator.onLine && needsFreshAi) {
       try {
         const neededFromAi = count;
         const aiQuestions = await this.generateGeminiQuestions(subjectFilter, topicFilter, neededFromAi, difficulty);
