@@ -3568,6 +3568,162 @@ export class QuestionPatternEngineService {
   }
 
   // =========================================================================
+  // CURRENT AFFAIRS (NATIONAL, INTERNATIONAL & FINANCIAL NEWS) GENERATOR
+  // =========================================================================
+
+  public generateCurrentAffairsSection(count: number, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const caBank = [
+      {
+        question: 'Which country recently linked its national fast-payment network "PayNow" with India\'s Unified Payments Interface (UPI) for instantaneous cross-border remittances?',
+        options: ['Singapore', 'United Arab Emirates', 'France', 'Mauritius', 'Malaysia'],
+        correct: 0,
+        explanation: 'Singapore became the first country to link its real-time payment system (PayNow) with India\'s UPI to enable direct, low-cost cross-border fund transfers.'
+      },
+      {
+        question: 'The Reserve Bank of India launched the "UDGAM" portal to assist the public in searching for:',
+        options: ['Unclaimed deposits across multiple banks in one centralized platform', 'Counterfeit currency detection reports', 'Direct agricultural subsidy disbursements', 'Non-performing asset auction schedules', 'Foreign currency exchange licenses'],
+        correct: 0,
+        explanation: 'UDGAM stands for Unclaimed Deposits - Gateway to Access inforMation, developed by RBI to help depositors search their unclaimed accounts across all participating banks in India.'
+      },
+      {
+        question: 'Under the PM Vishwakarma Scheme, what is the maximum collateral-free enterprise development loan provided to traditional artisans across two tranches at a concessional interest rate of 5%?',
+        options: ['₹3 Lakh (₹1 Lakh in first tranche, ₹2 Lakh in second tranche)', '₹5 Lakh', '₹2 Lakh', '₹10 Lakh', '₹1 Lakh'],
+        correct: 0,
+        explanation: 'The PM Vishwakarma Scheme provides holistic support including skill training and collateral-free enterprise loans up to ₹3 Lakh (₹1L tranche-1 and ₹2L tranche-2) at a subsidised interest rate of 5%.'
+      },
+      {
+        question: 'The Reserve Bank of India\'s Central Bank Digital Currency (CBDC) pilot operates in two segments: retail and wholesale. What is the official symbol/denomination name for India\'s digital currency?',
+        options: ['Digital Rupee (e₹)', 'Bharat Coin (bCoin)', 'DigiRupee (DR)', 'RBI Token (rToken)', 'CryptoRupee (c₹)'],
+        correct: 0,
+        explanation: 'The RBI launched India\'s official sovereign Central Bank Digital Currency under the name "Digital Rupee", denoted as "e₹" (e₹-R for retail and e₹-W for wholesale).'
+      },
+      {
+        question: 'In a significant international debt market milestone, which major global benchmark index began including Indian Government Bonds (FAR securities) starting from June 2024?',
+        options: ['JPMorgan Government Bond Index - Emerging Markets (GBI-EM)', 'Bloomberg Global Aggregate Index', 'FTSE Emerging Markets Bond Index', 'MSCI World Sovereign Index', 'S&P Dow Jones Global Bond Index'],
+        correct: 0,
+        explanation: 'JPMorgan included Indian Government Fully Accessible Route (FAR) bonds into its flagship GBI-EM Global Diversified index with a phased 10% maximum weight.'
+      },
+      {
+        question: 'Which organization was admitted as the newest permanent member of the Group of Twenty (G20) during the New Delhi G20 Leaders\' Summit?',
+        options: ['African Union (AU)', 'European Free Trade Association (EFTA)', 'Association of Southeast Asian Nations (ASEAN)', 'Commonwealth of Independent States (CIS)', 'OPEC'],
+        correct: 0,
+        explanation: 'Under India\'s G20 Presidency in New Delhi, the 55-nation African Union (AU) was formally admitted as a permanent member of the G20 group.'
+      },
+      {
+        question: 'The "MuleHunter.AI" collaborative artificial intelligence tool was initiated by which entity in India to detect and dismantle illicit money mule accounts used in cyber-financial fraud?',
+        options: ['Reserve Bank Innovation Hub (RBIH)', 'SEBI', 'National Crime Records Bureau (NCRB)', 'CERT-In', 'Indian Banks Association (IBA)'],
+        correct: 0,
+        explanation: 'Reserve Bank Innovation Hub (RBIH), a wholly owned subsidiary of the RBI, built MuleHunter.AI to assist banks in proactively identifying mule account networks.'
+      },
+      {
+        question: 'Under the Union Budget fiscal consolidation roadmap, the Government of India aims to reduce the fiscal deficit to below what percentage of GDP by FY 2025-26?',
+        options: ['Below 4.5% of GDP', 'Below 3.0% of GDP', 'Below 5.1% of GDP', 'Below 4.0% of GDP', 'Below 5.5% of GDP'],
+        correct: 0,
+        explanation: 'The Government of India has committed to a glide path reaching a fiscal deficit below 4.5% of GDP by financial year 2025-26.'
+      },
+      {
+        question: 'Which international financial institution is headquartered in Shanghai, China, and was established by the BRICS nations to mobilize resources for infrastructure and sustainable development projects?',
+        options: ['New Development Bank (NDB)', 'Asian Infrastructure Investment Bank (AIIB)', 'Asian Development Bank (ADB)', 'Bank for International Settlements (BIS)', 'International Monetary Fund (IMF)'],
+        correct: 0,
+        explanation: 'The New Development Bank (NDB), formerly referred to as the BRICS Development Bank, has its headquarters in Shanghai, China.'
+      },
+      {
+        question: 'The Reserve Bank of India mandated that all Scheduled Commercial Banks must maintain an Incremental Cash Reserve Ratio (I-CRR) temporarily in 2023 primarily to absorb surplus liquidity generated by:',
+        options: ['The return and withdrawal of ₹2,000 denomination banknotes', 'Inflow of foreign portfolio investments', 'Heavy government transfer payments during elections', 'Reduction in statutory liquidity ratio (SLR)', 'Open market sales of government securities'],
+        correct: 0,
+        explanation: 'The RBI imposed a temporary 10% Incremental CRR on net demand and time liabilities (NDTL) to soak up excess banking system liquidity caused by the return of ₹2,000 banknotes.'
+      },
+      {
+        question: 'Under RBI guidelines on Digital Lending, all loan disbursals and repayments must be executed solely between:',
+        options: ['Bank accounts of the borrower and the Regulated Entity (RE) directly without any third-party pass-through', 'The borrower and the Lending Service Provider (LSP)', 'The escrow wallet of the mobile application and the borrower', 'The payment gateway and the fintech platform', 'The borrower and credit rating agencies'],
+        correct: 0,
+        explanation: 'To eliminate predatory fintech malpractices, the RBI mandates that all credit disbursement and collection must occur directly between the borrower\'s bank account and the regulated bank/NBFC.'
+      },
+      {
+        question: 'What is the primary objective of the "RBI Retail Direct" scheme introduced by the Reserve Bank of India?',
+        options: ['To facilitate individual retail investors to directly open Gilt accounts with RBI and buy Government Securities without intermediaries', 'To provide instant personal overdrafts to savings account holders', 'To issue credit cards to rural retail shopkeepers', 'To allow retail shopping using gold bullion', 'To insure deposits of retail merchants up to ₹25 Lakh'],
+        correct: 0,
+        explanation: 'RBI Retail Direct provides a one-stop portal for individual retail investors to invest in Central Government Securities, Treasury Bills, State Development Loans (SDLs), and Sovereign Gold Bonds directly.'
+      },
+      {
+        question: 'What is the maximum investment limit under the Senior Citizens Savings Scheme (SCSS) as enhanced by the Government of India?',
+        options: ['₹30 Lakh', '₹15 Lakh', '₹25 Lakh', '₹20 Lakh', '₹50 Lakh'],
+        correct: 0,
+        explanation: 'The Government of India doubled the maximum deposit limit under the Senior Citizens Savings Scheme (SCSS) from ₹15 Lakh to ₹30 Lakh.'
+      },
+      {
+        question: 'The National Asset Reconstruction Company Limited (NARCL), popular as India\'s "Bad Bank", was established with an aggregate sovereign government guarantee of how much amount to resolve stressed banking assets?',
+        options: ['₹30,600 crore', '₹50,000 crore', '₹20,000 crore', '₹15,000 crore', '₹75,000 crore'],
+        correct: 0,
+        explanation: 'The Union Cabinet approved a sovereign central government guarantee of up to ₹30,600 crore to back Security Receipts (SRs) issued by NARCL for acquiring legacy non-performing loans.'
+      },
+      {
+        question: 'Which state hosted the 37th National Games of India, where Maharashtra topped the overall medal tally to win the prestigious Raja Bhalindra Singh Trophy?',
+        options: ['Goa', 'Gujarat', 'Kerala', 'Uttarakhand', 'Assam'],
+        correct: 0,
+        explanation: 'Goa hosted the 37th National Games in 2023, where Maharashtra emerged as champions with over 200 medals.'
+      },
+      {
+        question: 'Under the RBI Financial Inclusion Index (FI-Index), which three broad parameters are evaluated, with weights of 35%, 45%, and 20% respectively?',
+        options: ['Access (35%), Usage (45%), and Quality (20%)', 'Availability, Affordability, and Accountability', 'Inclusion, Outreach, and Recovery', 'Rural Reach, Digital Volume, and Asset Quality', 'Branching, ATM density, and Microfinance'],
+        correct: 0,
+        explanation: 'The FI-Index incorporates 97 indicators capturing three dimensions: Access (35% weight), Usage (45% weight), and Quality (20% weight).'
+      },
+      {
+        question: 'Which Indian public sector bank introduced "Project WAVE" (World of Advanced Virtual Experience) to spearhead end-to-end digital pre-approved loans and financial journeys?',
+        options: ['Indian Bank', 'Punjab National Bank', 'Bank of Baroda', 'State Bank of India', 'Canara Bank'],
+        correct: 0,
+        explanation: 'Indian Bank launched Project WAVE to digitalise retail banking products, agriculture finance, and micro-loan sanctions without physical branch visits.'
+      },
+      {
+        question: 'In the context of green financing, Sovereign Green Bonds (SGrBs) issued by the Government of India qualify for which regulatory reserve requirement for banks?',
+        options: ['Statutory Liquidity Ratio (SLR)', 'Cash Reserve Ratio (CRR)', 'Capital Conservation Buffer only', 'Foreign Exchange Reserve Asset', 'Priority Sector Lending certificate only'],
+        correct: 0,
+        explanation: 'RBI notified that investments in Sovereign Green Bonds (SGrBs) are reckoned as eligible securities for Statutory Liquidity Ratio (SLR) purposes.'
+      },
+      {
+        question: 'Which country officially took over the presidency of the BRICS grouping from January 1, 2024, overseeing the expansion of its member nations?',
+        options: ['Russia', 'Brazil', 'South Africa', 'India', 'China'],
+        correct: 0,
+        explanation: 'Russia assumed the rotating one-year BRICS chairmanship under the motto "Strengthening Multilateralism for Equitable Global Development and Security".'
+      },
+      {
+        question: 'Under the Pradhan Mantri Jan Dhan Yojana (PMJDY), what is the maximum overdraft (OD) facility available to eligible account holders after 6 months of satisfactory operation?',
+        options: ['₹10,000', '₹5,00,000', '₹20,000', '₹15,000', '₹2,000'],
+        correct: 0,
+        explanation: 'Eligible PMJDY accounts with active debit transactions are entitled to an overdraft facility of up to ₹10,000 (with no conditions up to ₹2,000) for individuals aged 18 to 65 years.'
+      }
+    ];
+
+    const shuffledBank = this.shuffle(caBank);
+    const items: ExamQuestionItem[] = [];
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const qData = shuffledBank[i % shuffledBank.length];
+      const fmt = this.format5Options(qData.options[qData.correct], qData.options.filter((_, idx) => idx !== qData.correct));
+      items.push({
+        id: `${runId}-ca-${i}`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'ga',
+        topicName: 'Current Affairs (National & International)',
+        patternCode: 'GA_CA_01',
+        difficulty: 'medium',
+        questionText: qData.question,
+        options: fmt.options,
+        correctOptionIndex: fmt.correctIndex,
+        explanation: qData.explanation,
+        marks: 1,
+        negativeMarks: 0.25
+      });
+    }
+
+    return items;
+  }
+
+  // =========================================================================
   // COMPUTER APTITUDE & KNOWLEDGE GENERATOR (FOR MAINS & RRB EXAMS)
   // =========================================================================
 
@@ -3925,7 +4081,29 @@ export class QuestionPatternEngineService {
         rawItems.push(this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i));
       } else if (normalized.includes('cloze') || normalized.includes('filler')) {
         rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
-      } else if (normalized.includes('bank') || normalized.includes('monetary') || normalized.includes('rbi') || normalized.includes('ga') || normalized.includes('awareness')) {
+      } else if (
+        normalized.includes('current') ||
+        normalized.includes('affairs') ||
+        normalized.includes('news') ||
+        normalized.includes('national') ||
+        normalized.includes('international')
+      ) {
+        const caItems = this.generateCurrentAffairsSection(1, 'ga', 'Current Affairs (National & International)');
+        if (caItems.length > 0) {
+          caItems[0].id = qId;
+          caItems[0].questionNumber = i + 1;
+          rawItems.push(caItems[0]);
+        }
+      } else if (
+        normalized.includes('bank') ||
+        normalized.includes('monetary') ||
+        normalized.includes('rbi') ||
+        normalized.includes('ga') ||
+        normalized.includes('awareness') ||
+        normalized.includes('economy') ||
+        normalized.includes('financial') ||
+        normalized.includes('gk')
+      ) {
         const gaItems = this.generateGaSection(1, 'ga', 'General & Banking Awareness');
         if (gaItems.length > 0) {
           gaItems[0].id = qId;
@@ -3964,7 +4142,9 @@ export class QuestionPatternEngineService {
         difficulty: item.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty),
         created_at: new Date().toISOString(),
         correct_count: 0,
-        incorrect_count: 0
+        incorrect_count: 0,
+        is_ai_generated: false,
+        generator_type: 'algorithmic_engine' as const
       };
     });
   }

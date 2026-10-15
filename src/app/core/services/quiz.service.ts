@@ -301,6 +301,86 @@ export class QuizService {
         correct_option_index: 0,
         explanation: 'The DICGC insures each depositor in insured commercial and cooperative banks up to a maximum of ₹5 Lakh for both principal and interest.',
         difficulty: 'easy'
+      },
+      {
+        id: 'ca-1',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'Which country recently integrated its national fast-payment system "PayNow" with India\'s UPI for instantaneous cross-border remittances?',
+        options: ['Singapore', 'United Arab Emirates', 'France', 'Mauritius'],
+        correct_option_index: 0,
+        explanation: 'Singapore\'s PayNow was linked with India\'s UPI to enable low-cost, instant cross-border remittances.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'ca-2',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'The Reserve Bank of India launched the "UDGAM" portal primarily to assist citizens in:',
+        options: ['Locating unclaimed bank deposits across multiple banks in one place', 'Applying for agricultural collateral-free loans', 'Filing consumer court grievances against NBFCs', 'Tracking foreign currency remittances'],
+        correct_option_index: 0,
+        explanation: 'UDGAM (Unclaimed Deposits - Gateway to Access inforMation) allows the public to search unclaimed deposits across participating banks.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'ca-3',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'Under the PM Vishwakarma Scheme, what is the maximum collateral-free enterprise loan available to artisans at a 5% interest rate?',
+        options: ['₹3 Lakh (in two tranches of ₹1L and ₹2L)', '₹5 Lakh', '₹2 Lakh', '₹10 Lakh'],
+        correct_option_index: 0,
+        explanation: 'The PM Vishwakarma scheme provides collateral-free credit support of up to ₹3 Lakh in two tranches (₹1L first, ₹2L second) at a concessional interest rate of 5%.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'ca-4',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'Which entity was admitted as the newest permanent member of the G20 during the New Delhi G20 Leaders\' Summit?',
+        options: ['African Union (AU)', 'ASEAN', 'European Free Trade Association', 'OPEC'],
+        correct_option_index: 0,
+        explanation: 'The African Union (comprising 55 member states) became a permanent member of the G20 under India\'s Presidency.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'ca-5',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'What is the official denomination name for India\'s Central Bank Digital Currency (CBDC) piloted by the RBI?',
+        options: ['Digital Rupee (e₹)', 'Bharat Rupee (b₹)', 'DigiCash', 'CryptoRupee'],
+        correct_option_index: 0,
+        explanation: 'The RBI officially named its digital legal tender the "Digital Rupee", represented by the symbol "e₹".',
+        difficulty: 'easy'
+      },
+      {
+        id: 'ca-6',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'In June 2024, which premier global index included Indian Government Bonds (FAR securities) into its Emerging Markets Index?',
+        options: ['JPMorgan GBI-EM Global Diversified Index', 'Bloomberg Global Aggregate Index', 'FTSE World Government Bond Index', 'MSCI World Sovereign Index'],
+        correct_option_index: 0,
+        explanation: 'JPMorgan included Indian Government Fully Accessible Route (FAR) bonds into its flagship GBI-EM index.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'ca-7',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'Which institution established "MuleHunter.AI" to collaborate with banks in detecting and curbing digital money mule bank accounts?',
+        options: ['Reserve Bank Innovation Hub (RBIH)', 'SEBI', 'National Payments Corporation of India', 'CERT-In'],
+        correct_option_index: 0,
+        explanation: 'The Reserve Bank Innovation Hub (RBIH) developed MuleHunter.AI to proactively identify money mule networks.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'ca-8',
+        subject_id: 'sub-ga',
+        topic_name: 'Current Affairs (National & International)',
+        question_text: 'What is the maximum investment limit under the Senior Citizens Savings Scheme (SCSS) as enhanced by the Government of India?',
+        options: ['₹30 Lakh', '₹15 Lakh', '₹20 Lakh', '₹25 Lakh'],
+        correct_option_index: 0,
+        explanation: 'The government doubled the maximum investment limit in the Senior Citizens Savings Scheme (SCSS) from ₹15 Lakh to ₹30 Lakh.',
+        difficulty: 'easy'
       }
     ];
   }
@@ -423,6 +503,8 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     for (let i = 0; i < keysToTry.length; i++) {
       const apiKey = keysToTry[i];
       const keyLabel = i === 0 ? 'Primary' : 'Fallback';
+      const keyType: 'primary' | 'fallback' = i === 0 ? 'primary' : 'fallback';
+      const startTime = performance.now();
       try {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(endpoint, {
@@ -437,9 +519,24 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           })
         });
 
+        const latencyMs = Math.round(performance.now() - startTime);
+
         if (!response.ok) {
           const errText = await response.text();
           console.warn(`Gemini ${keyLabel} key returned HTTP ${response.status}: ${errText}`);
+          this.aiConfig.recordAiUsage({
+            model,
+            keyUsed: keyType,
+            topic: topicFilter,
+            subject: subjectFilter,
+            questionsCount: 0,
+            tokensUsed: 0,
+            promptTokens: 0,
+            completionTokens: 0,
+            latencyMs,
+            status: 'failed',
+            errorMessage: `HTTP ${response.status}: ${errText.slice(0, 100)}`
+          });
           continue; // Try fallback key
         }
 
@@ -455,6 +552,10 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
         if (Array.isArray(questionsArray) && questionsArray.length > 0) {
           const nowIso = new Date().toISOString();
+          const promptTokens = data.usageMetadata?.promptTokenCount || Math.round(prompt.length / 4);
+          const completionTokens = data.usageMetadata?.candidatesTokenCount || Math.round(jsonText.length / 4);
+          const totalTokens = data.usageMetadata?.totalTokenCount || (promptTokens + completionTokens);
+
           const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => ({
             id: `gemini-${Date.now()}-${idx}`,
             subject_id: subjectFilter || 'sub-ai',
@@ -467,15 +568,45 @@ Output MUST be a valid JSON array of objects conforming to this schema:
             created_at: nowIso,
             correct_count: 0,
             incorrect_count: 0,
-            last_attempted_at: undefined
+            last_attempted_at: undefined,
+            is_ai_generated: true,
+            generator_type: 'gemini_ai'
           }));
+
+          // Record telemetry
+          this.aiConfig.recordAiUsage({
+            model,
+            keyUsed: keyType,
+            topic: topicFilter,
+            subject: subjectFilter,
+            questionsCount: formattedQuestions.length,
+            tokensUsed: totalTokens,
+            promptTokens,
+            completionTokens,
+            latencyMs,
+            status: 'success'
+          });
 
           // Cache newly generated questions to persistent bank
           this.cacheGeneratedQuestions(formattedQuestions);
           return formattedQuestions.slice(0, count);
         }
-      } catch (err) {
+      } catch (err: any) {
+        const latencyMs = Math.round(performance.now() - startTime);
         console.warn(`Error generating questions with Gemini ${keyLabel} key:`, err);
+        this.aiConfig.recordAiUsage({
+          model,
+          keyUsed: keyType,
+          topic: topicFilter,
+          subject: subjectFilter,
+          questionsCount: 0,
+          tokensUsed: 0,
+          promptTokens: 0,
+          completionTokens: 0,
+          latencyMs,
+          status: 'failed',
+          errorMessage: err?.message || 'Network request failed'
+        });
       }
     }
 
@@ -649,10 +780,12 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     // 1) Online AND useAi is true AND
     // 2) We don't have enough eligible questions in the bank (less than requested count)
     //    OR the bank is saturated with mastered questions (> 65% mastered ratio)
+    const policy = this.aiConfig.getAiPolicy();
+    const canUseAiPolicy = policy !== 'offline_only' && (policy !== 'engine_first' || useAi);
     const totalMatching = matching.length;
     const isBankSaturated = totalMatching >= 5 && (mastered.length / totalMatching) > 0.65;
     const needsFreshAi = eligiblePool.length < count || isBankSaturated;
-    const effectivelyUseAi = useAi && this.aiConfig.isAiGloballyEnabled();
+    const effectivelyUseAi = useAi && this.aiConfig.isAiGloballyEnabled() && canUseAiPolicy;
 
     if (effectivelyUseAi && navigator.onLine && needsFreshAi) {
       try {

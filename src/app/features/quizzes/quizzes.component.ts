@@ -315,16 +315,25 @@ import confetti from 'canvas-confetti';
               <div class="p-4 rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50/70 via-brand-50/40 to-white space-y-3">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-2">
-                    <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-xs">
-                      ✨
+                    <span class="w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs shadow-xs" [ngClass]="aiPowered() ? 'bg-indigo-600' : 'bg-slate-500'">
+                      {{ aiPowered() ? '✨' : '⚡' }}
                     </span>
                     <div>
-                      <h4 class="text-xs font-bold text-slate-900">Gemini AI Adaptive Generator</h4>
-                      <p class="text-[11px] text-slate-500">Synthesizes brand-new bank exam questions using Gemini 3.1 Flash</p>
+                      <div class="flex items-center space-x-1.5">
+                        <h4 class="text-xs font-bold text-slate-900">
+                          {{ aiPowered() ? 'Gemini AI Adaptive Generator' : 'High-Speed Pattern Engine (Non-AI)' }}
+                        </h4>
+                        <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full" [ngClass]="aiPowered() ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-800'">
+                          {{ aiPowered() ? 'AI Active' : '0 Tokens / Offline' }}
+                        </span>
+                      </div>
+                      <p class="text-[11px] text-slate-500">
+                        {{ aiPowered() ? 'Synthesizes novel questions via Gemini API' : 'Instant client-side parametric & syllabus questions with zero token usage' }}
+                      </p>
                     </div>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" [(ngModel)]="aiPowered" class="sr-only peer">
+                    <input type="checkbox" [ngModel]="aiPowered()" (ngModelChange)="aiPowered.set($event)" class="sr-only peer">
                     <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                   </label>
                 </div>
@@ -534,7 +543,7 @@ export class QuizzesComponent implements OnInit {
   public selectedSubjectId = signal<string>('all');
   public selectedTopicName = signal<string>('');
   public questionCount = signal<number>(5);
-  public aiPowered = signal<boolean>(true);
+  public aiPowered = signal<boolean>(this.quizService.aiConfig.getAiDefaultToggleState());
   public selectedDifficulty = signal<'easy' | 'medium' | 'hard' | 'mixed'>('mixed');
   public isGeneratingQuestions = signal<boolean>(false);
 

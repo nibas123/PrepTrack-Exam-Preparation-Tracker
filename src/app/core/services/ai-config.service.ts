@@ -1,8 +1,41 @@
 import { Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
+export type AiGenerationPolicy = 'smart_frugal' | 'engine_first' | 'always_ai' | 'offline_only';
+
+export interface AiLogEntry {
+  id: string;
+  timestamp: string;
+  model: string;
+  keyUsed: 'primary' | 'fallback';
+  topic?: string;
+  subject?: string;
+  questionsCount: number;
+  tokensUsed: number;
+  promptTokens: number;
+  completionTokens: number;
+  latencyMs: number;
+  status: 'success' | 'failed' | 'fallback';
+  errorMessage?: string;
+}
+
+export interface AiUsageTelemetry {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  totalTokensUsed: number;
+  promptTokensUsed: number;
+  completionTokensUsed: number;
+  totalAiQuestionsGenerated: number;
+  totalLatencyMs: number;
+  lastUsedAt?: string;
+  logs: AiLogEntry[];
+}
+
 export interface GeminiTokenConfig {
   enabled: boolean;
+  policy: AiGenerationPolicy;
+  defaultQuizAiToggle: boolean;
   primaryKey: string;
   fallbackKey: string;
   model: string;
@@ -25,6 +58,7 @@ export interface TokenTestResult {
 }
 
 const STORAGE_KEY = 'preptrack_gemini_config';
+const TELEMETRY_KEY = 'preptrack_ai_telemetry';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +69,7 @@ export class AiConfigService {
   private readonly defaultModel = 'gemini-3.1-flash-lite-preview';
 
   public readonly config = signal<GeminiTokenConfig>(this.loadConfig());
+  public readonly telemetry = signal<AiUsageTelemetry>(this.loadTelemetry());
 
   constructor() {
     // If not in storage yet, persist initial state
@@ -50,6 +85,8 @@ export class AiConfigService {
         const parsed = JSON.parse(stored);
         return {
           enabled: parsed.enabled !== undefined ? !!parsed.enabled : true,
+          policy: parsed.policy || 'smart_frugal',
+          defaultQuizAiToggle: parsed.defaultQuizAiToggle !== undefined ? !!parsed.defaultQuizAiToggle : false,
           primaryKey: parsed.primaryKey !== undefined ? parsed.primaryKey : this.defaultPrimaryKey,
           fallbackKey: parsed.fallbackKey !== undefined ? parsed.fallbackKey : this.defaultFallbackKey,
           model: parsed.model || this.defaultModel,
@@ -69,6 +106,8 @@ export class AiConfigService {
 
     return {
       enabled: true,
+      policy: 'smart_frugal',
+      defaultQuizAiToggle: false,
       primaryKey: this.defaultPrimaryKey,
       fallbackKey: this.defaultFallbackKey,
       model: this.defaultModel,
@@ -77,6 +116,49 @@ export class AiConfigService {
       primaryKeyStatus: 'untested',
       fallbackKeyStatus: 'untested'
     };
+  }
+
+  private loadTelemetry(): AiUsageTelemetry {
+    try {
+      const stored = localStorage.getItem(TELEMETRY_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          totalRequests: parsed.totalRequests || 0,
+          successfulRequests: parsed.successfulRequests || 0,
+          failedRequests: parsed.failedRequests || 0,
+          totalTokensUsed: parsed.totalTokensUsed || 0,
+          promptTokensUsed: parsed.promptTokensUsed || 0,
+          completionTokensUsed: parsed.completionTokensUsed || 0,
+          totalAiQuestionsGenerated: parsed.totalAiQuestionsGenerated || 0,
+          totalLatencyMs: parsed.totalLatencyMs || 0,
+          lastUsedAt: parsed.lastUsedAt,
+          logs: Array.isArray(parsed.logs) ? parsed.logs : []
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to parse telemetry from storage:', e);
+    }
+
+    return {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      totalTokensUsed: 0,
+      promptTokensUsed: 0,
+      completionTokensUsed: 0,
+      totalAiQuestionsGenerated: 0,
+      totalLatencyMs: 0,
+      logs: []
+    };
+  }
+
+  private persistTelemetry(tel: AiUsageTelemetry): void {
+    try {
+      localStorage.setItem(TELEMETRY_KEY, JSON.stringify(tel));
+    } catch (e) {
+      console.warn('Failed to persist telemetry:', e);
+    }
   }
 
   private persistConfig(conf: GeminiTokenConfig): void {
@@ -103,6 +185,8 @@ export class AiConfigService {
   public resetToDefaults(): void {
     const resetConf: GeminiTokenConfig = {
       enabled: true,
+      policy: 'smart_frugal',
+      defaultQuizAiToggle: false,
       primaryKey: this.defaultPrimaryKey,
       fallbackKey: this.defaultFallbackKey,
       model: this.defaultModel,
@@ -228,6 +312,66 @@ export class AiConfigService {
       errorMessage: result.success ? undefined : result.message
     });
     return result;
+  }
+
+  public getAiPolicy(): AiGenerationPolicy {
+    return this.config().policy || 'smart_frugal';
+  }
+
+  public setAiPolicy(policy: AiGenerationPolicy): void {
+    this.updateConfig({ policy });
+  }
+
+  public getAiDefaultToggleState(): boolean {
+    const policy = this.getAiPolicy();
+    if (policy === 'offline_only' || policy === 'engine_first') return false;
+    if (policy === 'always_ai') return true;
+    return this.config().defaultQuizAiToggle ?? false;
+  }
+
+  public setDefaultQuizAiToggle(defaultQuizAiToggle: boolean): void {
+    this.updateConfig({ defaultQuizAiToggle });
+  }
+
+  public recordAiUsage(entry: Omit<AiLogEntry, 'id' | 'timestamp'>): void {
+    const newEntry: AiLogEntry = {
+      ...entry,
+      id: `ai-req-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      timestamp: new Date().toISOString()
+    };
+
+    const cur = this.telemetry();
+    const updated: AiUsageTelemetry = {
+      totalRequests: cur.totalRequests + 1,
+      successfulRequests: cur.successfulRequests + (entry.status === 'success' ? 1 : 0),
+      failedRequests: cur.failedRequests + (entry.status === 'failed' ? 1 : 0),
+      totalTokensUsed: cur.totalTokensUsed + (entry.tokensUsed || 0),
+      promptTokensUsed: cur.promptTokensUsed + (entry.promptTokens || 0),
+      completionTokensUsed: cur.completionTokensUsed + (entry.completionTokens || 0),
+      totalAiQuestionsGenerated: cur.totalAiQuestionsGenerated + (entry.questionsCount || 0),
+      totalLatencyMs: cur.totalLatencyMs + (entry.latencyMs || 0),
+      lastUsedAt: newEntry.timestamp,
+      logs: [newEntry, ...(cur.logs || [])].slice(0, 50)
+    };
+
+    this.telemetry.set(updated);
+    this.persistTelemetry(updated);
+  }
+
+  public clearTelemetry(): void {
+    const empty: AiUsageTelemetry = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      totalTokensUsed: 0,
+      promptTokensUsed: 0,
+      completionTokensUsed: 0,
+      totalAiQuestionsGenerated: 0,
+      totalLatencyMs: 0,
+      logs: []
+    };
+    this.telemetry.set(empty);
+    this.persistTelemetry(empty);
   }
 
   /**

@@ -39,6 +39,8 @@ export interface QuizQuestion {
   correct_count?: number;
   incorrect_count?: number;
   last_attempted_at?: string;
+  is_ai_generated?: boolean;
+  generator_type?: 'gemini_ai' | 'algorithmic_engine' | 'blueprint_static' | 'manual_seed';
 }
 
 export interface ManualQuestionLog {

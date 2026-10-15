@@ -84,6 +84,9 @@ describe('AdminComponent', () => {
   });
 
   it('should switch between tabs properly', () => {
+    expect(component.activeTab()).toBe('dashboard');
+
+    component.activeTab.set('gemini');
     expect(component.activeTab()).toBe('gemini');
 
     component.activeTab.set('bank');
