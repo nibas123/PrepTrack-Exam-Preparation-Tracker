@@ -267,10 +267,10 @@ import confetti from 'canvas-confetti';
                       <p class="text-[11px] text-slate-500">Practice questions exclusively from a specific topic like Percentage, Syllogisms, or Number Series</p>
                     </div>
                   </div>
-                  @if (selectedTopicName()) {
+                  @if (selectedTopicName() || topicSearchQuery()) {
                     <button
                       type="button"
-                      (click)="selectedTopicName.set('')"
+                      (click)="clearTopicFilter()"
                       class="inline-flex items-center space-x-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200"
                     >
                       <span>✕ Clear Topic Filter</span>
@@ -278,26 +278,148 @@ import confetti from 'canvas-confetti';
                   }
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-2">
-                  <div class="flex-1 relative">
-                    <select
-                      [ngModel]="selectedTopicName()"
-                      (ngModelChange)="onTopicSelected($event)"
-                      class="w-full text-xs font-semibold rounded-xl border-slate-200 bg-white py-2 px-3 text-slate-800 focus:ring-brand-500 focus:border-brand-500 shadow-2xs"
-                    >
-                      <option value="">-- All Topics (Mixed {{ selectedSubjectId() === 'all' ? 'All Subjects' : 'Subject' }}) --</option>
-                      @for (top of availableTopics(); track top.id) {
-                        <option [value]="top.name">{{ top.name }}</option>
+                <!-- Search Input with Dropdown Combobox -->
+                <div class="relative">
+                  <div class="relative flex items-center">
+                    <span class="absolute left-3 text-slate-400 pointer-events-none">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </span>
+
+                    <input
+                      type="text"
+                      [ngModel]="topicSearchQuery()"
+                      (ngModelChange)="onSearchInputChange($event)"
+                      (focus)="isTopicDropdownOpen.set(true)"
+                      (keydown.enter)="onSearchEnterKey($event)"
+                      (keydown.escape)="isTopicDropdownOpen.set(false)"
+                      placeholder="Search topics (e.g. Percentage, Syllogisms, Profit & Loss)..."
+                      class="w-full text-xs font-semibold rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-20 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-2xs transition-all"
+                    />
+
+                    <div class="absolute right-2 flex items-center space-x-1">
+                      @if (topicSearchQuery() || selectedTopicName()) {
+                        <button
+                          type="button"
+                          (click)="clearTopicFilter()"
+                          class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-slate-100 transition-colors"
+                          title="Clear topic search"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       }
-                    </select>
+
+                      <button
+                        type="button"
+                        (click)="toggleTopicDropdown()"
+                        class="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                        title="Toggle topic options"
+                      >
+                        <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="isTopicDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
+
+                  <!-- Active Topic Selected Badge -->
+                  @if (selectedTopicName()) {
+                    <div class="mt-2 flex items-center justify-between p-2 rounded-lg bg-brand-50 border border-brand-200 text-xs animate-in fade-in duration-150">
+                      <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                        <span class="text-slate-500 text-[11px]">Selected Chapter:</span>
+                        <span class="font-bold text-brand-800">{{ selectedTopicName() }}</span>
+                      </div>
+                      <button
+                        type="button"
+                        (click)="clearTopicFilter()"
+                        class="text-[11px] font-bold text-brand-700 hover:text-rose-600 underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  }
+
+                  <!-- Dropdown List for Matching Topics -->
+                  @if (isTopicDropdownOpen()) {
+                    <div
+                      class="fixed inset-0 z-20"
+                      (click)="isTopicDropdownOpen.set(false)"
+                    ></div>
+
+                    <div class="absolute left-0 right-0 top-full mt-1.5 z-30 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl space-y-0.5 text-xs animate-in fade-in duration-150">
+                      <!-- All Topics Option -->
+                      <button
+                        type="button"
+                        (click)="selectTopic('')"
+                        class="w-full text-left px-3 py-2 rounded-lg font-semibold flex items-center justify-between hover:bg-slate-50 transition-colors"
+                        [ngClass]="!selectedTopicName() ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-600'"
+                      >
+                        <span>-- All Topics (Mixed {{ selectedSubjectId() === 'all' ? 'All Subjects' : 'Subject' }}) --</span>
+                        @if (!selectedTopicName()) {
+                          <span class="text-emerald-600 text-xs font-bold">✓ Active</span>
+                        }
+                      </button>
+
+                      <!-- Filtered Topic Matches -->
+                      @for (top of filteredTopics(); track top.id) {
+                        <button
+                          type="button"
+                          (click)="selectTopic(top.name)"
+                          class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between hover:bg-brand-50/70 transition-colors group"
+                          [ngClass]="selectedTopicName().toLowerCase() === top.name.toLowerCase() ? 'bg-brand-50 text-brand-900 font-bold' : 'text-slate-700'"
+                        >
+                          <div class="flex items-center space-x-2 min-w-0">
+                            <span class="truncate font-medium">{{ top.name }}</span>
+                            @if (getSubjectNameForTopic(top)) {
+                              <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-700 transition-colors">
+                                {{ getSubjectNameForTopic(top) }}
+                              </span>
+                            }
+                          </div>
+                          @if (selectedTopicName().toLowerCase() === top.name.toLowerCase()) {
+                            <span class="text-brand-600 text-xs font-bold">✓</span>
+                          }
+                        </button>
+                      }
+
+                      <!-- Practice Custom Typed Topic -->
+                      @if (isCustomTopicAvailable()) {
+                        <button
+                          type="button"
+                          (click)="selectTopic(topicSearchQuery().trim())"
+                          class="w-full text-left px-3 py-2.5 rounded-lg bg-indigo-50/70 hover:bg-indigo-100/80 text-indigo-900 transition-colors flex items-center justify-between border border-indigo-100 mt-1"
+                        >
+                          <div class="flex items-center space-x-2">
+                            <span>✨</span>
+                            <span>Target chapter: <strong class="underline font-bold">"{{ topicSearchQuery().trim() }}"</strong></span>
+                          </div>
+                          <span class="text-[10px] uppercase font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-indigo-200">Press Enter ↵</span>
+                        </button>
+                      }
+
+                      @if (filteredTopics().length === 0 && !isCustomTopicAvailable()) {
+                        <div class="py-4 text-center text-xs text-slate-400">
+                          No matching topics found.
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
 
                 <!-- Quick Selection Topic Pills -->
                 <div>
-                  <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1.5">Quick Select Chapters:</span>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Quick Select Chapters:</span>
+                    @if (filteredPopularSuggestions().length > 0 && topicSearchQuery().trim()) {
+                      <span class="text-[10px] text-brand-600 font-semibold">{{ filteredPopularSuggestions().length }} matching shortcuts</span>
+                    }
+                  </div>
                   <div class="flex flex-wrap gap-1.5">
-                    @for (topName of popularTopicSuggestions(); track topName) {
+                    @for (topName of filteredPopularSuggestions(); track topName) {
                       <button
                         type="button"
                         (click)="selectTopicPill(topName)"
@@ -554,6 +676,10 @@ export class QuizzesComponent implements OnInit {
     { value: 'hard', label: 'Hard', desc: 'Advanced' },
   ];
 
+  // Topic search & combobox
+  public topicSearchQuery = signal<string>('');
+  public isTopicDropdownOpen = signal<boolean>(false);
+
   public availableTopics = computed(() => {
     const subId = this.selectedSubjectId();
     const all = this.topics();
@@ -561,6 +687,27 @@ export class QuizzesComponent implements OnInit {
       return all;
     }
     return all.filter(t => t.subject_id === subId);
+  });
+
+  public filteredTopics = computed(() => {
+    const query = this.topicSearchQuery().trim().toLowerCase();
+    const available = this.availableTopics();
+    if (!query) {
+      return available;
+    }
+    return available.filter(t => {
+      const matchName = t.name.toLowerCase().includes(query);
+      const sub = this.subjects().find(s => s.id === t.subject_id);
+      const matchSubject = sub ? sub.name.toLowerCase().includes(query) : false;
+      return matchName || matchSubject;
+    });
+  });
+
+  public isCustomTopicAvailable = computed(() => {
+    const q = this.topicSearchQuery().trim();
+    if (!q) return false;
+    const exists = this.availableTopics().some(t => t.name.toLowerCase() === q.toLowerCase());
+    return !exists;
   });
 
   public popularTopicSuggestions = computed(() => {
@@ -579,6 +726,16 @@ export class QuizzesComponent implements OnInit {
       ];
     }
     return this.availableTopics().slice(0, 8).map(t => t.name);
+  });
+
+  public filteredPopularSuggestions = computed(() => {
+    const suggestions = this.popularTopicSuggestions();
+    const query = this.topicSearchQuery().trim().toLowerCase();
+    if (!query) {
+      return suggestions;
+    }
+    const matching = suggestions.filter(s => s.toLowerCase().includes(query));
+    return matching.length > 0 ? matching : suggestions;
   });
 
   // Active quiz state
@@ -616,6 +773,7 @@ export class QuizzesComponent implements OnInit {
       if (params['topicName']) {
         const topName = params['topicName'];
         this.selectedTopicName.set(topName);
+        this.topicSearchQuery.set(topName);
         this.activeTab.set('builder');
         const matched = allTopics.find(t => t.name.toLowerCase() === topName.toLowerCase());
         if (matched) {
@@ -627,8 +785,43 @@ export class QuizzesComponent implements OnInit {
     });
   }
 
-  onTopicSelected(topicName: string): void {
+  public getSubjectNameForTopic(top: Topic): string {
+    const sub = this.subjects().find(s => s.id === top.subject_id);
+    return sub ? sub.name : '';
+  }
+
+  public onSearchInputChange(query: string): void {
+    this.topicSearchQuery.set(query);
+    this.isTopicDropdownOpen.set(true);
+    if (!query.trim()) {
+      this.selectedTopicName.set('');
+    }
+  }
+
+  public toggleTopicDropdown(): void {
+    this.isTopicDropdownOpen.update(v => !v);
+  }
+
+  public onSearchEnterKey(event: Event): void {
+    event.preventDefault();
+    const q = this.topicSearchQuery().trim();
+    if (!q) {
+      this.clearTopicFilter();
+      return;
+    }
+    const matches = this.filteredTopics();
+    if (matches.length > 0) {
+      const exact = matches.find(m => m.name.toLowerCase() === q.toLowerCase());
+      this.selectTopic(exact ? exact.name : matches[0].name);
+    } else {
+      this.selectTopic(q);
+    }
+  }
+
+  public selectTopic(topicName: string): void {
     this.selectedTopicName.set(topicName);
+    this.topicSearchQuery.set(topicName);
+    this.isTopicDropdownOpen.set(false);
     if (topicName) {
       const matched = this.topics().find(t => t.name.toLowerCase() === topicName.toLowerCase());
       if (matched && this.selectedSubjectId() === 'all') {
@@ -637,12 +830,18 @@ export class QuizzesComponent implements OnInit {
     }
   }
 
-  selectTopicPill(topicName: string): void {
-    this.selectedTopicName.set(topicName);
-    const matched = this.topics().find(t => t.name.toLowerCase() === topicName.toLowerCase());
-    if (matched && this.selectedSubjectId() === 'all') {
-      this.selectedSubjectId.set(matched.subject_id);
+  public selectTopicPill(topicName: string): void {
+    if (this.selectedTopicName().toLowerCase() === topicName.toLowerCase()) {
+      this.clearTopicFilter();
+      return;
     }
+    this.selectTopic(topicName);
+  }
+
+  public clearTopicFilter(): void {
+    this.selectedTopicName.set('');
+    this.topicSearchQuery.set('');
+    this.isTopicDropdownOpen.set(false);
   }
 
   async startQuiz(): Promise<void> {
