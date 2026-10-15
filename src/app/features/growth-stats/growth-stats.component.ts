@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { QuizService } from '../../core/services/quiz.service';
+import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { ManualQuestionLog, QuizAttempt, QuizQuestion } from '../../core/models/database.types';
+import { ManualQuestionLog, QuizAttempt, QuizQuestion, MockExamAttempt, Subject, Topic } from '../../core/models/database.types';
 
 @Component({
   selector: 'app-growth-stats',
@@ -51,7 +52,7 @@ import { ManualQuestionLog, QuizAttempt, QuizQuestion } from '../../core/models/
           </div>
           <p class="text-2xl font-black text-slate-900">{{ totalQuestionsSolved() }}</p>
           <div class="flex items-center space-x-2 text-[11px] text-slate-500">
-            <span>{{ inAppQuestionsCount() }} in-app</span>
+            <span>{{ inAppQuestionsCount() }} in-app ({{ quizQuestionsCount() }} quiz, {{ mockQuestionsCount() }} mock)</span>
             <span>•</span>
             <span class="text-indigo-600 font-semibold">{{ outsideQuestionsCount() }} outside</span>
           </div>
@@ -122,6 +123,11 @@ import { ManualQuestionLog, QuizAttempt, QuizQuestion } from '../../core/models/
                     <span class="text-[10px] px-1.5 py-0.2 rounded bg-white border border-slate-200 text-slate-500">
                       {{ subj.total }} questions
                     </span>
+                    @if (subj.total > 0) {
+                      <span class="text-[10px] text-slate-400 hidden sm:inline">
+                        ({{ subj.quizTotal }} quiz, {{ subj.mockTotal }} mock, {{ subj.outTotal }} outside)
+                      </span>
+                    }
                   </div>
                   <div class="font-bold" [ngClass]="subj.accuracy >= 70 ? 'text-emerald-600' : (subj.accuracy >= 50 ? 'text-amber-600' : 'text-rose-600')">
                     {{ subj.accuracy }}% Accuracy
@@ -432,13 +438,17 @@ import { ManualQuestionLog, QuizAttempt, QuizQuestion } from '../../core/models/
 })
 export class GrowthStatsComponent implements OnInit {
   private quizService = inject(QuizService);
+  private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
 
   public Math = Math;
 
   public inAppAttempts = signal<QuizAttempt[]>([]);
+  public mockAttempts = signal<MockExamAttempt[]>([]);
   public manualLogs = signal<ManualQuestionLog[]>([]);
   public questionBank = signal<QuizQuestion[]>([]);
+  public subjects = signal<Subject[]>([]);
+  public topics = signal<Topic[]>([]);
 
   public openLogModal = signal<boolean>(false);
 
@@ -459,18 +469,32 @@ export class GrowthStatsComponent implements OnInit {
   }
 
   async refreshData(): Promise<void> {
-    const [attempts, logs] = await Promise.all([
+    const [attempts, logs, mocks, subs, tops] = await Promise.all([
       this.quizService.getQuizAttempts(),
-      this.quizService.getManualQuestionLogs()
+      this.quizService.getManualQuestionLogs(),
+      this.dataStorage.getMockExamSimulatorAttempts(),
+      this.dataStorage.getSubjects(),
+      this.dataStorage.getTopics()
     ]);
     this.inAppAttempts.set(attempts);
     this.manualLogs.set(logs);
+    this.mockAttempts.set(mocks);
+    this.subjects.set(subs);
+    this.topics.set(tops);
     this.questionBank.set(this.quizService.getStoredQuestionBank());
   }
 
   // --- COMPUTED AGGREGATES ---
-  public inAppQuestionsCount = computed(() => {
+  public quizQuestionsCount = computed(() => {
     return this.inAppAttempts().reduce((acc, curr) => acc + (curr.total_questions || 0), 0);
+  });
+
+  public mockQuestionsCount = computed(() => {
+    return this.mockAttempts().reduce((acc, curr) => acc + (curr.attempted_questions || curr.total_questions || 0), 0);
+  });
+
+  public inAppQuestionsCount = computed(() => {
+    return this.quizQuestionsCount() + this.mockQuestionsCount();
   });
 
   public outsideQuestionsCount = computed(() => {
@@ -481,8 +505,16 @@ export class GrowthStatsComponent implements OnInit {
     return this.inAppQuestionsCount() + this.outsideQuestionsCount();
   });
 
-  public inAppCorrectCount = computed(() => {
+  public quizCorrectCount = computed(() => {
     return this.inAppAttempts().reduce((acc, curr) => acc + (curr.correct_answers || 0), 0);
+  });
+
+  public mockCorrectCount = computed(() => {
+    return this.mockAttempts().reduce((acc, curr) => acc + (curr.correct_answers || 0), 0);
+  });
+
+  public inAppCorrectCount = computed(() => {
+    return this.quizCorrectCount() + this.mockCorrectCount();
   });
 
   public outsideCorrectCount = computed(() => {
@@ -509,57 +541,164 @@ export class GrowthStatsComponent implements OnInit {
 
   // --- BREAKDOWNS ---
   public subjectStats = computed(() => {
-    const subjects = [
-      { name: 'Quantitative Aptitude', color: '#3b82f6' },
-      { name: 'Reasoning Ability', color: '#8b5cf6' },
-      { name: 'English Language', color: '#10b981' },
-      { name: 'General & Banking Awareness', color: '#f59e0b' },
-      { name: 'Computer Aptitude', color: '#06b6d4' }
+    const defaultConfigs = [
+      {
+        name: 'Quantitative Aptitude',
+        code: 'quant',
+        color: '#3b82f6',
+        keywords: ['quant', 'math', 'arithmetic', 'numerical', 'percentage', 'profit', 'interest', 'ratio', 'series', 'simplification', 'sub-quant']
+      },
+      {
+        name: 'Reasoning Ability',
+        code: 'reasoning',
+        color: '#8b5cf6',
+        keywords: ['reasoning', 'logic', 'puzzle', 'seating', 'syllogism', 'inequality', 'blood', 'coding', 'direction', 'sub-reasoning']
+      },
+      {
+        name: 'English Language',
+        code: 'english',
+        color: '#10b981',
+        keywords: ['english', 'verbal', 'reading', 'cloze', 'grammar', 'comprehension', 'vocabulary', 'para jumble', 'sub-english']
+      },
+      {
+        name: 'General & Banking Awareness',
+        code: 'ga',
+        color: '#f59e0b',
+        keywords: ['general awareness', 'general & banking', 'banking', 'current affairs', 'financial', 'ga', 'gk', 'static banking', 'sub-ga']
+      },
+      {
+        name: 'Computer Aptitude',
+        code: 'computer',
+        color: '#06b6d4',
+        keywords: ['computer', 'aptitude', 'hardware', 'software', 'networking', 'it', 'sub-computer']
+      }
     ];
 
-    return subjects.map(sub => {
-      // In-app matches
-      const subInApp = this.inAppAttempts().filter(a => {
+    const currentSubjects = this.subjects();
+    const currentTopics = this.topics();
+    const attempts = this.inAppAttempts();
+    const mocks = this.mockAttempts();
+    const logs = this.manualLogs();
+
+    return defaultConfigs.map(cfg => {
+      // Find matching subject ID from dataStorage if present
+      const matchedSubject = currentSubjects.find(s =>
+        s.name.toLowerCase().includes(cfg.code) ||
+        cfg.keywords.some(kw => s.name.toLowerCase().includes(kw))
+      );
+      const subjectId = matchedSubject?.id;
+
+      // Find topic names belonging to this subject
+      const topicNames = new Set(
+        currentTopics
+          .filter(t => subjectId ? t.subject_id === subjectId : false)
+          .map(t => t.name.toLowerCase())
+      );
+
+      // 1. In-app quiz attempts matching this subject
+      const subQuizzes = attempts.filter(a => {
         const top = (a.topic_name || '').toLowerCase();
         const sId = (a.subject_id || '').toLowerCase();
-        return top.includes(sub.name.toLowerCase()) || sId.includes(sub.name.toLowerCase());
+        if (subjectId && sId === subjectId.toLowerCase()) return true;
+        if (sId === `sub-${cfg.code}` || sId.includes(cfg.code)) return true;
+        if (topicNames.has(top)) return true;
+        return cfg.keywords.some(kw => top.includes(kw) || sId.includes(kw));
       });
-      const inAppTotal = subInApp.reduce((acc, c) => acc + c.total_questions, 0);
-      const inAppCorrect = subInApp.reduce((acc, c) => acc + c.correct_answers, 0);
+      const quizTotal = subQuizzes.reduce((acc, c) => acc + (c.total_questions || 0), 0);
+      const quizCorrect = subQuizzes.reduce((acc, c) => acc + (c.correct_answers || 0), 0);
 
-      // Outside matches
-      const subOutside = this.manualLogs().filter(m => m.subject_name === sub.name);
-      const outTotal = subOutside.reduce((acc, c) => acc + c.questions_count, 0);
-      const outCorrect = subOutside.reduce((acc, c) => acc + c.correct_count, 0);
+      // 2. Mock exam simulator section breakdown matching this subject
+      let mockTotal = 0;
+      let mockCorrect = 0;
+      for (const m of mocks) {
+        if (Array.isArray(m.section_breakdown)) {
+          for (const sec of m.section_breakdown) {
+            const secCode = (sec.sectionCode || '').toLowerCase();
+            const secName = (sec.sectionName || '').toLowerCase();
+            if (
+              secCode === cfg.code ||
+              secCode.includes(cfg.code) ||
+              secName.includes(cfg.code) ||
+              cfg.keywords.some(kw => secName.includes(kw))
+            ) {
+              mockTotal += sec.attempted || sec.totalQuestions || 0;
+              mockCorrect += sec.correct || 0;
+            }
+          }
+        }
+      }
 
-      const total = inAppTotal + outTotal;
-      const correct = inAppCorrect + outCorrect;
+      // 3. Outside manual logs matching this subject
+      const subOutside = logs.filter(m => {
+        const sName = (m.subject_name || '').toLowerCase();
+        const sPart = (m.section_part || '').toLowerCase();
+        const top = (m.topic_name || '').toLowerCase();
+        return (
+          sName.includes(cfg.code) ||
+          sName.includes(cfg.name.toLowerCase()) ||
+          cfg.keywords.some(kw => sName.includes(kw) || sPart.includes(kw) || top.includes(kw))
+        );
+      });
+      const outTotal = subOutside.reduce((acc, c) => acc + (c.questions_count || 0), 0);
+      const outCorrect = subOutside.reduce((acc, c) => acc + (c.correct_count || 0), 0);
+
+      const total = quizTotal + mockTotal + outTotal;
+      const correct = quizCorrect + mockCorrect + outCorrect;
       const incorrect = Math.max(0, total - correct);
       const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
 
       return {
-        name: sub.name,
-        color: sub.color,
+        name: cfg.name,
+        color: cfg.color,
         total,
         correct,
         incorrect,
-        accuracy
+        accuracy,
+        quizTotal,
+        mockTotal,
+        outTotal
       };
     });
   });
 
   public sectionPartStats = computed(() => {
     const parts = [
-      'Arithmetic', 'DI', 'Puzzles', 'Seating Arrangement',
-      'Grammar', 'Reading Comprehension', 'Static Banking', 'Current Affairs', 'Computer'
+      { name: 'Arithmetic', keywords: ['arithmetic', 'percentage', 'profit', 'interest', 'ratio', 'work', 'speed', 'mixture', 'average'] },
+      { name: 'DI', keywords: ['di', 'data interpretation', 'chart', 'graph', 'caselet'] },
+      { name: 'Puzzles', keywords: ['puzzle', 'floor', 'box', 'day', 'scheduling'] },
+      { name: 'Seating Arrangement', keywords: ['seating', 'circular', 'linear', 'parallel'] },
+      { name: 'Grammar', keywords: ['grammar', 'error', 'cloze', 'fillers', 'sentence'] },
+      { name: 'Reading Comprehension', keywords: ['reading', 'comprehension', 'passage'] },
+      { name: 'Static Banking', keywords: ['static banking', 'rbi', 'monetary', 'headquarters', 'banking awareness'] },
+      { name: 'Current Affairs', keywords: ['current affairs', 'news', 'summit', 'awards', 'sports'] },
+      { name: 'Computer', keywords: ['computer', 'software', 'hardware', 'os', 'network'] }
     ];
 
+    const logs = this.manualLogs();
+    const attempts = this.inAppAttempts();
+
     return parts.map(p => {
-      const logs = this.manualLogs().filter(l => l.section_part === p);
-      const count = logs.reduce((acc, c) => acc + c.questions_count, 0);
-      const correct = logs.reduce((acc, c) => acc + c.correct_count, 0);
+      // From manual logs
+      const matchingLogs = logs.filter(l => 
+        l.section_part === p.name || 
+        p.keywords.some(kw => (l.section_part || '').toLowerCase().includes(kw) || (l.topic_name || '').toLowerCase().includes(kw))
+      );
+      const logCount = matchingLogs.reduce((acc, c) => acc + (c.questions_count || 0), 0);
+      const logCorrect = matchingLogs.reduce((acc, c) => acc + (c.correct_count || 0), 0);
+
+      // From quiz attempts (matching topic names to section parts)
+      const matchingQuizzes = attempts.filter(a => {
+        const top = (a.topic_name || '').toLowerCase();
+        return p.keywords.some(kw => top.includes(kw));
+      });
+      const quizCount = matchingQuizzes.reduce((acc, c) => acc + (c.total_questions || 0), 0);
+      const quizCorrect = matchingQuizzes.reduce((acc, c) => acc + (c.correct_answers || 0), 0);
+
+      const count = logCount + quizCount;
+      const correct = logCorrect + quizCorrect;
       const accuracy = count > 0 ? Math.round((correct / count) * 100) : 0;
-      return { name: p, count, accuracy };
+
+      return { name: p.name, count, accuracy };
     });
   });
 

@@ -5,7 +5,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { QuizService } from '../../core/services/quiz.service';
 import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { QuizQuestion, QuizAttempt, PreviousPaper, Subject } from '../../core/models/database.types';
+import { QuizQuestion, QuizAttempt, PreviousPaper, Subject, Topic } from '../../core/models/database.types';
 import confetti from 'canvas-confetti';
 
 @Component({
@@ -255,6 +255,62 @@ import confetti from 'canvas-confetti';
                 </div>
               </div>
 
+              <!-- Topic Selector (Specific Chapter Focus like Percentage, Syllogisms, etc.) -->
+              <div class="p-3.5 rounded-xl border border-slate-200/90 bg-slate-50/70 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-6 h-6 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">
+                      🎯
+                    </span>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-800 uppercase tracking-wide">Target Topic Practice (Optional)</label>
+                      <p class="text-[11px] text-slate-500">Practice questions exclusively from a specific topic like Percentage, Syllogisms, or Number Series</p>
+                    </div>
+                  </div>
+                  @if (selectedTopicName()) {
+                    <button
+                      type="button"
+                      (click)="selectedTopicName.set('')"
+                      class="inline-flex items-center space-x-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200"
+                    >
+                      <span>✕ Clear Topic Filter</span>
+                    </button>
+                  }
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="flex-1 relative">
+                    <select
+                      [ngModel]="selectedTopicName()"
+                      (ngModelChange)="onTopicSelected($event)"
+                      class="w-full text-xs font-semibold rounded-xl border-slate-200 bg-white py-2 px-3 text-slate-800 focus:ring-brand-500 focus:border-brand-500 shadow-2xs"
+                    >
+                      <option value="">-- All Topics (Mixed {{ selectedSubjectId() === 'all' ? 'All Subjects' : 'Subject' }}) --</option>
+                      @for (top of availableTopics(); track top.id) {
+                        <option [value]="top.name">{{ top.name }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Quick Selection Topic Pills -->
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1.5">Quick Select Chapters:</span>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (topName of popularTopicSuggestions(); track topName) {
+                      <button
+                        type="button"
+                        (click)="selectTopicPill(topName)"
+                        class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border"
+                        [ngClass]="selectedTopicName().toLowerCase() === topName.toLowerCase() ? 'bg-brand-600 text-white border-brand-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-brand-300 hover:bg-brand-50/50'"
+                      >
+                        {{ topName }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
               <!-- AI Question Generator Toggle & Difficulty Selector -->
               <div class="p-4 rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50/70 via-brand-50/40 to-white space-y-3">
                 <div class="flex items-center justify-between">
@@ -470,6 +526,7 @@ export class QuizzesComponent implements OnInit {
 
   public activeTab = signal<'builder' | 'papers' | 'history'>('builder');
   public subjects = signal<Subject[]>([]);
+  public topics = signal<Topic[]>([]);
   public previousPapers = signal<PreviousPaper[]>([]);
   public pastAttempts = signal<QuizAttempt[]>([]);
 
@@ -487,6 +544,33 @@ export class QuizzesComponent implements OnInit {
     { value: 'medium', label: 'Medium', desc: 'Moderate' },
     { value: 'hard', label: 'Hard', desc: 'Advanced' },
   ];
+
+  public availableTopics = computed(() => {
+    const subId = this.selectedSubjectId();
+    const all = this.topics();
+    if (subId === 'all') {
+      return all;
+    }
+    return all.filter(t => t.subject_id === subId);
+  });
+
+  public popularTopicSuggestions = computed(() => {
+    const curSubId = this.selectedSubjectId();
+    if (curSubId === 'all') {
+      return [
+        'Percentage',
+        'Simplification & Approximation',
+        'Profit & Loss',
+        'Simple & Compound Interest',
+        'Number Series',
+        'Syllogisms',
+        'Coding-Decoding',
+        'Reading Comprehension',
+        'Banking & Financial Awareness'
+      ];
+    }
+    return this.availableTopics().slice(0, 8).map(t => t.name);
+  });
 
   // Active quiz state
   public quizActive = signal<boolean>(false);
@@ -507,22 +591,49 @@ export class QuizzesComponent implements OnInit {
   private quizStartTime: number = 0;
 
   async ngOnInit(): Promise<void> {
-    const [subs, papers, attempts] = await Promise.all([
+    const [subs, allTopics, papers, attempts] = await Promise.all([
       this.dataStorage.getSubjects(),
+      this.dataStorage.getTopics(),
       this.quizService.getPreviousPapers(),
       this.quizService.getQuizAttempts()
     ]);
     this.subjects.set(subs);
+    this.topics.set(allTopics);
     this.previousPapers.set(papers);
     this.pastAttempts.set(attempts);
 
     // Check query params if user clicked "Take Quiz" from syllabus topic
     this.route.queryParams.subscribe(params => {
       if (params['topicName']) {
-        this.selectedTopicName.set(params['topicName']);
-        this.startQuiz();
+        const topName = params['topicName'];
+        this.selectedTopicName.set(topName);
+        this.activeTab.set('builder');
+        const matched = allTopics.find(t => t.name.toLowerCase() === topName.toLowerCase());
+        if (matched) {
+          this.selectedSubjectId.set(matched.subject_id);
+        } else if (params['subjectId']) {
+          this.selectedSubjectId.set(params['subjectId']);
+        }
       }
     });
+  }
+
+  onTopicSelected(topicName: string): void {
+    this.selectedTopicName.set(topicName);
+    if (topicName) {
+      const matched = this.topics().find(t => t.name.toLowerCase() === topicName.toLowerCase());
+      if (matched && this.selectedSubjectId() === 'all') {
+        this.selectedSubjectId.set(matched.subject_id);
+      }
+    }
+  }
+
+  selectTopicPill(topicName: string): void {
+    this.selectedTopicName.set(topicName);
+    const matched = this.topics().find(t => t.name.toLowerCase() === topicName.toLowerCase());
+    if (matched && this.selectedSubjectId() === 'all') {
+      this.selectedSubjectId.set(matched.subject_id);
+    }
   }
 
   async startQuiz(): Promise<void> {
@@ -636,8 +747,17 @@ export class QuizzesComponent implements OnInit {
       .filter((q, idx) => !this.recordedAnswers[idx]?.is_correct && q.topic_name)
       .map(q => q.topic_name!);
 
+    const matchedTopic = this.topics().find(
+      t => t.name.toLowerCase() === (this.selectedTopicName() || '').toLowerCase()
+    );
+    const resolvedSubjectId = this.selectedSubjectId() === 'all'
+      ? (matchedTopic?.subject_id || (this.activeQuestions()[0]?.subject_id || null))
+      : this.selectedSubjectId();
+
     const attempt = await this.quizService.saveQuizAttempt({
-      quiz_type: this.selectedTopicName() ? 'topic' : 'subject',
+      quiz_type: this.selectedTopicName() ? 'topic' : (this.selectedSubjectId() === 'all' ? 'mixed' : 'subject'),
+      subject_id: resolvedSubjectId,
+      topic_id: matchedTopic?.id || null,
       total_questions: totalCount,
       correct_answers: correctCount,
       score_percentage: percentage,

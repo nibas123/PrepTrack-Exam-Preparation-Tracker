@@ -4,6 +4,7 @@ import { SupabaseService } from './supabase.service';
 import { AuthService } from '../auth/auth.service';
 import { OfflineSyncService } from './offline-sync.service';
 import { AiConfigService } from './ai-config.service';
+import { QuestionPatternEngineService } from './question-pattern-engine.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -14,9 +15,10 @@ export class QuizService {
   private authService = inject(AuthService);
   private offlineSync = inject(OfflineSyncService);
   public aiConfig = inject(AiConfigService);
+  public patternEngine = inject(QuestionPatternEngineService);
 
   private get userId(): string {
-    return this.authService.currentUser()?.id || '';
+    return this.authService.currentUser()?.id || '00000000-0000-0000-0000-000000000000';
   }
 
   // --- MATHEMATICAL CODE-BASED QUANT QUESTION GENERATOR ---
@@ -684,6 +686,13 @@ Output MUST be a valid JSON array of objects conforming to this schema:
   }
 
   public getFallbackQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): QuizQuestion[] {
+    if (topicFilter && topicFilter.trim()) {
+      const topicQuestions = this.patternEngine.generateQuizQuestionsForTopic(topicFilter, subjectFilter, count);
+      if (topicQuestions && topicQuestions.length > 0) {
+        return topicQuestions;
+      }
+    }
+
     let pool: QuizQuestion[] = [];
     const filter = (subjectFilter || '').toLowerCase();
 
@@ -977,9 +986,12 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       this.updateQuestionPerformanceCounters(newAttempt.answers);
     }
 
-    // Cache to IndexedDB / local ledger immediately
+    // Cache to local storage & IndexedDB immediately
     const existing = await this.getQuizAttempts();
     existing.unshift(newAttempt);
+    try {
+      localStorage.setItem(`preptrack_quiz_attempts_${this.userId}`, JSON.stringify(existing));
+    } catch {}
     await this.offlineSync.setCached(`quiz_attempts_${this.userId}`, existing);
 
     // Save to Supabase or queue for sync
@@ -1000,11 +1012,25 @@ Output MUST be a valid JSON array of objects conforming to this schema:
   }
 
   async getQuizAttempts(): Promise<QuizAttempt[]> {
-    // Check IndexedDB cache first
-    const cached = await this.offlineSync.getCached<QuizAttempt[]>(`quiz_attempts_${this.userId}`);
-    if (cached && cached.length > 0) return cached;
+    // 1. Check local storage first (instant synchronous fallback)
+    try {
+      const localStr = localStorage.getItem(`preptrack_quiz_attempts_${this.userId}`);
+      if (localStr) {
+        const parsed = JSON.parse(localStr);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
 
-    // Fetch from Supabase
+    // 2. Check IndexedDB cache
+    const cached = await this.offlineSync.getCached<QuizAttempt[]>(`quiz_attempts_${this.userId}`);
+    if (cached && cached.length > 0) {
+      try {
+        localStorage.setItem(`preptrack_quiz_attempts_${this.userId}`, JSON.stringify(cached));
+      } catch {}
+      return cached;
+    }
+
+    // 3. Fetch from Supabase
     if (this.supabaseService.isRealSupabaseConfigured) {
       try {
         const { data, error } = await this.supabaseService.clientInstance
@@ -1013,8 +1039,11 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           .eq('user_id', this.userId)
           .order('created_at', { ascending: false });
 
-        if (!error && data) {
+        if (!error && data && data.length > 0) {
           await this.offlineSync.setCached(`quiz_attempts_${this.userId}`, data);
+          try {
+            localStorage.setItem(`preptrack_quiz_attempts_${this.userId}`, JSON.stringify(data));
+          } catch {}
           return data as QuizAttempt[];
         }
       } catch {
@@ -1047,9 +1076,12 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       created_at: new Date().toISOString()
     };
 
-    // Cache locally to IndexedDB/local ledger immediately
+    // Cache locally to local storage & IndexedDB immediately
     const existing = await this.getManualQuestionLogs();
     existing.unshift(newLog);
+    try {
+      localStorage.setItem(`preptrack_manual_question_logs_${this.userId}`, JSON.stringify(existing));
+    } catch {}
     await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, existing);
 
     // Save to Supabase or queue for sync
@@ -1069,9 +1101,25 @@ Output MUST be a valid JSON array of objects conforming to this schema:
   }
 
   async getManualQuestionLogs(): Promise<ManualQuestionLog[]> {
-    const cached = await this.offlineSync.getCached<ManualQuestionLog[]>(`manual_question_logs_${this.userId}`);
-    if (cached && cached.length > 0) return cached;
+    // 1. Check local storage first (instant synchronous fallback)
+    try {
+      const localStr = localStorage.getItem(`preptrack_manual_question_logs_${this.userId}`);
+      if (localStr) {
+        const parsed = JSON.parse(localStr);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
 
+    // 2. Check IndexedDB cache
+    const cached = await this.offlineSync.getCached<ManualQuestionLog[]>(`manual_question_logs_${this.userId}`);
+    if (cached && cached.length > 0) {
+      try {
+        localStorage.setItem(`preptrack_manual_question_logs_${this.userId}`, JSON.stringify(cached));
+      } catch {}
+      return cached;
+    }
+
+    // 3. Fetch from Supabase
     if (this.supabaseService.isRealSupabaseConfigured) {
       try {
         const { data, error } = await this.supabaseService.clientInstance
@@ -1080,8 +1128,11 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           .eq('user_id', this.userId)
           .order('logged_at', { ascending: false });
 
-        if (!error && data) {
+        if (!error && data && data.length > 0) {
           await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, data);
+          try {
+            localStorage.setItem(`preptrack_manual_question_logs_${this.userId}`, JSON.stringify(data));
+          } catch {}
           return data as ManualQuestionLog[];
         }
       } catch {}
@@ -1093,6 +1144,9 @@ Output MUST be a valid JSON array of objects conforming to this schema:
   async deleteManualQuestionLog(id: string): Promise<void> {
     const existing = await this.getManualQuestionLogs();
     const updated = existing.filter(l => l.id !== id);
+    try {
+      localStorage.setItem(`preptrack_manual_question_logs_${this.userId}`, JSON.stringify(updated));
+    } catch {}
     await this.offlineSync.setCached(`manual_question_logs_${this.userId}`, updated);
 
     if (this.supabaseService.isRealSupabaseConfigured && navigator.onLine) {

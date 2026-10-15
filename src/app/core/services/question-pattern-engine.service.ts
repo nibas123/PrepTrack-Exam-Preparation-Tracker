@@ -3,7 +3,8 @@ import {
   MockExamBlueprint,
   ExamQuestionItem,
   QuestionPattern,
-  ExamSubjectCode
+  ExamSubjectCode,
+  QuizQuestion
 } from '../models/database.types';
 
 @Injectable({
@@ -1740,6 +1741,87 @@ export class QuestionPatternEngineService {
 
   private buildArithmeticQuestion(id: string, sectionCode: string, sectionName: string, topic: string): ExamQuestionItem {
     switch (topic) {
+      case 'Percentage':
+      case 'Percentage & Fractions':
+      case 'Percentage & Profit/Loss': {
+        const variant = Math.floor(Math.random() * 3);
+        if (variant === 0) {
+          // Price increase and consumption reduction
+          const increases = [20, 25, 50];
+          const inc = increases[Math.floor(Math.random() * increases.length)];
+          const redPercent = inc === 20 ? 16.67 : (inc === 25 ? 20 : 33.33);
+          const distractors = this.generateNumericDistractors(redPercent, [redPercent + 5, redPercent - 4, inc, redPercent + 10]);
+          const fmt = this.format5Options(`${redPercent}%`, distractors.map(d => `${d}%`));
+
+          return {
+            id,
+            sectionCode,
+            sectionName,
+            questionNumber: 0,
+            subjectCode: 'quant',
+            topicName: 'Percentage',
+            patternCode: 'QUAN_ARITH_PERCENT_CONS',
+            difficulty: 'easy',
+            questionText: `If the price of sugar increases by ${inc}%, by what percentage must a household reduce its consumption so that the total expenditure remains unchanged?`,
+            options: fmt.options,
+            correctOptionIndex: fmt.correctIndex,
+            explanation: `Standard formula for consumption reduction without changing expenditure:\nReduction% = [R / (100 + R)] × 100%\nHere R = ${inc}%.\nReduction% = [${inc} / (100 + ${inc})] × 100% = [${inc} / ${100 + inc}] × 100% = ${redPercent}%.`,
+            marks: 1,
+            negativeMarks: 0.25
+          };
+        } else if (variant === 1) {
+          // Pass mark percentage
+          const passPercent = 40;
+          const scored = Math.floor(Math.random() * 4 + 3) * 50; // 150, 200, 250, 300
+          const failedBy = Math.floor(Math.random() * 4 + 2) * 5; // 10, 15, 20, 25
+          const passMarks = scored + failedBy;
+          const maxMarks = (passMarks / passPercent) * 100;
+          const distractors = this.generateNumericDistractors(maxMarks, [maxMarks + 50, maxMarks - 50, maxMarks + 100, maxMarks - 75]);
+          const fmt = this.format5Options(`${maxMarks}`, distractors.map(d => `${d}`));
+
+          return {
+            id,
+            sectionCode,
+            sectionName,
+            questionNumber: 0,
+            subjectCode: 'quant',
+            topicName: 'Percentage',
+            patternCode: 'QUAN_ARITH_PERCENT_PASS',
+            difficulty: 'medium',
+            questionText: `In a competitive examination, a student needs ${passPercent}% marks to pass. A candidate scores ${scored} marks and fails by ${failedBy} marks. What are the maximum aggregate marks for the examination?`,
+            options: fmt.options,
+            correctOptionIndex: fmt.correctIndex,
+            explanation: `Passing Marks = Marks Scored + Shortfall = ${scored} + ${failedBy} = ${passMarks}.\nSince passing marks represent ${passPercent}% of maximum marks (M):\n${passPercent}% of M = ${passMarks} ⇒ M = (${passMarks} × 100) / ${passPercent} = ${maxMarks} marks.`,
+            marks: 1,
+            negativeMarks: 0.25
+          };
+        } else {
+          // Successive percentage change
+          const inc = 20;
+          const dec = 10;
+          const net = inc - dec - (inc * dec) / 100; // 20 - 10 - 2 = 8% increase
+          const distractors = this.generateNumericDistractors(net, [10, 12, 6, 5]);
+          const fmt = this.format5Options(`${net}% increase`, distractors.map(d => `${d}% increase`));
+
+          return {
+            id,
+            sectionCode,
+            sectionName,
+            questionNumber: 0,
+            subjectCode: 'quant',
+            topicName: 'Percentage',
+            patternCode: 'QUAN_ARITH_PERCENT_SUCC',
+            difficulty: 'easy',
+            questionText: `The length of a rectangular field is increased by ${inc}% and its breadth is decreased by ${dec}%. What is the net percentage change in its area?`,
+            options: fmt.options,
+            correctOptionIndex: fmt.correctIndex,
+            explanation: `Using the successive percentage formula:\nNet Change% = x + y + (xy / 100)\nHere x = +${inc}% and y = -${dec}%.\nNet Change% = ${inc} - ${dec} + [(${inc} × (-${dec})) / 100] = 10 - 2 = +${net}% (Net Increase).`,
+            marks: 1,
+            negativeMarks: 0.25
+          };
+        }
+      }
+
       case 'Profit & Loss': {
         const cp = (Math.floor(Math.random() * 6) + 4) * 100; // 400..900
         const markupPairs = [
@@ -3779,6 +3861,112 @@ export class QuestionPatternEngineService {
       options: shuffled,
       correctIndex: correctIndex >= 0 ? correctIndex : 0
     };
+  }
+
+  /**
+   * Generates authentic, targeted QuizQuestion items for a specific syllabus topic.
+   * Directly supports granular topics such as Percentage, Profit & Loss, Simple Interest,
+   * Syllogisms, Inequalities, Time & Work, Speed & Distance, Error Spotting, etc.
+   */
+  public generateQuizQuestionsForTopic(
+    topicName: string,
+    subjectFilter?: string,
+    count: number = 5,
+    difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed'
+  ): QuizQuestion[] {
+    const rawItems: ExamQuestionItem[] = [];
+    const normalized = (topicName || '').toLowerCase().trim();
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const qId = `top-${runId}-${i}`;
+
+      if (normalized.includes('percent')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage'));
+      } else if (normalized.includes('profit') || normalized.includes('loss') || normalized.includes('discount')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Profit & Loss'));
+      } else if (normalized.includes('interest') || normalized.includes('si') || normalized.includes('ci')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Simple & Compound Interest'));
+      } else if (normalized.includes('work') || normalized.includes('pipe') || normalized.includes('cistern')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time & Work' : 'Pipes & Cisterns'));
+      } else if (normalized.includes('speed') || normalized.includes('distance') || normalized.includes('train') || normalized.includes('boat')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time, Speed & Distance' : 'Boats & Streams'));
+      } else if (normalized.includes('mixture') || normalized.includes('alligation')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mixtures & Alligation'));
+      } else if (normalized.includes('partnership')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Partnership'));
+      } else if (normalized.includes('age') || normalized.includes('ratio') || normalized.includes('proportion')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Ages'));
+      } else if (normalized.includes('average')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Averages'));
+      } else if (normalized.includes('mensuration')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mensuration'));
+      } else if (normalized.includes('probability')) {
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Probability'));
+      } else if (normalized.includes('simplif') || normalized.includes('approx') || normalized.includes('bodmas')) {
+        rawItems.push(this.buildSimplificationQuestion(qId, 'quant', 'Quantitative Aptitude'));
+      } else if (normalized.includes('quad') || normalized.includes('equation')) {
+        rawItems.push(this.buildQuadraticQuestion(qId, 'quant', 'Quantitative Aptitude'));
+      } else if (normalized.includes('series') || normalized.includes('number') || normalized.includes('missing') || normalized.includes('wrong')) {
+        rawItems.push(this.buildNumberSeriesQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0));
+      } else if (normalized.includes('syllog')) {
+        rawItems.push(this.buildSyllogismQuestion(qId, 'reasoning', 'Reasoning Ability'));
+      } else if (normalized.includes('inequal')) {
+        rawItems.push(this.buildInequalityQuestion(qId, 'reasoning', 'Reasoning Ability'));
+      } else if (normalized.includes('blood') || normalized.includes('relation')) {
+        rawItems.push(this.buildBloodRelationQuestion(qId, 'reasoning', 'Reasoning Ability'));
+      } else if (normalized.includes('direction')) {
+        rawItems.push(this.buildDirectionQuestion(qId, 'reasoning', 'Reasoning Ability'));
+      } else if (normalized.includes('coding') || normalized.includes('decoding')) {
+        rawItems.push(this.buildCodingDecodingQuestion(qId, 'reasoning', 'Reasoning Ability'));
+      } else if (normalized.includes('error') || normalized.includes('grammar')) {
+        rawItems.push(this.buildErrorSpottingQuestion(qId, 'english', 'English Language', i));
+      } else if (normalized.includes('phrase') || normalized.includes('sentence')) {
+        rawItems.push(this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i));
+      } else if (normalized.includes('cloze') || normalized.includes('filler')) {
+        rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
+      } else if (normalized.includes('bank') || normalized.includes('monetary') || normalized.includes('rbi') || normalized.includes('ga') || normalized.includes('awareness')) {
+        const gaItems = this.generateGaSection(1, 'ga', 'General & Banking Awareness');
+        if (gaItems.length > 0) {
+          gaItems[0].id = qId;
+          gaItems[0].questionNumber = i + 1;
+          rawItems.push(gaItems[0]);
+        }
+      } else if (normalized.includes('comp') || normalized.includes('hardware') || normalized.includes('network') || normalized.includes('shortcut')) {
+        const compItems = this.generateComputerSection(1, 'computer', 'Computer Aptitude');
+        if (compItems.length > 0) {
+          compItems[0].id = qId;
+          compItems[0].questionNumber = i + 1;
+          rawItems.push(compItems[0]);
+        }
+      } else {
+        // Fallback arithmetic with specific topic attribution
+        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage'));
+      }
+    }
+
+    // Convert ExamQuestionItem (5 options) into standard QuizQuestion (4 options)
+    return rawItems.map((item, idx) => {
+      const correctText = item.options[item.correctOptionIndex];
+      const distractors = item.options.filter((_, oIdx) => oIdx !== item.correctOptionIndex);
+      const chosen3Distractors = this.shuffle(distractors).slice(0, 3);
+      const fourOptions = this.shuffle([correctText, ...chosen3Distractors]);
+      const newCorrectIdx = fourOptions.indexOf(correctText);
+
+      return {
+        id: `topic-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
+        subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer'))),
+        topic_name: topicName || item.topicName,
+        question_text: item.questionText,
+        options: fourOptions,
+        correct_option_index: newCorrectIdx >= 0 ? newCorrectIdx : 0,
+        explanation: item.explanation,
+        difficulty: item.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty),
+        created_at: new Date().toISOString(),
+        correct_count: 0,
+        incorrect_count: 0
+      };
+    });
   }
 
   private shuffle<T>(array: T[]): T[] {
