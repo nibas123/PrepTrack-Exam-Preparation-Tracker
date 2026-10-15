@@ -21,6 +21,37 @@ export class QuizService {
     return this.authService.currentUser()?.id || '00000000-0000-0000-0000-000000000000';
   }
 
+  /**
+   * Strictly filters out duplicate questions by ID and normalized question text.
+   */
+  public deduplicateQuestions(questions: QuizQuestion[]): QuizQuestion[] {
+    if (!questions || questions.length <= 1) return questions || [];
+    const seenTexts = new Set<string>();
+    const seenIds = new Set<string>();
+    const unique: QuizQuestion[] = [];
+
+    for (const q of questions) {
+      if (!q) continue;
+      const normalizedText = (q.question_text || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+
+      if (q.id && seenIds.has(q.id)) {
+        continue;
+      }
+      if (normalizedText && seenTexts.has(normalizedText)) {
+        continue;
+      }
+
+      if (q.id) seenIds.add(q.id);
+      if (normalizedText) seenTexts.add(normalizedText);
+      unique.push(q);
+    }
+
+    return unique;
+  }
+
   // --- MATHEMATICAL CODE-BASED QUANT QUESTION GENERATOR ---
   generateDynamicQuantQuestions(count: number, topicName?: string): QuizQuestion[] {
     const questions: QuizQuestion[] = [];
@@ -437,6 +468,156 @@ export class QuizService {
         correct_option_index: 0,
         explanation: 'A Primary Key uniquely identifies each row in a relational database table and cannot contain NULL values.',
         difficulty: 'easy'
+      },
+      {
+        id: 'comp-6',
+        subject_id: 'sub-computer',
+        topic_name: 'Microsoft Office Shortcuts',
+        question_text: 'In Microsoft Excel, which keyboard shortcut is used to insert a new worksheet into a workbook?',
+        options: ['Shift + F11', 'Ctrl + N', 'Alt + F1', 'Ctrl + F11'],
+        correct_option_index: 0,
+        explanation: 'Pressing Shift + F11 inserts a new worksheet in Microsoft Excel, whereas Ctrl + N creates an entirely new workbook.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-7',
+        subject_id: 'sub-computer',
+        topic_name: 'Operating Systems & Security',
+        question_text: 'Which type of malicious software encrypts a victim’s files and demands a financial payment in exchange for the decryption key?',
+        options: ['Ransomware', 'Adware', 'Spyware', 'Rootkit'],
+        correct_option_index: 0,
+        explanation: 'Ransomware is a category of malware that locks or encrypts critical user/enterprise data and demands ransom for restoration.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-8',
+        subject_id: 'sub-computer',
+        topic_name: 'Networking & Protocols',
+        question_text: 'Which layer of the 7-layer OSI model is responsible for end-to-end communication, flow control, and TCP/UDP segmentation?',
+        options: ['Transport Layer (Layer 4)', 'Network Layer (Layer 3)', 'Data Link Layer (Layer 2)', 'Session Layer (Layer 5)'],
+        correct_option_index: 0,
+        explanation: 'The Transport Layer manages end-to-end communication and packet segmentation using TCP and UDP.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-9',
+        subject_id: 'sub-computer',
+        topic_name: 'Number Systems',
+        question_text: 'What is the hexadecimal equivalent of the 8-bit binary number (11011010)₂?',
+        options: ['DA', 'CA', 'DB', 'B6'],
+        correct_option_index: 0,
+        explanation: 'Grouping into 4-bit nibbles: 1101 = 13 (D in hex) and 1010 = 10 (A in hex). Result is DA.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-10',
+        subject_id: 'sub-computer',
+        topic_name: 'Networking & Protocols',
+        question_text: 'Which network protocol automatically assigns dynamic IP addresses and subnet masks to client devices?',
+        options: ['DHCP', 'DNS', 'SNMP', 'FTP'],
+        correct_option_index: 0,
+        explanation: 'DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses and network parameters.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-11',
+        subject_id: 'sub-computer',
+        topic_name: 'Digital Logic',
+        question_text: 'Which universal logic gate produces a LOW (0) output ONLY when all of its inputs are HIGH (1)?',
+        options: ['NAND Gate', 'NOR Gate', 'XOR Gate', 'OR Gate'],
+        correct_option_index: 0,
+        explanation: 'A NAND (NOT-AND) gate produces a 0 only when all inputs are 1, and 1 in all other cases.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-12',
+        subject_id: 'sub-computer',
+        topic_name: 'Operating Systems & Security',
+        question_text: 'In operating systems, what is the condition called where processes are permanently blocked waiting for resources held by each other?',
+        options: ['Deadlock', 'Paging', 'Thrashing', 'Context Switching'],
+        correct_option_index: 0,
+        explanation: 'Deadlock occurs when processes are blocked because each holds a resource while waiting for another resource held by another process.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-13',
+        subject_id: 'sub-computer',
+        topic_name: 'Database & SQL',
+        question_text: 'Which DDL SQL command deletes all rows from a table rapidly without logging individual row deletions, preserving the table schema?',
+        options: ['TRUNCATE', 'DELETE', 'DROP', 'UPDATE'],
+        correct_option_index: 0,
+        explanation: 'TRUNCATE TABLE is a DDL command that deallocates data pages rapidly while keeping table structure intact.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-14',
+        subject_id: 'sub-computer',
+        topic_name: 'Networking & Protocols',
+        question_text: 'What is the bit length of an IPv6 address compared to an IPv4 address?',
+        options: ['128 bits vs 32 bits', '64 bits vs 32 bits', '256 bits vs 64 bits', '128 bits vs 64 bits'],
+        correct_option_index: 0,
+        explanation: 'IPv6 uses 128 bits whereas IPv4 uses 32 bits.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-15',
+        subject_id: 'sub-computer',
+        topic_name: 'Operating Systems & Security',
+        question_text: 'What is the central core component of an operating system that manages system resources and hardware interaction?',
+        options: ['Kernel', 'Shell', 'Device Driver', 'Spooler'],
+        correct_option_index: 0,
+        explanation: 'The Kernel is the central core of an OS managing CPU scheduling, memory, and hardware devices.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-16',
+        subject_id: 'sub-computer',
+        topic_name: 'Hardware & Storage',
+        question_text: 'Which RAID configuration provides disk mirroring by writing duplicate data across two separate physical drives?',
+        options: ['RAID 1', 'RAID 0', 'RAID 5', 'RAID 6'],
+        correct_option_index: 0,
+        explanation: 'RAID 1 creates an exact mirror copy of data across two drives for high fault tolerance.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-17',
+        subject_id: 'sub-computer',
+        topic_name: 'Networking & Protocols',
+        question_text: 'Which service translates human-friendly Internet domain names into numeric IP addresses?',
+        options: ['DNS (Domain Name System)', 'SNMP', 'ICMP', 'ARP'],
+        correct_option_index: 0,
+        explanation: 'DNS resolves domain names into numeric IP addresses required for routing network packets.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'comp-18',
+        subject_id: 'sub-computer',
+        topic_name: 'Operating Systems & Security',
+        question_text: 'Which deadlock avoidance algorithm tests system safety by simulating allocation of maximum predetermined resources?',
+        options: ["Banker's Algorithm", "Round Robin Scheduling", "Dijkstra's Algorithm", "LRU Page Replacement"],
+        correct_option_index: 0,
+        explanation: "Banker's Algorithm tests whether allocating requested resources leaves the system in a safe state.",
+        difficulty: 'hard'
+      },
+      {
+        id: 'comp-19',
+        subject_id: 'sub-computer',
+        topic_name: 'Operating Systems & Security',
+        question_text: 'Which cryptography methodology utilizes a public key for encryption and a distinct private key for decryption?',
+        options: ['Asymmetric (Public Key) Cryptography', 'Symmetric Key Cryptography', 'Hash Checksumming', 'Substitution Cipher'],
+        correct_option_index: 0,
+        explanation: 'Asymmetric encryption uses a public key to encrypt and a mathematically linked private key to decrypt.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'comp-20',
+        subject_id: 'sub-computer',
+        topic_name: 'Microsoft Office Shortcuts',
+        question_text: 'In Microsoft Excel, which keyboard shortcut combination displays the Macro dialog box to view or run macros?',
+        options: ['Alt + F8', 'Alt + F11', 'Ctrl + F8', 'Shift + F8'],
+        correct_option_index: 0,
+        explanation: 'Alt + F8 opens the Macro dialog box in MS Excel.',
+        difficulty: 'easy'
       }
     ];
   }
@@ -798,9 +979,9 @@ Output MUST be a valid JSON array of objects conforming to this schema:
               reviewNeeded[0],
               ...aiQuestions.slice(0, count - 1)
             ];
-            return this.shuffle(blended);
+            return this.deduplicateQuestions(this.shuffle(blended)).slice(0, count);
           }
-          return aiQuestions.slice(0, count);
+          return this.deduplicateQuestions(aiQuestions).slice(0, count);
         }
       } catch (err) {
         console.warn('Smart AI generation fallback to bank:', err);
@@ -808,21 +989,23 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     }
 
     // If we have enough eligible unattempted / review questions, return them directly!
-    if (eligiblePool.length >= count) {
-      return eligiblePool.slice(0, count);
+    const uniqueEligible = this.deduplicateQuestions(eligiblePool);
+    if (uniqueEligible.length >= count) {
+      return uniqueEligible.slice(0, count);
     }
 
     // Otherwise, supplement with standard built-in dynamic math / syllabus fallbacks
-    const fallbackBank = this.getFallbackQuestions(subjectFilter, topicFilter, count);
-    const combined = [...eligiblePool, ...fallbackBank];
-    return this.shuffle(combined).slice(0, count);
+    const fallbackBank = this.getFallbackQuestions(subjectFilter, topicFilter, Math.max(count * 2, 10));
+    const combined = [...uniqueEligible, ...fallbackBank];
+    const unique = this.deduplicateQuestions(combined);
+    return this.shuffle(unique).slice(0, count);
   }
 
   public getFallbackQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): QuizQuestion[] {
     if (topicFilter && topicFilter.trim()) {
       const topicQuestions = this.patternEngine.generateQuizQuestionsForTopic(topicFilter, subjectFilter, count);
       if (topicQuestions && topicQuestions.length > 0) {
-        return topicQuestions;
+        return this.deduplicateQuestions(topicQuestions).slice(0, count);
       }
     }
 
@@ -831,7 +1014,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
     // Check if filter matches Quant or is empty
     if (!filter || filter.includes('quant') || filter.includes('aptitude') || filter.includes('sub-quant')) {
-      pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 10), topicFilter));
+      pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 15), topicFilter));
     }
     // Check if filter matches Reasoning or is empty
     if (!filter || filter.includes('reas') || filter.includes('reasoning') || filter.includes('sub-reasoning')) {
@@ -859,21 +1042,56 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     if (topicFilter) {
       const topicMatches = pool.filter(q => q.topic_name?.toLowerCase().includes(topicFilter.toLowerCase()));
       if (topicMatches.length > 0) {
-        if (topicMatches.length >= count) {
-          return this.shuffle(topicMatches).slice(0, count);
+        const uniqueTopicMatches = this.deduplicateQuestions(topicMatches);
+        if (uniqueTopicMatches.length >= count) {
+          return this.shuffle(uniqueTopicMatches).slice(0, count);
         }
         // If specific topic has fewer questions than count, pad with remaining pool
         const others = pool.filter(q => !topicMatches.includes(q));
-        return this.shuffle(topicMatches.concat(others)).slice(0, count);
+        const combinedMatches = this.deduplicateQuestions([...uniqueTopicMatches, ...others]);
+        return this.shuffle(combinedMatches).slice(0, count);
       }
     }
 
-    // If pool has fewer questions than requested count (e.g. 10 asked, 5 available), duplicate dynamic questions
-    if (pool.length < count) {
-      pool = pool.concat(this.generateDynamicQuantQuestions(count - pool.length, topicFilter));
+    const uniquePool = this.deduplicateQuestions(pool);
+    if (uniquePool.length < count) {
+      const extraDynamic = this.generateDynamicQuantQuestions(count - uniquePool.length, topicFilter);
+      return this.deduplicateQuestions([...uniquePool, ...extraDynamic]).slice(0, count);
     }
 
-    return this.shuffle(pool).slice(0, count);
+    return this.shuffle(uniquePool).slice(0, count);
+  }
+
+  public getPaperQuestions(blueprintId: string): QuizQuestion[] {
+    const bps = this.patternEngine.getDefaultBlueprints();
+    const matchedBp = bps.find(b => b.id === blueprintId) || bps[0];
+    const examItems = this.patternEngine.generateExamQuestions(matchedBp);
+
+    const quizQuestions: QuizQuestion[] = examItems.map((item, idx) => {
+      const correctText = item.options[item.correctOptionIndex];
+      const distractors = item.options.filter((_, oIdx) => oIdx !== item.correctOptionIndex);
+      const chosen3Distractors = this.shuffle(distractors).slice(0, 3);
+      const fourOptions = this.shuffle([correctText, ...chosen3Distractors]);
+      const newCorrectIdx = fourOptions.indexOf(correctText);
+
+      return {
+        id: `${blueprintId}-q-${idx + 1}`,
+        subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer'))),
+        topic_name: item.topicName || 'Mock Exam Section',
+        question_text: item.passageText ? `${item.passageText}\n\n${item.questionText}` : item.questionText,
+        options: fourOptions,
+        correct_option_index: newCorrectIdx >= 0 ? newCorrectIdx : 0,
+        explanation: item.explanation,
+        difficulty: item.difficulty || 'medium',
+        created_at: new Date().toISOString(),
+        correct_count: 0,
+        incorrect_count: 0,
+        is_ai_generated: false,
+        generator_type: 'blueprint_static'
+      };
+    });
+
+    return this.deduplicateQuestions(quizQuestions);
   }
 
   // --- PREVIOUS YEARS' PAPERS (Original & Licensed Mock Tests) ---
@@ -892,11 +1110,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Quantitative Aptitude', questions_count: 35 },
           { subject_name: 'English Language', questions_count: 30 }
         ],
-        questions: [
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getEnglishQuestionPool()
-        ]
+        questions: this.getPaperQuestions('ibps-po-prelims-live-1')
       },
       {
         id: 'paper-sbi-po-2025',
@@ -911,11 +1125,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Quantitative Aptitude', questions_count: 35 },
           { subject_name: 'English Language', questions_count: 30 }
         ],
-        questions: [
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getEnglishQuestionPool()
-        ]
+        questions: this.getPaperQuestions('sbi-po-prelims-live-1')
       },
       {
         id: 'paper-ibps-clerk-2025',
@@ -930,11 +1140,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Numerical Ability', questions_count: 35 },
           { subject_name: 'Reasoning Ability', questions_count: 35 }
         ],
-        questions: [
-          ...this.getEnglishQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getReasoningQuestionPool()
-        ]
+        questions: this.getPaperQuestions('ibps-clerk-prelims-mock-1')
       },
       {
         id: 'paper-sbi-clerk-2025',
@@ -949,11 +1155,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Numerical Ability', questions_count: 35 },
           { subject_name: 'Reasoning Ability', questions_count: 35 }
         ],
-        questions: [
-          ...this.getEnglishQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getReasoningQuestionPool()
-        ]
+        questions: this.getPaperQuestions('sbi-clerk-prelims-mock-1')
       },
       {
         id: 'paper-rrb-po-2025',
@@ -967,10 +1169,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Reasoning Ability', questions_count: 40 },
           { subject_name: 'Quantitative Aptitude', questions_count: 40 }
         ],
-        questions: [
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(10)
-        ]
+        questions: this.getPaperQuestions('rrb-po-prelims-mock-1')
       },
       {
         id: 'paper-ibps-po-mains-2025',
@@ -986,12 +1185,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'English Language', questions_count: 35 },
           { subject_name: 'Data Analysis & Interpretation', questions_count: 35 }
         ],
-        questions: [
-          ...this.getBankingAwarenessQuestionPool(),
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getEnglishQuestionPool()
-        ]
+        questions: this.getPaperQuestions('ibps-po-mains-mock-1')
       },
       {
         id: 'paper-rbi-gradeb-2025',
@@ -1007,11 +1201,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'English Language', questions_count: 30 },
           { subject_name: 'Quantitative Aptitude', questions_count: 30 }
         ],
-        questions: [
-          ...this.getBankingAwarenessQuestionPool(),
-          ...this.getComputerKnowledgeQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5)
-        ]
+        questions: this.getPaperQuestions('rbi-gradeb-phase1-mock-1')
       },
       {
         id: 'paper-nabard-gradea-2025',
@@ -1027,12 +1217,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Reasoning & Quantitative Aptitude', questions_count: 40 },
           { subject_name: 'English Language', questions_count: 40 }
         ],
-        questions: [
-          ...this.getBankingAwarenessQuestionPool(),
-          ...this.getComputerKnowledgeQuestionPool(),
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5)
-        ]
+        questions: this.getPaperQuestions('nabard-gradea-phase1-mock-1')
       },
       {
         id: 'paper-sebi-gradea-2025',
@@ -1048,12 +1233,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Quantitative Aptitude', questions_count: 25 },
           { subject_name: 'Reasoning Ability', questions_count: 25 }
         ],
-        questions: [
-          ...this.getBankingAwarenessQuestionPool(),
-          ...this.getEnglishQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getReasoningQuestionPool()
-        ]
+        questions: this.getPaperQuestions('sebi-gradea-phase1-mock-1')
       },
       {
         id: 'paper-lic-aao-2025',
@@ -1068,11 +1248,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Quantitative Aptitude', questions_count: 35 },
           { subject_name: 'English Language (Qualifying)', questions_count: 30 }
         ],
-        questions: [
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5),
-          ...this.getEnglishQuestionPool()
-        ]
+        questions: this.getPaperQuestions('lic-aao-prelims-mock-1')
       },
       {
         id: 'paper-ibps-so-2025',
@@ -1087,11 +1263,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           { subject_name: 'Reasoning Ability', questions_count: 50 },
           { subject_name: 'Quantitative Aptitude', questions_count: 50 }
         ],
-        questions: [
-          ...this.getEnglishQuestionPool(),
-          ...this.getReasoningQuestionPool(),
-          ...this.generateDynamicQuantQuestions(5)
-        ]
+        questions: this.getPaperQuestions('ibps-so-prelims-mock-1')
       }
     ];
   }

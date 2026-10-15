@@ -102,4 +102,22 @@ describe('QuestionPatternEngineService', () => {
     expect(library.some(p => p.subject_code === 'ga')).toBe(true);
     expect(library.some(p => p.subject_code === 'computer')).toBe(true);
   });
+
+  it('should generate completely unique, non-duplicating questions for Computer Aptitude', () => {
+    const questions = service.generateQuizQuestionsForTopic('Computer Aptitude & Networking', undefined, 10);
+    expect(questions.length).toBe(10);
+    const texts = questions.map(q => q.question_text.trim().toLowerCase());
+    const uniqueTexts = new Set(texts);
+    expect(uniqueTexts.size).toBe(10);
+  });
+
+  it('should generate completely unique questions for Current Affairs and Syllogisms', () => {
+    const caQuestions = service.generateQuizQuestionsForTopic('Current Affairs (National & International)', undefined, 10);
+    const caTexts = new Set(caQuestions.map(q => q.question_text.trim().toLowerCase()));
+    expect(caTexts.size).toBe(caQuestions.length);
+
+    const sylQuestions = service.generateQuizQuestionsForTopic('Syllogisms', undefined, 5);
+    const sylTexts = new Set(sylQuestions.map(q => q.question_text.trim().toLowerCase()));
+    expect(sylTexts.size).toBe(sylQuestions.length);
+  });
 });

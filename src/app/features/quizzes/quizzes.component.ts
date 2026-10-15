@@ -664,7 +664,8 @@ export class QuizzesComponent implements OnInit {
         return;
       }
 
-      this.activeQuestions.set(questions);
+      const unique = this.quizService.deduplicateQuestions(questions);
+      this.activeQuestions.set(unique);
       this.currentQuestionIndex.set(0);
       this.selectedOptionIndex.set(null);
       this.recordedAnswers = [];
@@ -682,7 +683,8 @@ export class QuizzesComponent implements OnInit {
   }
 
   startPreviousPaper(paper: PreviousPaper): void {
-    this.activeQuestions.set(paper.questions);
+    const unique = this.quizService.deduplicateQuestions(paper.questions);
+    this.activeQuestions.set(unique);
     this.currentQuestionIndex.set(0);
     this.selectedOptionIndex.set(null);
     this.recordedAnswers = [];

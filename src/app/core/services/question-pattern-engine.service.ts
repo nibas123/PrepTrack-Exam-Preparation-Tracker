@@ -1739,17 +1739,17 @@ export class QuestionPatternEngineService {
     return diQuestions;
   }
 
-  private buildArithmeticQuestion(id: string, sectionCode: string, sectionName: string, topic: string): ExamQuestionItem {
+  private buildArithmeticQuestion(id: string, sectionCode: string, sectionName: string, topic: string, index: number = 0): ExamQuestionItem {
     switch (topic) {
       case 'Percentage':
       case 'Percentage & Fractions':
       case 'Percentage & Profit/Loss': {
-        const variant = Math.floor(Math.random() * 3);
+        const variant = index % 3;
         if (variant === 0) {
           // Price increase and consumption reduction
-          const increases = [20, 25, 50];
-          const inc = increases[Math.floor(Math.random() * increases.length)];
-          const redPercent = inc === 20 ? 16.67 : (inc === 25 ? 20 : 33.33);
+          const increases = [20, 25, 50, 10, 30];
+          const inc = increases[index % increases.length];
+          const redPercent = inc === 20 ? 16.67 : (inc === 25 ? 20 : (inc === 50 ? 33.33 : (inc === 10 ? 9.09 : 23.08)));
           const distractors = this.generateNumericDistractors(redPercent, [redPercent + 5, redPercent - 4, inc, redPercent + 10]);
           const fmt = this.format5Options(`${redPercent}%`, distractors.map(d => `${d}%`));
 
@@ -2220,7 +2220,7 @@ export class QuestionPatternEngineService {
 
   // --- Reasoning Sub-Generators ---
 
-  private buildSyllogismQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
+  private buildSyllogismQuestion(id: string, sectionCode: string, sectionName: string, index: number = 0): ExamQuestionItem {
     const templates = [
       {
         statements: 'Statements:\n• Only a few laptops are tablets.\n• All tablets are mobiles.\n• No mobile is a watch.',
@@ -2245,10 +2245,22 @@ export class QuestionPatternEngineService {
         conclusions: 'Conclusions:\nI. All rivers being oceans is a possibility.\nII. Some rivers are glaciers.',
         answer: 'Only conclusion II follows',
         explanation: '1. "Only a few rivers are oceans" means some rivers are oceans AND some rivers are definitely NOT oceans. Therefore, all rivers can never be oceans (I does not follow).\n2. Since some rivers are oceans and all oceans are glaciers, some rivers are definitely glaciers (II follows).'
+      },
+      {
+        statements: 'Statements:\n• Only a few banks are lenders.\n• All lenders are NBFCs.\n• No NBFC is a pawnshop.',
+        conclusions: 'Conclusions:\nI. Some banks are NBFCs.\nII. All banks can never be pawnshops.',
+        answer: 'Both conclusions I and II follow',
+        explanation: '1. Since some banks are lenders and all lenders are NBFCs, some banks are definitely NBFCs (I follows).\n2. The part of banks that are NBFCs cannot be pawnshops. Hence, all banks can never be pawnshops (II follows).'
+      },
+      {
+        statements: 'Statements:\n• All cards are accounts.\n• Only a few accounts are deposits.\n• No deposit is credit.',
+        conclusions: 'Conclusions:\nI. No card is credit.\nII. Some accounts being credit is a possibility.',
+        answer: 'Only conclusion II follows',
+        explanation: '1. There is no direct negative relation between cards and credit (only deposits cannot be credit). Card can overlap credit, so I does not definitely follow.\n2. Accounts that are not deposits can freely overlap credit, so II is a valid possibility.'
       }
     ];
 
-    const pick = templates[Math.floor(Math.random() * templates.length)];
+    const pick = templates[index % templates.length];
     const options = [
       'Only conclusion I follows',
       'Only conclusion II follows',
@@ -2276,7 +2288,7 @@ export class QuestionPatternEngineService {
     };
   }
 
-  private buildInequalityQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
+  private buildInequalityQuestion(id: string, sectionCode: string, sectionName: string, index: number = 0): ExamQuestionItem {
     const templates = [
       {
         statement: 'Statements: P ≥ Q > R = S ≤ T < U',
@@ -2301,10 +2313,22 @@ export class QuestionPatternEngineService {
         conclusions: 'Conclusions:\nI. K > O\nII. K = O',
         answer: 'Either conclusion I or II follows',
         explanation: 'Combining the chain: K ≥ L = M ≥ N = O ⇒ K ≥ O.\nSince K ≥ O means either K > O or K = O, Conclusions I and II form a complementary "Either/Or" pair.'
+      },
+      {
+        statement: 'Statements: W < X ≤ Y = Z; Z > V ≥ U',
+        conclusions: 'Conclusions:\nI. Y > U\nII. W < Z',
+        answer: 'Both conclusions I and II follow',
+        explanation: 'From Y = Z > V ≥ U, we have Y > U (Conclusion I follows).\nFrom W < X ≤ Y = Z, we have W < Z (Conclusion II follows).\nBoth conclusions follow.'
+      },
+      {
+        statement: 'Statements: G ≥ H > I; I = J ≤ K < L',
+        conclusions: 'Conclusions:\nI. G > J\nII. H < L',
+        answer: 'Only conclusion I follows',
+        explanation: 'From G ≥ H > I = J, we have G > J (I follows).\nFrom H > I = J ≤ K < L, comparing H and L encounters opposite inequality directions (> and <), so relation cannot be determined (II does not follow).'
       }
     ];
 
-    const pick = templates[Math.floor(Math.random() * templates.length)];
+    const pick = templates[index % templates.length];
     const options = [
       'Only conclusion I follows',
       'Only conclusion II follows',
@@ -2332,13 +2356,15 @@ export class QuestionPatternEngineService {
     };
   }
 
-  private buildDirectionQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
+  private buildDirectionQuestion(id: string, sectionCode: string, sectionName: string, index: number = 0): ExamQuestionItem {
     const triplets = [
-      { n1: 12, e: 8, s: 6, netN: 6, ans: 10 }, // 6, 8 -> 10
-      { n1: 15, e: 12, s: 6, netN: 9, ans: 15 }, // 9, 12 -> 15
-      { n1: 10, e: 12, s: 5, netN: 5, ans: 13 }  // 5, 12 -> 13
+      { name: 'Rohan', n1: 12, e: 8, s: 6, netN: 6, ans: 10 },
+      { name: 'Ananya', n1: 15, e: 12, s: 6, netN: 9, ans: 15 },
+      { name: 'Vikram', n1: 10, e: 12, s: 5, netN: 5, ans: 13 },
+      { name: 'Kavita', n1: 20, e: 15, s: 8, netN: 12, ans: 19 },
+      { name: 'Deepak', n1: 16, e: 24, s: 9, netN: 7, ans: 25 }
     ];
-    const t = triplets[Math.floor(Math.random() * triplets.length)];
+    const t = triplets[index % triplets.length];
     const distractors = this.generateNumericDistractors(t.ans, [t.ans + 2, t.ans + 4, t.ans - 2, t.ans + 5]);
     const fmt = this.format5Options(`${t.ans} meters`, distractors.map(d => `${d} meters`));
 
@@ -2351,7 +2377,7 @@ export class QuestionPatternEngineService {
       topicName: 'Direction & Distance',
       patternCode: 'REAS_DIR_01',
       difficulty: 'easy',
-      questionText: `Rohan starts walking from point A towards North. After walking ${t.n1} meters, he turns right and walks ${t.e} meters. He then turns right again and walks ${t.s} meters to reach point B. What is the shortest straight-line distance between point A and point B?`,
+      questionText: `${t.name} starts walking from point A towards North. After walking ${t.n1} meters, turns right and walks ${t.e} meters. Then turns right again and walks ${t.s} meters to reach point B. What is the shortest straight-line distance between point A and point B?`,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
       explanation: `Net displacement:\nNorth-South displacement = ${t.n1} m (North) - ${t.s} m (South) = ${t.netN} m North.\nEast-West displacement = ${t.e} m East.\nShortest distance = √(${t.netN}² + ${t.e}²) = ${t.ans} meters.`,
@@ -2360,7 +2386,7 @@ export class QuestionPatternEngineService {
     };
   }
 
-  private buildBloodRelationQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
+  private buildBloodRelationQuestion(id: string, sectionCode: string, sectionName: string, index: number = 0): ExamQuestionItem {
     const templates = [
       {
         q: `Pointing to a photograph, Priya said, "He is the only son of the mother of my sister's brother." How is the person in the photograph related to Priya?`,
@@ -2373,9 +2399,27 @@ export class QuestionPatternEngineService {
         ans: 'Son-in-law',
         dis: ['Brother-in-law', 'Son', 'Nephew', 'Brother'],
         exp: `A is the father of B & C, and D is the mother of B & C, so A is the husband of D. Since E is the father of D, A is the son-in-law of E.`
+      },
+      {
+        q: `Introducing a man to her husband, a woman said, "His wife is the only daughter of my father." How is the man related to the woman?`,
+        ans: 'Husband',
+        dis: ['Brother', 'Father-in-law', 'Maternal Uncle', 'Cousin'],
+        exp: `The only daughter of the woman's father is the woman herself. Thus, the man's wife is the woman herself, meaning the man is her husband.`
+      },
+      {
+        q: `P is the brother of Q. R is the daughter of Q. S is the sister of P. T is the brother of R. Who is the uncle of T?`,
+        ans: 'P',
+        dis: ['Q', 'S', 'R', 'Cannot be determined'],
+        exp: `R and T are children of Q. P is the brother of Q. Therefore, P is the uncle of T.`
+      },
+      {
+        q: `Looking at a portrait, Mahesh said, "I have no brothers or sisters, but this man's father is my father's son." Whose portrait was Mahesh looking at?`,
+        ans: 'His son',
+        dis: ['His father', 'Himself', 'His nephew', 'His cousin'],
+        exp: `Since Mahesh has no brothers or sisters, "my father's son" is Mahesh himself. Therefore, "this man's father is Mahesh" means the portrait is of Mahesh's son.`
       }
     ];
-    const pick = templates[Math.floor(Math.random() * templates.length)];
+    const pick = templates[index % templates.length];
     const fmt = this.format5Options(pick.ans, pick.dis);
 
     return {
@@ -2396,8 +2440,36 @@ export class QuestionPatternEngineService {
     };
   }
 
-  private buildCodingDecodingQuestion(id: string, sectionCode: string, sectionName: string): ExamQuestionItem {
-    const fmt = this.format5Options('tu', ['la', 'pa', 'so', 'ki']);
+  private buildCodingDecodingQuestion(id: string, sectionCode: string, sectionName: string, index: number = 0): ExamQuestionItem {
+    const templates = [
+      {
+        q: `In a certain code language:\n• 'banking exam target score' is written as 'la tu pa so'\n• 'score high target rank' is written as 'tu pa ki ze'\n• 'banking rank dream job' is written as 'la ki ma vo'\n\nWhat is the code for the word 'target' in this language if 'score' is coded as 'pa'?`,
+        ans: 'tu',
+        dis: ['la', 'pa', 'so', 'ki'],
+        exp: `Common words between Sentence 1 and Sentence 2 are 'target' and 'score'. Common codes are 'tu' and 'pa'. Given that 'score' is coded as 'pa', the remaining word 'target' must be coded as 'tu'.`
+      },
+      {
+        q: `In a certain code language:\n• 'rbi monetary policy review' is written as 'xo na bi ku'\n• 'review financial market growth' is written as 'na ze lo ti'\n• 'monetary growth index steady' is written as 'bi lo wa pe'\n\nWhat is the code for the word 'review' in that language?`,
+        ans: 'na',
+        dis: ['xo', 'bi', 'ku', 'ze'],
+        exp: `The word 'review' appears in Sentence 1 and Sentence 2. The only common code between Sentence 1 and Sentence 2 is 'na'.`
+      },
+      {
+        q: `In a certain code language:\n• 'digital payment secure fast' is written as 'da ri sa te'\n• 'secure banking network robust' is written as 'ri mo fa ka'\n• 'fast network transfer instant' is written as 'sa mo ju lo'\n\nWhat is the code for the word 'secure'?`,
+        ans: 'ri',
+        dis: ['da', 'sa', 'mo', 'ka'],
+        exp: `'secure' is common between Sentence 1 and Sentence 2. The common code between 'da ri sa te' and 'ri mo fa ka' is 'ri'.`
+      },
+      {
+        q: `If in a code language, 'CREDIT' is coded as 'FUGGLW', then how will 'DEBIT' be coded in the same language?`,
+        ans: 'GHGLW',
+        dis: ['GHFLW', 'GHHKW', 'FGGKW', 'EFCJU'],
+        exp: `Each letter is shifted forward by +3:\nC(+3)=F, R(+3)=U, E(+3)=H, D(+3)=G, I(+3)=L, T(+3)=W.\nApplying +3 to DEBIT gives GHGLW.`
+      }
+    ];
+
+    const pick = templates[index % templates.length];
+    const fmt = this.format5Options(pick.ans, pick.dis);
 
     return {
       id,
@@ -2408,10 +2480,10 @@ export class QuestionPatternEngineService {
       topicName: 'Coding & Decoding',
       patternCode: 'REAS_CODE_01',
       difficulty: 'medium',
-      questionText: `In a certain code language:\n• 'banking exam target score' is written as 'la tu pa so'\n• 'score high target rank' is written as 'tu pa ki ze'\n• 'banking rank dream job' is written as 'la ki ma vo'\n\nWhat is the code for the word 'target' in this language if 'score' is coded as 'pa'?`,
+      questionText: pick.q,
       options: fmt.options,
       correctOptionIndex: fmt.correctIndex,
-      explanation: `Common words between Sentence 1 and Sentence 2 are 'target' and 'score'.\nCommon codes are 'tu' and 'pa'.\nGiven that 'score' is coded as 'pa', the remaining word 'target' must be coded as 'tu'.`,
+      explanation: pick.exp,
       marks: 1,
       negativeMarks: 0.25
     };
@@ -3788,6 +3860,126 @@ export class QuestionPatternEngineService {
         options: ['Ransomware', 'Adware', 'Spyware', 'Rootkit', 'Keylogger'],
         correct: 0,
         explanation: 'Ransomware is a category of malware that locks or encrypts critical user/enterprise data and demands ransom for restoration.'
+      },
+      {
+        question: 'What is the address length in bits of an Internet Protocol Version 6 (IPv6) address compared to an IPv4 address?',
+        options: ['128 bits (IPv6) vs 32 bits (IPv4)', '64 bits (IPv6) vs 32 bits (IPv4)', '256 bits (IPv6) vs 64 bits (IPv4)', '128 bits (IPv6) vs 64 bits (IPv4)', '32 bits (IPv6) vs 16 bits (IPv4)'],
+        correct: 0,
+        explanation: 'IPv4 uses 32-bit numeric addresses yielding ~4.3 billion addresses, whereas IPv6 uses 128-bit hexadecimal addresses allowing 2^128 unique addresses.'
+      },
+      {
+        question: 'What standard well-known TCP port number is utilized for Secure Hypertext Transfer Protocol (HTTPS) traffic encrypted via TLS/SSL?',
+        options: ['Port 443', 'Port 80', 'Port 21', 'Port 25', 'Port 22'],
+        correct: 0,
+        explanation: 'Port 443 is universally designated for HTTPS secure encrypted web traffic, whereas port 80 is for unencrypted HTTP.'
+      },
+      {
+        question: 'Which memory type is non-volatile, retains its contents when computer power is switched off, and holds the firmware bootstrap startup routines?',
+        options: ['ROM (Read Only Memory)', 'DRAM (Dynamic RAM)', 'SRAM (Static RAM)', 'Virtual Swap File', 'CPU Register Cache'],
+        correct: 0,
+        explanation: 'ROM is non-volatile memory where vital bootstrap loader instructions and BIOS/UEFI firmware are permanently stored.'
+      },
+      {
+        question: 'In cybersecurity, what term describes a deceptive social engineering attack where fraudulent emails or websites impersonate legitimate banks to steal user credentials?',
+        options: ['Phishing', 'Man-in-the-Middle Attack', 'Denial of Service (DoS)', 'SQL Injection', 'Buffer Overflow'],
+        correct: 0,
+        explanation: 'Phishing is a fraudulent attempt to obtain sensitive information such as usernames, passwords, and banking details by disguising as a trustworthy entity.'
+      },
+      {
+        question: 'Which keyboard shortcut is used in Microsoft Office applications (Word, Excel, PowerPoint) to open the Insert Hyperlink dialog box?',
+        options: ['Ctrl + K', 'Ctrl + H', 'Ctrl + L', 'Alt + K', 'Ctrl + Shift + H'],
+        correct: 0,
+        explanation: 'Ctrl + K is the standard universal shortcut across Microsoft Office and browsers to insert a hyperlink.'
+      },
+      {
+        question: 'In operating system architecture, what is the core computer program that possesses complete control over everything in the system and directly bridges user applications to CPU hardware?',
+        options: ['Kernel', 'Shell', 'Device Driver', 'Compiler', 'Spooler'],
+        correct: 0,
+        explanation: 'The Kernel is the central core component of an OS that manages hardware resources, process scheduling, memory allocation, and system calls.'
+      },
+      {
+        question: 'Which RAID (Redundant Array of Independent Disks) configuration level provides disk mirroring without parity, duplicating data across two drives for high fault tolerance?',
+        options: ['RAID 1', 'RAID 0', 'RAID 5', 'RAID 6', 'RAID 10'],
+        correct: 0,
+        explanation: 'RAID 1 uses disk mirroring, writing identical copies of data to two separate drives so that if one drive fails, no data is lost.'
+      },
+      {
+        question: 'Which network security system continuously monitors and controls incoming and outgoing network traffic based on predetermined security access rules?',
+        options: ['Firewall', 'Proxy Server', 'Modem', 'Network Switch', 'Hub'],
+        correct: 0,
+        explanation: 'A Firewall inspects network packets at network boundaries and permits or blocks traffic based on configured security policies.'
+      },
+      {
+        question: 'Which protocol translates human-friendly Internet domain names (like www.rbi.org.in) into machine-readable numeric IP addresses?',
+        options: ['DNS (Domain Name System)', 'SNMP (Simple Network Management Protocol)', 'ICMP (Internet Control Message Protocol)', 'ARP (Address Resolution Protocol)', 'BGP (Border Gateway Protocol)'],
+        correct: 0,
+        explanation: 'DNS serves as the phonebook of the Internet, resolving domain names into the corresponding IP addresses required by networking hardware.'
+      },
+      {
+        question: 'In operating systems, which resource allocation and deadlock avoidance algorithm tests for safety by simulating the allocation of predetermined maximum possible amounts of all resources?',
+        options: ["Banker's Algorithm", "Round Robin Scheduling", "Dijkstra's Shortest Path", "LRU Page Replacement", "First-Come First-Served"],
+        correct: 0,
+        explanation: "The Banker's Algorithm (developed by Edsger Dijkstra) is a deadlock avoidance algorithm that checks if resource allocation leaves the system in a safe state."
+      },
+      {
+        question: 'What technique temporarily holds print jobs or I/O data in a disk buffer until the slower peripheral device is ready to process them?',
+        options: ['Spooling (Simultaneous Peripheral Operations On-Line)', 'Swapping', 'Caching', 'Pipelining', 'Interleaving'],
+        correct: 0,
+        explanation: 'Spooling overlaps the I/O of one job with the computation of other jobs by holding print/data streams on high-speed disk storage.'
+      },
+      {
+        question: 'In relational database design, a table is in Boyce-Codd Normal Form (BCNF) if and only if for every non-trivial functional dependency X → Y:',
+        options: ['X is a Super Key', 'Y is a Super Key', 'X is a Foreign Key', 'Y is a Prime Attribute', 'X is a Candidate Key of another table'],
+        correct: 0,
+        explanation: 'BCNF is a stricter version of 3NF where every determinant (X in X → Y) must strictly be a Super Key.'
+      },
+      {
+        question: 'Which type of malicious software misleads users of its true intent by disguising itself as legitimate, safe software while secretly executing malicious payloads?',
+        options: ['Trojan Horse', 'Worm', 'Rootkit', 'Adware', 'Spyware'],
+        correct: 0,
+        explanation: 'A Trojan Horse appears as a harmless utility or game to trick the user into installing it, but contains hidden malicious code.'
+      },
+      {
+        question: 'Which media access control method is historically utilized in half-duplex Ethernet networks to detect collisions on shared transmission media?',
+        options: ['CSMA/CD (Carrier Sense Multiple Access with Collision Detection)', 'CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance)', 'Token Ring Passing', 'Slotted ALOHA', 'TDMA (Time Division Multiple Access)'],
+        correct: 0,
+        explanation: 'CSMA/CD listens before transmitting on Ethernet cables; if a collision is detected during transmission, both stations back off for a random interval.'
+      },
+      {
+        question: 'Which cloud computing service delivery model provides end users with complete on-demand applications hosted entirely over the internet without local software installation?',
+        options: ['SaaS (Software as a Service)', 'IaaS (Infrastructure as a Service)', 'PaaS (Platform as a Service)', 'DaaS (Desktop as a Service)', 'BaaS (Backend as a Service)'],
+        correct: 0,
+        explanation: 'SaaS provides software applications (like Google Workspace, Microsoft 365, Salesforce) accessible through web browsers over the cloud.'
+      },
+      {
+        question: 'In Microsoft Excel, which keyboard shortcut combination displays the Macro dialog box to view, run, or edit VBA macros?',
+        options: ['Alt + F8', 'Alt + F11', 'Ctrl + F8', 'Shift + F8', 'Ctrl + M'],
+        correct: 0,
+        explanation: 'Alt + F8 opens the Macro dialog box in Microsoft Excel (Alt + F11 opens the Visual Basic Editor).'
+      },
+      {
+        question: 'Which physical network topology connects all client nodes directly to a central networking device such as a network switch or hub?',
+        options: ['Star Topology', 'Bus Topology', 'Ring Topology', 'Mesh Topology', 'Tree Topology'],
+        correct: 0,
+        explanation: 'In a Star topology, all devices are connected directly to a central hub or switch; a failure in any individual cable only isolates that single workstation.'
+      },
+      {
+        question: 'Which cryptography methodology utilizes a pair of mathematically linked keys — a public key for encryption and a private key for decryption?',
+        options: ['Asymmetric (Public Key) Cryptography', 'Symmetric Key Cryptography', 'Stream Cipher Hashing', 'Block Cipher Substitution', 'Caesar Cipher'],
+        correct: 0,
+        explanation: 'Asymmetric encryption (e.g., RSA, ECC) uses a public key available to anyone for encryption and a mathematically linked private key kept secret for decryption.'
+      },
+      {
+        question: 'Which type of programmable read-only memory can be erased and reprogrammed repeatedly using electrical charges without exposure to ultraviolet light?',
+        options: ['EEPROM (Electrically Erasable Programmable ROM)', 'EPROM', 'PROM', 'Mask ROM', 'Static RAM'],
+        correct: 0,
+        explanation: 'EEPROM allows individual bytes to be erased and rewritten electrically; modern flash memory is a specialized form of EEPROM.'
+      },
+      {
+        question: 'In operating systems, what mechanism uses secondary storage (such as SSD or hard drive paging space) to simulate additional main physical memory?',
+        options: ['Virtual Memory', 'Dynamic RAM', 'Segment Register', 'Direct Memory Access (DMA)', 'Cache Coherence'],
+        correct: 0,
+        explanation: 'Virtual memory maps physical RAM addresses to secondary storage pages, allowing the system to execute processes larger than physical RAM.'
       }
     ];
 
@@ -3795,8 +3987,10 @@ export class QuestionPatternEngineService {
     const items: ExamQuestionItem[] = [];
     const runId = Math.random().toString(36).substring(2, 7);
 
-    for (let i = 0; i < count; i++) {
-      const qData = shuffled[i % shuffled.length];
+    // Guaranteed uniqueness: pick up to shuffled.length without replacement
+    const safeCount = Math.min(count, shuffled.length);
+    for (let i = 0; i < safeCount; i++) {
+      const qData = shuffled[i];
       const fmt = this.format5Options(qData.options[qData.correct], qData.options.filter((_, idx) => idx !== qData.correct));
       items.push({
         id: `${runId}-comp-${i}`,
@@ -3814,6 +4008,32 @@ export class QuestionPatternEngineService {
         marks: 1,
         negativeMarks: 0.25
       });
+    }
+
+    // If more questions requested than bank size (e.g. 40 Qs in Mains), generate dynamic unique binary/hex and networking variants
+    if (count > safeCount) {
+      for (let i = safeCount; i < count; i++) {
+        const byte = 100 + (i * 7) % 155;
+        const bin = byte.toString(2).padStart(8, '0');
+        const hex = byte.toString(16).toUpperCase();
+        const fmt = this.format5Options(hex, [(byte + 1).toString(16).toUpperCase(), (byte - 1).toString(16).toUpperCase(), (byte + 16).toString(16).toUpperCase(), (byte ^ 15).toString(16).toUpperCase()]);
+        items.push({
+          id: `${runId}-comp-dyn-${i}`,
+          sectionCode,
+          sectionName,
+          questionNumber: 0,
+          subjectCode: 'computer',
+          topicName: 'Computer Aptitude & Networking',
+          patternCode: 'COMP_APT_DYN',
+          difficulty: 'medium',
+          questionText: `What is the hexadecimal equivalent of the 8-bit binary number (${bin})₂?`,
+          options: fmt.options,
+          correctOptionIndex: fmt.correctIndex,
+          explanation: `Convert binary to hex by grouping into 4-bit nibbles: high nibble (${bin.substring(0, 4)})₂ and low nibble (${bin.substring(4)})₂. Result is (${hex})₁₆.`,
+          marks: 1,
+          negativeMarks: 0.25
+        });
+      }
     }
 
     return items;
@@ -4034,97 +4254,101 @@ export class QuestionPatternEngineService {
     const normalized = (topicName || '').toLowerCase().trim();
     const runId = Math.random().toString(36).substring(2, 7);
 
-    for (let i = 0; i < count; i++) {
-      const qId = `top-${runId}-${i}`;
+    // BATCH GENERATION FOR CATEGORICAL BANKS (guarantees unique questions without replacement)
+    if (normalized.includes('comp') || normalized.includes('hardware') || normalized.includes('network') || normalized.includes('shortcut')) {
+      const compItems = this.generateComputerSection(count, 'computer', 'Computer Aptitude');
+      rawItems.push(...compItems);
+    } else if (
+      normalized.includes('current') ||
+      normalized.includes('affairs') ||
+      normalized.includes('news') ||
+      normalized.includes('national') ||
+      normalized.includes('international')
+    ) {
+      const caItems = this.generateCurrentAffairsSection(count, 'ga', 'Current Affairs (National & International)');
+      rawItems.push(...caItems);
+    } else if (
+      normalized.includes('bank') ||
+      normalized.includes('monetary') ||
+      normalized.includes('rbi') ||
+      normalized.includes('ga') ||
+      normalized.includes('awareness') ||
+      normalized.includes('economy') ||
+      normalized.includes('financial') ||
+      normalized.includes('gk')
+    ) {
+      const gaItems = this.generateGaSection(count, 'ga', 'General & Banking Awareness');
+      rawItems.push(...gaItems);
+    } else {
+      // PARAMETRIC & ROTATING GENERATORS WITH UNIQUE SEEDS
+      for (let i = 0; i < count; i++) {
+        const qId = `top-${runId}-${i}`;
 
-      if (normalized.includes('percent')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage'));
-      } else if (normalized.includes('profit') || normalized.includes('loss') || normalized.includes('discount')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Profit & Loss'));
-      } else if (normalized.includes('interest') || normalized.includes('si') || normalized.includes('ci')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Simple & Compound Interest'));
-      } else if (normalized.includes('work') || normalized.includes('pipe') || normalized.includes('cistern')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time & Work' : 'Pipes & Cisterns'));
-      } else if (normalized.includes('speed') || normalized.includes('distance') || normalized.includes('train') || normalized.includes('boat')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time, Speed & Distance' : 'Boats & Streams'));
-      } else if (normalized.includes('mixture') || normalized.includes('alligation')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mixtures & Alligation'));
-      } else if (normalized.includes('partnership')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Partnership'));
-      } else if (normalized.includes('age') || normalized.includes('ratio') || normalized.includes('proportion')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Ages'));
-      } else if (normalized.includes('average')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Averages'));
-      } else if (normalized.includes('mensuration')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mensuration'));
-      } else if (normalized.includes('probability')) {
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Probability'));
-      } else if (normalized.includes('simplif') || normalized.includes('approx') || normalized.includes('bodmas')) {
-        rawItems.push(this.buildSimplificationQuestion(qId, 'quant', 'Quantitative Aptitude'));
-      } else if (normalized.includes('quad') || normalized.includes('equation')) {
-        rawItems.push(this.buildQuadraticQuestion(qId, 'quant', 'Quantitative Aptitude'));
-      } else if (normalized.includes('series') || normalized.includes('number') || normalized.includes('missing') || normalized.includes('wrong')) {
-        rawItems.push(this.buildNumberSeriesQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0));
-      } else if (normalized.includes('syllog')) {
-        rawItems.push(this.buildSyllogismQuestion(qId, 'reasoning', 'Reasoning Ability'));
-      } else if (normalized.includes('inequal')) {
-        rawItems.push(this.buildInequalityQuestion(qId, 'reasoning', 'Reasoning Ability'));
-      } else if (normalized.includes('blood') || normalized.includes('relation')) {
-        rawItems.push(this.buildBloodRelationQuestion(qId, 'reasoning', 'Reasoning Ability'));
-      } else if (normalized.includes('direction')) {
-        rawItems.push(this.buildDirectionQuestion(qId, 'reasoning', 'Reasoning Ability'));
-      } else if (normalized.includes('coding') || normalized.includes('decoding')) {
-        rawItems.push(this.buildCodingDecodingQuestion(qId, 'reasoning', 'Reasoning Ability'));
-      } else if (normalized.includes('error') || normalized.includes('grammar')) {
-        rawItems.push(this.buildErrorSpottingQuestion(qId, 'english', 'English Language', i));
-      } else if (normalized.includes('phrase') || normalized.includes('sentence')) {
-        rawItems.push(this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i));
-      } else if (normalized.includes('cloze') || normalized.includes('filler')) {
-        rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
-      } else if (
-        normalized.includes('current') ||
-        normalized.includes('affairs') ||
-        normalized.includes('news') ||
-        normalized.includes('national') ||
-        normalized.includes('international')
-      ) {
-        const caItems = this.generateCurrentAffairsSection(1, 'ga', 'Current Affairs (National & International)');
-        if (caItems.length > 0) {
-          caItems[0].id = qId;
-          caItems[0].questionNumber = i + 1;
-          rawItems.push(caItems[0]);
+        if (normalized.includes('percent')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage', i));
+        } else if (normalized.includes('profit') || normalized.includes('loss') || normalized.includes('discount')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Profit & Loss', i));
+        } else if (normalized.includes('interest') || normalized.includes('si') || normalized.includes('ci')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Simple & Compound Interest', i));
+        } else if (normalized.includes('work') || normalized.includes('pipe') || normalized.includes('cistern')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time & Work' : 'Pipes & Cisterns', i));
+        } else if (normalized.includes('speed') || normalized.includes('distance') || normalized.includes('train') || normalized.includes('boat')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0 ? 'Time, Speed & Distance' : 'Boats & Streams', i));
+        } else if (normalized.includes('mixture') || normalized.includes('alligation')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mixtures & Alligation', i));
+        } else if (normalized.includes('partnership')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Partnership', i));
+        } else if (normalized.includes('age') || normalized.includes('ratio') || normalized.includes('proportion')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Ages', i));
+        } else if (normalized.includes('average')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Averages', i));
+        } else if (normalized.includes('mensuration')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Mensuration', i));
+        } else if (normalized.includes('probability')) {
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Probability', i));
+        } else if (normalized.includes('simplif') || normalized.includes('approx') || normalized.includes('bodmas')) {
+          rawItems.push(this.buildSimplificationQuestion(qId, 'quant', 'Quantitative Aptitude'));
+        } else if (normalized.includes('quad') || normalized.includes('equation')) {
+          rawItems.push(this.buildQuadraticQuestion(qId, 'quant', 'Quantitative Aptitude'));
+        } else if (normalized.includes('series') || normalized.includes('number') || normalized.includes('missing') || normalized.includes('wrong')) {
+          rawItems.push(this.buildNumberSeriesQuestion(qId, 'quant', 'Quantitative Aptitude', i % 2 === 0));
+        } else if (normalized.includes('syllog')) {
+          rawItems.push(this.buildSyllogismQuestion(qId, 'reasoning', 'Reasoning Ability', i));
+        } else if (normalized.includes('inequal')) {
+          rawItems.push(this.buildInequalityQuestion(qId, 'reasoning', 'Reasoning Ability', i));
+        } else if (normalized.includes('blood') || normalized.includes('relation')) {
+          rawItems.push(this.buildBloodRelationQuestion(qId, 'reasoning', 'Reasoning Ability', i));
+        } else if (normalized.includes('direction')) {
+          rawItems.push(this.buildDirectionQuestion(qId, 'reasoning', 'Reasoning Ability', i));
+        } else if (normalized.includes('coding') || normalized.includes('decoding')) {
+          rawItems.push(this.buildCodingDecodingQuestion(qId, 'reasoning', 'Reasoning Ability', i));
+        } else if (normalized.includes('error') || normalized.includes('grammar')) {
+          rawItems.push(this.buildErrorSpottingQuestion(qId, 'english', 'English Language', i));
+        } else if (normalized.includes('phrase') || normalized.includes('sentence')) {
+          rawItems.push(this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i));
+        } else if (normalized.includes('cloze') || normalized.includes('filler')) {
+          rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
+        } else {
+          // Fallback arithmetic with specific topic attribution
+          rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage', i));
         }
-      } else if (
-        normalized.includes('bank') ||
-        normalized.includes('monetary') ||
-        normalized.includes('rbi') ||
-        normalized.includes('ga') ||
-        normalized.includes('awareness') ||
-        normalized.includes('economy') ||
-        normalized.includes('financial') ||
-        normalized.includes('gk')
-      ) {
-        const gaItems = this.generateGaSection(1, 'ga', 'General & Banking Awareness');
-        if (gaItems.length > 0) {
-          gaItems[0].id = qId;
-          gaItems[0].questionNumber = i + 1;
-          rawItems.push(gaItems[0]);
-        }
-      } else if (normalized.includes('comp') || normalized.includes('hardware') || normalized.includes('network') || normalized.includes('shortcut')) {
-        const compItems = this.generateComputerSection(1, 'computer', 'Computer Aptitude');
-        if (compItems.length > 0) {
-          compItems[0].id = qId;
-          compItems[0].questionNumber = i + 1;
-          rawItems.push(compItems[0]);
-        }
-      } else {
-        // Fallback arithmetic with specific topic attribution
-        rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage'));
+      }
+    }
+
+    // STRICT DEDUPLICATION: Ensure no identical questions by normalized text
+    const seenTexts = new Set<string>();
+    const deduplicatedRaw: ExamQuestionItem[] = [];
+
+    for (const item of rawItems) {
+      const norm = (item.questionText || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!seenTexts.has(norm)) {
+        seenTexts.add(norm);
+        deduplicatedRaw.push(item);
       }
     }
 
     // Convert ExamQuestionItem (5 options) into standard QuizQuestion (4 options)
-    return rawItems.map((item, idx) => {
+    return deduplicatedRaw.map((item, idx) => {
       const correctText = item.options[item.correctOptionIndex];
       const distractors = item.options.filter((_, oIdx) => oIdx !== item.correctOptionIndex);
       const chosen3Distractors = this.shuffle(distractors).slice(0, 3);
