@@ -86,7 +86,7 @@ import confetti from 'canvas-confetti';
               type="button"
               (click)="statusFilter.set('all')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
-              [ngClass]="statusFilter() === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
+              [ngClass]="statusFilter() === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
             >
               All ({{ stageTopics().length }})
             </button>
@@ -94,7 +94,7 @@ import confetti from 'canvas-confetti';
               type="button"
               (click)="statusFilter.set('learned')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
-              [ngClass]="statusFilter() === 'learned' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
+              [ngClass]="statusFilter() === 'learned' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
             >
               Mastered ({{ masteredCount() }})
             </button>
@@ -102,7 +102,7 @@ import confetti from 'canvas-confetti';
               type="button"
               (click)="statusFilter.set('learning')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
-              [ngClass]="statusFilter() === 'learning' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
+              [ngClass]="statusFilter() === 'learning' ? 'bg-amber-700 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
             >
               Learning ({{ learningCount() }})
             </button>
@@ -110,7 +110,7 @@ import confetti from 'canvas-confetti';
               type="button"
               (click)="statusFilter.set('not_started')"
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0"
-              [ngClass]="statusFilter() === 'not_started' ? 'bg-slate-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'"
+              [ngClass]="statusFilter() === 'not_started' ? 'bg-slate-700 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
             >
               Not Started ({{ notStartedCount() }})
             </button>

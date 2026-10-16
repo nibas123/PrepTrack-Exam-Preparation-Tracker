@@ -61,7 +61,7 @@ interface StorageKeyReport {
           <button
             type="button"
             (click)="openAiGenModal()"
-            class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs"
+            class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 shadow-xs"
             title="Generate fresh AI questions with Gemini and save to bank"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,46 +90,63 @@ interface StorageKeyReport {
         <button
           type="button"
           (click)="activeTab.set('dashboard')"
-          class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
-          [ngClass]="activeTab() === 'dashboard' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-3.5 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+          [ngClass]="activeTab() === 'dashboard' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <span>📊 Overview & AI Telemetry</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>Overview & AI Telemetry</span>
         </button>
 
         <button
           type="button"
           (click)="activeTab.set('gemini')"
-          class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
-          [ngClass]="activeTab() === 'gemini' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-3.5 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+          [ngClass]="activeTab() === 'gemini' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <span>🤖 Gemini AI & Tokens</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          <span>Gemini AI & Tokens</span>
         </button>
 
         <button
           type="button"
           (click)="activeTab.set('bank')"
-          class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
-          [ngClass]="activeTab() === 'bank' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-3.5 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+          [ngClass]="activeTab() === 'bank' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <span>📚 Question Bank & Cache ({{ cachedBank().length }})</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Question Bank & Cache ({{ cachedBank().length }})</span>
         </button>
 
         <button
           type="button"
           (click)="activeTab.set('patterns')"
-          class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
-          [ngClass]="activeTab() === 'patterns' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-3.5 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+          [ngClass]="activeTab() === 'patterns' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <span>⚙️ Exam Blueprints & Patterns ({{ blueprints.length }})</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Exam Blueprints ({{ blueprints.length }})</span>
         </button>
 
         <button
           type="button"
           (click)="activeTab.set('diagnostics')"
-          class="px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
-          [ngClass]="activeTab() === 'diagnostics' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+          class="px-3.5 py-2 rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap"
+          [ngClass]="activeTab() === 'diagnostics' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <span>💾 Storage & System Data</span>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m-6-8h6" />
+          </svg>
+          <span>Storage & Diagnostics</span>
         </button>
       </div>
 
@@ -912,7 +929,7 @@ interface StorageKeyReport {
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="card p-4">
               <span class="text-xs text-slate-500 font-semibold block">Total Cached Qs</span>
-              <span class="text-2xl font-bold text-purple-700 mt-1 block font-mono">
+              <span class="text-2xl font-bold text-slate-900 mt-1 block font-mono">
                 {{ cachedBank().length }} / {{ aiConfig.getMaxCacheSize() }}
               </span>
               <span class="text-[10px] text-slate-400 mt-1 block">In local offline bank</span>
@@ -920,26 +937,26 @@ interface StorageKeyReport {
 
             <div class="card p-4">
               <span class="text-xs text-slate-500 font-semibold block">Mastered Questions</span>
-              <span class="text-2xl font-bold text-emerald-600 mt-1 block font-mono">
+              <span class="text-2xl font-bold text-emerald-700 mt-1 block font-mono">
                 {{ bankStats().mastered }}
               </span>
-              <span class="text-[10px] text-emerald-600/80 mt-1 block">Answered correctly ≥ 2 times</span>
+              <span class="text-[10px] text-emerald-700/80 mt-1 block">Answered correctly ≥ 2 times</span>
             </div>
 
             <div class="card p-4">
               <span class="text-xs text-slate-500 font-semibold block">Needs Review</span>
-              <span class="text-2xl font-bold text-amber-600 mt-1 block font-mono">
+              <span class="text-2xl font-bold text-amber-700 mt-1 block font-mono">
                 {{ bankStats().needsReview }}
               </span>
-              <span class="text-[10px] text-amber-600/80 mt-1 block">Spaced repetition queue</span>
+              <span class="text-[10px] text-amber-700/80 mt-1 block">Spaced repetition queue</span>
             </div>
 
             <div class="card p-4">
               <span class="text-xs text-slate-500 font-semibold block">Fresh / Unattempted</span>
-              <span class="text-2xl font-bold text-indigo-600 mt-1 block font-mono">
+              <span class="text-2xl font-bold text-brand-700 mt-1 block font-mono">
                 {{ bankStats().unattempted }}
               </span>
-              <span class="text-[10px] text-indigo-600/80 mt-1 block">Ready for practice</span>
+              <span class="text-[10px] text-brand-700/80 mt-1 block">Ready for practice</span>
             </div>
           </div>
 
@@ -954,7 +971,7 @@ interface StorageKeyReport {
               @for (entry of bankStats().subjectCounts | keyvalue; track entry.key) {
                 <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 flex items-center space-x-1.5">
                   <span class="font-semibold">{{ entry.key }}:</span>
-                  <span class="font-mono font-bold text-purple-700">{{ entry.value }}</span>
+                  <span class="font-mono font-bold text-brand-700">{{ entry.value }}</span>
                 </span>
               }
               @if ((bankStats().subjectCounts | keyvalue).length === 0) {
@@ -975,7 +992,7 @@ interface StorageKeyReport {
                 <button
                   type="button"
                   (click)="openAiGenModal()"
-                  class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xs"
+                  class="btn-primary text-xs py-1.5 px-3 font-semibold flex items-center space-x-1.5 shadow-xs"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -1366,25 +1383,25 @@ interface StorageKeyReport {
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div class="p-3.5 rounded-xl bg-indigo-50/60 border border-indigo-100">
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                 <span class="text-slate-500 text-[11px] font-semibold block">Bank Exams Registered</span>
-                <span class="text-2xl font-bold text-indigo-700 mt-1 block font-mono">{{ totalExams() }}</span>
+                <span class="text-2xl font-bold text-slate-900 mt-1 block font-mono">{{ totalExams() }}</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">IBPS, SBI, RBI, NABARD, LIC</span>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-purple-50/60 border border-purple-100">
+              <div class="p-3.5 rounded-xl bg-brand-50/60 border border-brand-200">
                 <span class="text-slate-500 text-[11px] font-semibold block">Syllabus Topics</span>
-                <span class="text-2xl font-bold text-purple-700 mt-1 block font-mono">{{ totalTopics() }}</span>
+                <span class="text-2xl font-bold text-brand-700 mt-1 block font-mono">{{ totalTopics() }}</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">Across 5 banking subjects</span>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
+              <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200">
                 <span class="text-slate-500 text-[11px] font-semibold block">Practice Quiz Attempts</span>
                 <span class="text-2xl font-bold text-emerald-700 mt-1 block font-mono">{{ totalQuizAttempts() }}</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">In-app practice drills</span>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-100">
+              <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200">
                 <span class="text-slate-500 text-[11px] font-semibold block">Mock Exam Attempts</span>
                 <span class="text-2xl font-bold text-amber-700 mt-1 block font-mono">{{ totalMockAttempts() }}</span>
                 <span class="text-[10px] text-slate-400 mt-0.5 block">Full exam simulations</span>
@@ -1403,7 +1420,7 @@ interface StorageKeyReport {
               <button
                 type="button"
                 (click)="exportFullBackupJson()"
-                class="btn-primary text-xs py-2 px-3.5 font-semibold bg-purple-600 hover:bg-purple-700 flex items-center space-x-1.5"
+                class="btn-primary text-xs py-2 px-3.5 font-semibold flex items-center space-x-1.5 shadow-xs"
               >
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1426,7 +1443,7 @@ interface StorageKeyReport {
                   @for (rep of storageReports(); track rep.key) {
                     <tr class="hover:bg-slate-50">
                       <td class="py-2 px-3 font-bold text-slate-800">{{ rep.key }}</td>
-                      <td class="py-2 px-3 text-purple-700 font-semibold">{{ rep.sizeBytes | number }} B</td>
+                      <td class="py-2 px-3 text-brand-700 font-semibold">{{ rep.sizeBytes | number }} B</td>
                       <td class="py-2 px-3 text-slate-600">{{ rep.itemCount }}</td>
                       <td class="py-2 px-3 font-sans text-slate-500 text-xs">{{ rep.description }}</td>
                     </tr>
@@ -1451,9 +1468,9 @@ interface StorageKeyReport {
             (click)="$event.stopPropagation()"
           >
             <!-- Modal Header -->
-            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50/60 to-indigo-50/60">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-200">
+                <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold shadow-xs">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -1538,7 +1555,7 @@ interface StorageKeyReport {
                         (click)="setAiTopic(topic)"
                         [disabled]="isGeneratingAi()"
                         class="px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors"
-                        [ngClass]="aiGenTopic() === topic ? 'bg-purple-600 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        [ngClass]="aiGenTopic() === topic ? 'bg-brand-600 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
                       >
                         {{ topic }}
                       </button>
@@ -1612,7 +1629,7 @@ interface StorageKeyReport {
             <!-- Modal Footer -->
             <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
               <span class="text-[11px] text-slate-400">
-                Model: <span class="font-mono text-purple-700 font-semibold">{{ aiConfig.getEffectiveModel() }}</span>
+                Model: <span class="font-mono text-brand-700 font-semibold">{{ aiConfig.getEffectiveModel() }}</span>
               </span>
 
               <div class="flex items-center space-x-2">
@@ -1629,7 +1646,7 @@ interface StorageKeyReport {
                   type="button"
                   (click)="generateAiQuestionsForBank()"
                   [disabled]="isGeneratingAi() || !aiConfig.isAiGloballyEnabled()"
-                  class="btn-primary text-xs py-2 px-4 font-semibold flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-200 disabled:opacity-50"
+                  class="btn-primary text-xs py-2 px-4 font-semibold flex items-center space-x-1.5 shadow-xs disabled:opacity-50"
                 >
                   @if (isGeneratingAi()) {
                     <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">

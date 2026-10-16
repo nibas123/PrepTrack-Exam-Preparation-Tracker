@@ -137,7 +137,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('all')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'all' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'all' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   All Exams ({{ blueprints().length }})
                 </button>
@@ -145,7 +145,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('prelims')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'prelims' ? 'bg-brand-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'prelims' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   Prelims Mocks
                 </button>
@@ -153,7 +153,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('mains')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'mains' ? 'bg-purple-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'mains' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   Mains Full Mocks
                 </button>
@@ -161,7 +161,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('rrb_rbi')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'rrb_rbi' ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'rrb_rbi' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   RRB & Regulatory
                 </button>
@@ -169,7 +169,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('specialist_insurance')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'specialist_insurance' ? 'bg-indigo-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'specialist_insurance' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   Specialist & Insurance
                 </button>
@@ -177,7 +177,7 @@ import confetti from 'canvas-confetti';
                   type="button"
                   (click)="blueprintFilter.set('sectional')"
                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                  [ngClass]="blueprintFilter() === 'sectional' ? 'bg-amber-600 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                  [ngClass]="blueprintFilter() === 'sectional' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
                 >
                   Sprints & Sectionals
                 </button>

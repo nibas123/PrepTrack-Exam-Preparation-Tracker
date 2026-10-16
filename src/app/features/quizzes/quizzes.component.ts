@@ -260,7 +260,9 @@ import confetti from 'canvas-confetti';
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-2">
                     <span class="w-6 h-6 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">
-                      🎯
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 100 12 6 6 0 000-12zm0 4a2 2 0 100 4 2 2 0 000-4z" />
+                      </svg>
                     </span>
                     <div>
                       <div class="flex items-center space-x-2">
@@ -411,13 +413,15 @@ import confetti from 'canvas-confetti';
                         <button
                           type="button"
                           (click)="selectTopic(topicSearchQuery().trim())"
-                          class="w-full text-left px-3 py-2.5 rounded-lg bg-indigo-50/70 hover:bg-indigo-100/80 text-indigo-900 transition-colors flex items-center justify-between border border-indigo-100 mt-1"
+                          class="w-full text-left px-3 py-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-800 transition-colors flex items-center justify-between border border-slate-200 mt-1"
                         >
                           <div class="flex items-center space-x-2">
-                            <span>✨</span>
-                            <span>Add chapter: <strong class="underline font-bold">"{{ topicSearchQuery().trim() }}"</strong></span>
+                            <svg class="w-3.5 h-3.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Add chapter: <strong class="underline font-bold text-slate-900">"{{ topicSearchQuery().trim() }}"</strong></span>
                           </div>
-                          <span class="text-[10px] uppercase font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-indigo-200">Press Enter ↵</span>
+                          <span class="text-[10px] uppercase font-bold text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200">Press Enter ↵</span>
                         </button>
                       }
 
@@ -457,34 +461,42 @@ import confetti from 'canvas-confetti';
               </div>
 
               <!-- AI Question Generator Toggle & Difficulty Selector -->
-              <div class="p-4 rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50/70 via-brand-50/40 to-white space-y-3">
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-white space-y-3 shadow-2xs">
                 <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <span class="w-7 h-7 rounded-lg text-white flex items-center justify-center text-xs shadow-xs" [ngClass]="aiPowered() ? 'bg-indigo-600' : 'bg-slate-500'">
-                      {{ aiPowered() ? '✨' : '⚡' }}
+                  <div class="flex items-center space-x-2.5">
+                    <span class="w-8 h-8 rounded-lg flex items-center justify-center text-xs shadow-2xs" [ngClass]="aiPowered() ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700'">
+                      @if (aiPowered()) {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      } @else {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      }
                     </span>
                     <div>
-                      <div class="flex items-center space-x-1.5">
+                      <div class="flex items-center space-x-2">
                         <h4 class="text-xs font-bold text-slate-900">
-                          {{ aiPowered() ? 'Gemini AI Adaptive Generator' : 'High-Speed Pattern Engine (Non-AI)' }}
+                          {{ aiPowered() ? 'Gemini AI Adaptive Generator' : 'Algorithmic Pattern Engine (Offline)' }}
                         </h4>
-                        <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full" [ngClass]="aiPowered() ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-800'">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border" [ngClass]="aiPowered() ? 'bg-brand-50 text-brand-800 border-brand-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
                           {{ aiPowered() ? 'AI Active' : '0 Tokens / Offline' }}
                         </span>
                       </div>
-                      <p class="text-[11px] text-slate-500">
+                      <p class="text-[11px] text-slate-500 mt-0.5">
                         {{ aiPowered() ? 'Synthesizes novel questions via Gemini API' : 'Instant client-side parametric & syllabus questions with zero token usage' }}
                       </p>
                     </div>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" [ngModel]="aiPowered()" (ngModelChange)="aiPowered.set($event)" class="sr-only peer">
-                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-600"></div>
                   </label>
                 </div>
 
                 @if (aiPowered()) {
-                  <div class="pt-2 border-t border-indigo-100/80">
+                  <div class="pt-3 border-t border-slate-100">
                     <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">Question Difficulty</label>
                     <div class="grid grid-cols-4 gap-2 text-xs">
                       @for (diff of difficulties; track diff.value) {
@@ -492,7 +504,7 @@ import confetti from 'canvas-confetti';
                           type="button"
                           (click)="selectedDifficulty.set(diff.value)"
                           class="py-2 px-2.5 rounded-lg border text-center font-bold transition-all text-xs flex flex-col items-center justify-center"
-                          [ngClass]="selectedDifficulty() === diff.value ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
+                          [ngClass]="selectedDifficulty() === diff.value ? 'bg-brand-600 text-white border-brand-600 shadow-xs' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
                         >
                           <span>{{ diff.label }}</span>
                           <span class="text-[9px] font-normal opacity-80">{{ diff.desc }}</span>

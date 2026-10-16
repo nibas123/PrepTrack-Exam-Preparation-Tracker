@@ -25,9 +25,12 @@ import { PwaService } from '../../core/services/pwa.service';
 
         <a
           routerLink="/admin"
-          class="btn-primary text-xs py-2 px-4 font-semibold bg-purple-600 hover:bg-purple-700 flex items-center space-x-1.5 self-start sm:self-auto shadow-xs"
+          class="btn-primary text-xs py-2 px-4 font-semibold flex items-center space-x-1.5 self-start sm:self-auto shadow-xs"
         >
-          <span>🛡️ Admin & AI Console</span>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>Admin & AI Console</span>
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -35,15 +38,15 @@ import { PwaService } from '../../core/services/pwa.service';
       </div>
 
       <!-- ADMIN & QUESTION ENGINE CONSOLE SHORTCUT CARD -->
-      <div class="card p-5 bg-gradient-to-br from-purple-50/50 via-white to-indigo-50/30 border-purple-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="card p-5 bg-white border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
         <div class="space-y-1">
           <div class="flex items-center space-x-2">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-800 border border-brand-200">
               Admin & Diagnostics
             </span>
             <span class="text-xs font-bold text-slate-800">Platform Control Center</span>
           </div>
-          <h3 class="text-sm font-bold text-slate-950">Question Bank, Algorithmic Patterns & Gemini Tokens</h3>
+          <h3 class="text-sm font-bold text-slate-900">Question Bank, Algorithmic Patterns & Gemini Tokens</h3>
           <p class="text-xs text-slate-600">
             Monitor the offline question bank, test exam pattern generation speed, and toggle or reapply Gemini AI API tokens.
           </p>
@@ -51,7 +54,7 @@ import { PwaService } from '../../core/services/pwa.service';
 
         <a
           routerLink="/admin"
-          class="btn-primary text-xs py-2 px-4 font-semibold bg-purple-600 hover:bg-purple-700 whitespace-nowrap self-start sm:self-auto shadow-xs flex items-center space-x-1.5"
+          class="btn-primary text-xs py-2 px-4 font-semibold whitespace-nowrap self-start sm:self-auto shadow-xs flex items-center space-x-1.5"
         >
           <span>Open Admin Console</span>
           <span>→</span>
