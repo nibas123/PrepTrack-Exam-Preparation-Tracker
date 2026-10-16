@@ -235,7 +235,7 @@ import confetti from 'canvas-confetti';
                   @for (sub of subjects(); track sub.id) {
                     <button
                       type="button"
-                      (click)="selectedSubjectId.set(sub.id); selectedTopicName.set('')"
+                      (click)="selectedSubjectId.set(sub.id); clearTopicFilter()"
                       class="p-2.5 rounded-xl border text-left font-semibold transition-all flex items-center space-x-2"
                       [ngClass]="selectedSubjectId() === sub.id ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
                     >
@@ -245,7 +245,7 @@ import confetti from 'canvas-confetti';
                   }
                   <button
                     type="button"
-                    (click)="selectedSubjectId.set('all'); selectedTopicName.set('')"
+                    (click)="selectedSubjectId.set('all'); clearTopicFilter()"
                     class="p-2.5 rounded-xl border text-left font-semibold transition-all flex items-center space-x-2"
                     [ngClass]="selectedSubjectId() === 'all' ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
                   >
@@ -263,20 +263,54 @@ import confetti from 'canvas-confetti';
                       🎯
                     </span>
                     <div>
-                      <label class="block text-xs font-bold text-slate-800 uppercase tracking-wide">Target Topic Practice (Optional)</label>
-                      <p class="text-[11px] text-slate-500">Practice questions exclusively from a specific topic like Percentage, Syllogisms, or Number Series</p>
+                      <div class="flex items-center space-x-2">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wide">Target Topic Practice (Optional)</label>
+                        @if (selectedTopicNames().length > 0) {
+                          <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">
+                            {{ selectedTopicNames().length }} Selected
+                          </span>
+                        }
+                      </div>
+                      <p class="text-[11px] text-slate-500">Practice questions from one or multiple chapters simultaneously (e.g. Percentage + Profit & Loss)</p>
                     </div>
                   </div>
-                  @if (selectedTopicName() || topicSearchQuery()) {
+                  @if (selectedTopicNames().length > 0 || topicSearchQuery()) {
                     <button
                       type="button"
                       (click)="clearTopicFilter()"
-                      class="inline-flex items-center space-x-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200"
+                      class="inline-flex items-center space-x-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 transition-colors"
                     >
-                      <span>✕ Clear Topic Filter</span>
+                      <span>✕ Clear All Topics</span>
                     </button>
                   }
                 </div>
+
+                <!-- Active Multi-Topic Selected Tags/Chips -->
+                @if (selectedTopicNames().length > 0) {
+                  <div class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-white border border-brand-200 shadow-2xs animate-in fade-in duration-150">
+                    <span class="text-[11px] font-semibold text-slate-400 mr-1">Active:</span>
+                    @for (top of selectedTopicNames(); track top) {
+                      <span class="inline-flex items-center space-x-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-brand-50 border border-brand-200 text-xs font-semibold text-brand-900 group">
+                        <span>{{ top }}</span>
+                        <button
+                          type="button"
+                          (click)="removeTopic(top)"
+                          class="w-4 h-4 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-100 transition-colors"
+                          [title]="'Remove ' + top"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    }
+                    <button
+                      type="button"
+                      (click)="clearTopicFilter()"
+                      class="text-[11px] font-semibold text-slate-400 hover:text-rose-600 ml-auto transition-colors"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                }
 
                 <!-- Search Input with Dropdown Combobox -->
                 <div class="relative">
@@ -294,17 +328,17 @@ import confetti from 'canvas-confetti';
                       (focus)="isTopicDropdownOpen.set(true)"
                       (keydown.enter)="onSearchEnterKey($event)"
                       (keydown.escape)="isTopicDropdownOpen.set(false)"
-                      placeholder="Search topics (e.g. Percentage, Syllogisms, Profit & Loss)..."
+                      placeholder="Search & add topics (e.g. Percentage, Profit & Loss, Syllogisms)..."
                       class="w-full text-xs font-semibold rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-20 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-2xs transition-all"
                     />
 
                     <div class="absolute right-2 flex items-center space-x-1">
-                      @if (topicSearchQuery() || selectedTopicName()) {
+                      @if (topicSearchQuery()) {
                         <button
                           type="button"
-                          (click)="clearTopicFilter()"
+                          (click)="topicSearchQuery.set('')"
                           class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-slate-100 transition-colors"
-                          title="Clear topic search"
+                          title="Clear input text"
                         >
                           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -325,24 +359,6 @@ import confetti from 'canvas-confetti';
                     </div>
                   </div>
 
-                  <!-- Active Topic Selected Badge -->
-                  @if (selectedTopicName()) {
-                    <div class="mt-2 flex items-center justify-between p-2 rounded-lg bg-brand-50 border border-brand-200 text-xs animate-in fade-in duration-150">
-                      <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
-                        <span class="text-slate-500 text-[11px]">Selected Chapter:</span>
-                        <span class="font-bold text-brand-800">{{ selectedTopicName() }}</span>
-                      </div>
-                      <button
-                        type="button"
-                        (click)="clearTopicFilter()"
-                        class="text-[11px] font-bold text-brand-700 hover:text-rose-600 underline"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  }
-
                   <!-- Dropdown List for Matching Topics -->
                   @if (isTopicDropdownOpen()) {
                     <div
@@ -351,28 +367,32 @@ import confetti from 'canvas-confetti';
                     ></div>
 
                     <div class="absolute left-0 right-0 top-full mt-1.5 z-30 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl space-y-0.5 text-xs animate-in fade-in duration-150">
-                      <!-- All Topics Option -->
+                      <!-- All Topics / Reset Option -->
                       <button
                         type="button"
-                        (click)="selectTopic('')"
+                        (click)="clearTopicFilter()"
                         class="w-full text-left px-3 py-2 rounded-lg font-semibold flex items-center justify-between hover:bg-slate-50 transition-colors"
-                        [ngClass]="!selectedTopicName() ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-600'"
+                        [ngClass]="selectedTopicNames().length === 0 ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-600'"
                       >
                         <span>-- All Topics (Mixed {{ selectedSubjectId() === 'all' ? 'All Subjects' : 'Subject' }}) --</span>
-                        @if (!selectedTopicName()) {
+                        @if (selectedTopicNames().length === 0) {
                           <span class="text-emerald-600 text-xs font-bold">✓ Active</span>
                         }
                       </button>
 
-                      <!-- Filtered Topic Matches -->
+                      <!-- Filtered Topic Matches with Checkbox Status -->
                       @for (top of filteredTopics(); track top.id) {
                         <button
                           type="button"
-                          (click)="selectTopic(top.name)"
+                          (click)="toggleTopic(top.name)"
                           class="w-full text-left px-3 py-2 rounded-lg flex items-center justify-between hover:bg-brand-50/70 transition-colors group"
-                          [ngClass]="selectedTopicName().toLowerCase() === top.name.toLowerCase() ? 'bg-brand-50 text-brand-900 font-bold' : 'text-slate-700'"
+                          [ngClass]="isTopicSelected(top.name) ? 'bg-brand-50 text-brand-900 font-bold' : 'text-slate-700'"
                         >
                           <div class="flex items-center space-x-2 min-w-0">
+                            <span class="w-4 h-4 rounded flex items-center justify-center border text-[10px]"
+                              [ngClass]="isTopicSelected(top.name) ? 'bg-brand-600 text-white border-brand-600' : 'bg-white border-slate-300 text-transparent'">
+                              ✓
+                            </span>
                             <span class="truncate font-medium">{{ top.name }}</span>
                             @if (getSubjectNameForTopic(top)) {
                               <span class="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-700 transition-colors">
@@ -380,8 +400,8 @@ import confetti from 'canvas-confetti';
                               </span>
                             }
                           </div>
-                          @if (selectedTopicName().toLowerCase() === top.name.toLowerCase()) {
-                            <span class="text-brand-600 text-xs font-bold">✓</span>
+                          @if (isTopicSelected(top.name)) {
+                            <span class="text-brand-600 text-[11px] font-bold">Selected</span>
                           }
                         </button>
                       }
@@ -395,7 +415,7 @@ import confetti from 'canvas-confetti';
                         >
                           <div class="flex items-center space-x-2">
                             <span>✨</span>
-                            <span>Target chapter: <strong class="underline font-bold">"{{ topicSearchQuery().trim() }}"</strong></span>
+                            <span>Add chapter: <strong class="underline font-bold">"{{ topicSearchQuery().trim() }}"</strong></span>
                           </div>
                           <span class="text-[10px] uppercase font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-indigo-200">Press Enter ↵</span>
                         </button>
@@ -410,10 +430,10 @@ import confetti from 'canvas-confetti';
                   }
                 </div>
 
-                <!-- Quick Selection Topic Pills -->
+                <!-- Quick Selection Topic Pills (Toggleable) -->
                 <div>
                   <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[10px] uppercase font-bold text-slate-400">Quick Select Chapters:</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Quick Select Chapters (Tap to toggle):</span>
                     @if (filteredPopularSuggestions().length > 0 && topicSearchQuery().trim()) {
                       <span class="text-[10px] text-brand-600 font-semibold">{{ filteredPopularSuggestions().length }} matching shortcuts</span>
                     }
@@ -422,11 +442,14 @@ import confetti from 'canvas-confetti';
                     @for (topName of filteredPopularSuggestions(); track topName) {
                       <button
                         type="button"
-                        (click)="selectTopicPill(topName)"
-                        class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border"
-                        [ngClass]="selectedTopicName().toLowerCase() === topName.toLowerCase() ? 'bg-brand-600 text-white border-brand-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-brand-300 hover:bg-brand-50/50'"
+                        (click)="toggleTopic(topName)"
+                        class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border inline-flex items-center space-x-1"
+                        [ngClass]="isTopicSelected(topName) ? 'bg-brand-600 text-white border-brand-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-brand-300 hover:bg-brand-50/50'"
                       >
-                        {{ topName }}
+                        @if (isTopicSelected(topName)) {
+                          <span class="text-[10px]">✓</span>
+                        }
+                        <span>{{ topName }}</span>
                       </button>
                     }
                   </div>
@@ -663,7 +686,8 @@ export class QuizzesComponent implements OnInit {
 
   // Builder configuration
   public selectedSubjectId = signal<string>('all');
-  public selectedTopicName = signal<string>('');
+  public selectedTopicNames = signal<string[]>([]);
+  public selectedTopicName = computed(() => this.selectedTopicNames().join(', '));
   public questionCount = signal<number>(5);
   public aiPowered = signal<boolean>(this.quizService.aiConfig.getAiDefaultToggleState());
   public selectedDifficulty = signal<'easy' | 'medium' | 'hard' | 'mixed'>('mixed');
@@ -772,8 +796,7 @@ export class QuizzesComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['topicName']) {
         const topName = params['topicName'];
-        this.selectedTopicName.set(topName);
-        this.topicSearchQuery.set(topName);
+        this.selectedTopicNames.set([topName]);
         this.activeTab.set('builder');
         const matched = allTopics.find(t => t.name.toLowerCase() === topName.toLowerCase());
         if (matched) {
@@ -790,12 +813,37 @@ export class QuizzesComponent implements OnInit {
     return sub ? sub.name : '';
   }
 
+  public isTopicSelected(topicName: string): boolean {
+    if (!topicName) return false;
+    const lower = topicName.trim().toLowerCase();
+    return this.selectedTopicNames().some(t => t.toLowerCase() === lower);
+  }
+
+  public toggleTopic(topicName: string): void {
+    const trimmed = topicName.trim();
+    if (!trimmed) return;
+    const lower = trimmed.toLowerCase();
+    const current = this.selectedTopicNames();
+    const exists = current.some(t => t.toLowerCase() === lower);
+    if (exists) {
+      this.selectedTopicNames.set(current.filter(t => t.toLowerCase() !== lower));
+    } else {
+      this.selectedTopicNames.set([...current, trimmed]);
+      const matched = this.topics().find(t => t.name.toLowerCase() === lower);
+      if (matched && this.selectedSubjectId() === 'all' && current.length === 0) {
+        this.selectedSubjectId.set(matched.subject_id);
+      }
+    }
+  }
+
+  public removeTopic(topicName: string): void {
+    const lower = topicName.trim().toLowerCase();
+    this.selectedTopicNames.update(list => list.filter(t => t.toLowerCase() !== lower));
+  }
+
   public onSearchInputChange(query: string): void {
     this.topicSearchQuery.set(query);
     this.isTopicDropdownOpen.set(true);
-    if (!query.trim()) {
-      this.selectedTopicName.set('');
-    }
   }
 
   public toggleTopicDropdown(): void {
@@ -806,40 +854,33 @@ export class QuizzesComponent implements OnInit {
     event.preventDefault();
     const q = this.topicSearchQuery().trim();
     if (!q) {
-      this.clearTopicFilter();
       return;
     }
     const matches = this.filteredTopics();
     if (matches.length > 0) {
       const exact = matches.find(m => m.name.toLowerCase() === q.toLowerCase());
-      this.selectTopic(exact ? exact.name : matches[0].name);
+      this.toggleTopic(exact ? exact.name : matches[0].name);
     } else {
-      this.selectTopic(q);
+      this.toggleTopic(q);
     }
+    this.topicSearchQuery.set('');
   }
 
   public selectTopic(topicName: string): void {
-    this.selectedTopicName.set(topicName);
-    this.topicSearchQuery.set(topicName);
-    this.isTopicDropdownOpen.set(false);
-    if (topicName) {
-      const matched = this.topics().find(t => t.name.toLowerCase() === topicName.toLowerCase());
-      if (matched && this.selectedSubjectId() === 'all') {
-        this.selectedSubjectId.set(matched.subject_id);
-      }
-    }
-  }
-
-  public selectTopicPill(topicName: string): void {
-    if (this.selectedTopicName().toLowerCase() === topicName.toLowerCase()) {
+    if (!topicName) {
       this.clearTopicFilter();
       return;
     }
-    this.selectTopic(topicName);
+    this.toggleTopic(topicName);
+    this.topicSearchQuery.set('');
+  }
+
+  public selectTopicPill(topicName: string): void {
+    this.toggleTopic(topicName);
   }
 
   public clearTopicFilter(): void {
-    this.selectedTopicName.set('');
+    this.selectedTopicNames.set([]);
     this.topicSearchQuery.set('');
     this.isTopicDropdownOpen.set(false);
   }
@@ -850,9 +891,10 @@ export class QuizzesComponent implements OnInit {
     
     this.isGeneratingQuestions.set(true);
     try {
+      const topicFilter = this.selectedTopicNames().length > 0 ? this.selectedTopicNames() : undefined;
       const questions = await this.quizService.getQuestions(
         subFilter,
-        this.selectedTopicName() || undefined,
+        topicFilter,
         this.questionCount(),
         this.selectedDifficulty(),
         this.aiPowered()

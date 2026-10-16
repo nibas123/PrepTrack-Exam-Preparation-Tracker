@@ -8,7 +8,7 @@ import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Subject, Topic } from '../../core/models/database.types';
 
-describe('QuizzesComponent - Topic Search Functionality', () => {
+describe('QuizzesComponent - Multi-Topic Search & Selection Functionality', () => {
   let component: QuizzesComponent;
   let fixture: ComponentFixture<QuizzesComponent>;
 
@@ -27,19 +27,22 @@ describe('QuizzesComponent - Topic Search Functionality', () => {
     { id: 'top-6', user_id: 'user-1', subject_id: 'sub-eng', name: 'Reading Comprehension', priority: 'high', learning_status: 'learning', display_order: 1 }
   ];
 
-  const mockDataStorage = {
-    getSubjects: vi.fn().mockResolvedValue(mockSubjects),
-    getTopics: vi.fn().mockResolvedValue(mockTopics)
-  };
-
   const mockQuizService = {
     getPreviousPapers: vi.fn().mockResolvedValue([]),
     getQuizAttempts: vi.fn().mockResolvedValue([]),
-    getQuestions: vi.fn().mockResolvedValue([]),
+    getQuestions: vi.fn().mockResolvedValue([
+      { id: 'q-1', question_text: 'Test Q1', options: ['A', 'B', 'C', 'D'], correct_option_index: 0, topic_name: 'Percentage' }
+    ]),
+    deduplicateQuestions: vi.fn().mockImplementation((qs) => qs),
     saveQuizAttempt: vi.fn().mockResolvedValue({ id: 'att-1' }),
     aiConfig: {
       getAiDefaultToggleState: vi.fn().mockReturnValue(false)
     }
+  };
+
+  const mockDataStorage = {
+    getSubjects: vi.fn().mockResolvedValue(mockSubjects),
+    getTopics: vi.fn().mockResolvedValue(mockTopics)
   };
 
   const mockToast = {
@@ -50,6 +53,7 @@ describe('QuizzesComponent - Topic Search Functionality', () => {
   };
 
   beforeEach(async () => {
+    vi.clearAllMocks();
     await TestBed.configureTestingModule({
       imports: [QuizzesComponent],
       providers: [
@@ -68,16 +72,17 @@ describe('QuizzesComponent - Topic Search Functionality', () => {
     fixture = TestBed.createComponent(QuizzesComponent);
     component = fixture.componentInstance;
     component.selectedSubjectId.set('all');
-    component.selectedTopicName.set('');
+    component.selectedTopicNames.set([]);
     component.topicSearchQuery.set('');
     await component.ngOnInit();
     fixture.detectChanges();
   });
 
-  it('should initialize and load subjects and topics', () => {
+  it('should initialize with empty selected topics list', () => {
     expect(component).toBeTruthy();
     expect(component.subjects().length).toBe(3);
     expect(component.topics().length).toBe(6);
+    expect(component.selectedTopicNames()).toEqual([]);
     expect(component.selectedTopicName()).toBe('');
     expect(component.topicSearchQuery()).toBe('');
   });
@@ -101,64 +106,87 @@ describe('QuizzesComponent - Topic Search Functionality', () => {
     expect(filtered.map(t => t.name)).toEqual(['Syllogisms', 'Coding-Decoding']);
   });
 
-  it('should select topic when clicked and auto-sync subject if on all subjects', () => {
-    component.selectTopic('Coding-Decoding');
+  it('should support selecting multiple topics and report isTopicSelected correctly', () => {
+    component.toggleTopic('Percentage');
+    component.toggleTopic('Profit & Loss');
 
-    expect(component.selectedTopicName()).toBe('Coding-Decoding');
-    expect(component.topicSearchQuery()).toBe('Coding-Decoding');
-    expect(component.isTopicDropdownOpen()).toBe(false);
-    expect(component.selectedSubjectId()).toBe('sub-reas');
+    expect(component.selectedTopicNames()).toEqual(['Percentage', 'Profit & Loss']);
+    expect(component.selectedTopicName()).toBe('Percentage, Profit & Loss');
+    expect(component.isTopicSelected('Percentage')).toBe(true);
+    expect(component.isTopicSelected('Profit & Loss')).toBe(true);
+    expect(component.isTopicSelected('Syllogisms')).toBe(false);
   });
 
-  it('should toggle quick select pills and support clearing', () => {
-    component.selectTopicPill('Syllogisms');
-    expect(component.selectedTopicName()).toBe('Syllogisms');
+  it('should remove specific topic chip when removeTopic is called', () => {
+    component.toggleTopic('Percentage');
+    component.toggleTopic('Profit & Loss');
+    component.toggleTopic('Syllogisms');
 
-    // Clicking again deselects/clears
-    component.selectTopicPill('Syllogisms');
-    expect(component.selectedTopicName()).toBe('');
-    expect(component.topicSearchQuery()).toBe('');
+    expect(component.selectedTopicNames().length).toBe(3);
+
+    component.removeTopic('Profit & Loss');
+    expect(component.selectedTopicNames()).toEqual(['Percentage', 'Syllogisms']);
+    expect(component.isTopicSelected('Profit & Loss')).toBe(false);
   });
 
-  it('should clear topic filter completely', () => {
-    component.selectTopic('Percentage');
-    expect(component.selectedTopicName()).toBe('Percentage');
+  it('should toggle quick select pills and allow multi-selection', () => {
+    component.selectTopicPill('Syllogisms');
+    expect(component.selectedTopicNames()).toEqual(['Syllogisms']);
+
+    // Select second pill
+    component.selectTopicPill('Coding-Decoding');
+    expect(component.selectedTopicNames()).toEqual(['Syllogisms', 'Coding-Decoding']);
+
+    // Tapping first pill again deselects it
+    component.selectTopicPill('Syllogisms');
+    expect(component.selectedTopicNames()).toEqual(['Coding-Decoding']);
+  });
+
+  it('should clear all selected topics with clearTopicFilter()', () => {
+    component.toggleTopic('Percentage');
+    component.toggleTopic('Syllogisms');
+    expect(component.selectedTopicNames().length).toBe(2);
 
     component.clearTopicFilter();
+    expect(component.selectedTopicNames()).toEqual([]);
     expect(component.selectedTopicName()).toBe('');
     expect(component.topicSearchQuery()).toBe('');
     expect(component.isTopicDropdownOpen()).toBe(false);
   });
 
-  it('should support custom topic if query does not match any syllabus topics', () => {
+  it('should support adding custom topic through search enter key', () => {
     component.onSearchInputChange('Quadratic Inequalities');
-
     expect(component.isCustomTopicAvailable()).toBe(true);
 
-    // Press Enter to select custom topic
     const mockEvent = { preventDefault: vi.fn() } as unknown as Event;
     component.onSearchEnterKey(mockEvent);
 
-    expect(component.selectedTopicName()).toBe('Quadratic Inequalities');
-    expect(component.topicSearchQuery()).toBe('Quadratic Inequalities');
-    expect(component.isTopicDropdownOpen()).toBe(false);
+    expect(component.selectedTopicNames()).toContain('Quadratic Inequalities');
+    expect(component.topicSearchQuery()).toBe(''); // Cleared for next entry
   });
 
-  it('should select first matching topic when pressing Enter on partial query', () => {
+  it('should add first matching topic when pressing Enter on partial query', () => {
     component.onSearchInputChange('inter');
 
     const mockEvent = { preventDefault: vi.fn() } as unknown as Event;
     component.onSearchEnterKey(mockEvent);
 
-    expect(component.selectedTopicName()).toBe('Simple & Compound Interest');
+    expect(component.selectedTopicNames()).toContain('Simple & Compound Interest');
+    expect(component.topicSearchQuery()).toBe('');
   });
 
-  it('should filter popular suggestions when searching', () => {
-    component.selectedSubjectId.set('all');
-    component.onSearchInputChange('Coding');
-    const filteredSuggestions = component.filteredPopularSuggestions();
+  it('should pass array of selected topics to quizService.getQuestions on startQuiz', async () => {
+    component.toggleTopic('Percentage');
+    component.toggleTopic('Profit & Loss');
 
-    expect(filteredSuggestions).toContain('Coding-Decoding');
-    expect(filteredSuggestions.length).toBe(1);
+    await component.startQuiz();
+
+    expect(mockQuizService.getQuestions).toHaveBeenCalledWith(
+      'Quantitative Aptitude',
+      ['Percentage', 'Profit & Loss'],
+      5,
+      'mixed',
+      false
+    );
   });
 });

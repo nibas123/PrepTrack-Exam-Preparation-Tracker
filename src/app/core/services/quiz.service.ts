@@ -625,7 +625,7 @@ export class QuizService {
   // --- GEMINI AI QUESTION GENERATION ---
   async generateGeminiQuestions(
     subjectFilter?: string,
-    topicFilter?: string,
+    topicFilter?: string | string[],
     count: number = 5,
     difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed'
   ): Promise<QuizQuestion[]> {
@@ -645,8 +645,15 @@ export class QuizService {
       return this.getFallbackQuestions(subjectFilter, topicFilter, count);
     }
 
+    const topicNames = Array.isArray(topicFilter)
+      ? topicFilter.map(t => t.trim()).filter(Boolean)
+      : (topicFilter ? topicFilter.split(',').map(t => t.trim()).filter(Boolean) : []);
+    const topicSummary = topicNames.join(', ') || undefined;
+
     const subjectContext = subjectFilter && subjectFilter !== 'all' ? subjectFilter : 'Indian Banking Exams (Quantitative Aptitude, Reasoning, English Language, General Awareness, Computer Aptitude)';
-    const topicContext = topicFilter ? `Topic: ${topicFilter}` : 'Mixed exam syllabus topics';
+    const topicContext = topicNames.length > 1
+      ? `Target Topics (${topicNames.length}): ${topicNames.join(', ')}. You MUST generate questions distributed across all these topics (${topicNames.join(', ')}).`
+      : (topicNames.length === 1 ? `Topic: ${topicNames[0]}` : 'Mixed exam syllabus topics');
     const difficultyGuide = difficulty === 'mixed'
       ? 'Include a balanced mix of Easy (30%), Medium (50%), and Hard (20%) questions.'
       : `All questions must strictly be of ${difficulty.toUpperCase()} difficulty level.`;
@@ -677,7 +684,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     "correct_option_index": 0,
     "explanation": "Detailed step-by-step solution here",
     "difficulty": "${difficulty === 'mixed' ? 'medium' : difficulty}",
-    "topic_name": "${topicFilter || 'Banking Exam Prep'}"
+    "topic_name": "${topicSummary || 'Banking Exam Prep'}"
   }
 ]`;
 
@@ -708,7 +715,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           this.aiConfig.recordAiUsage({
             model,
             keyUsed: keyType,
-            topic: topicFilter,
+            topic: topicSummary,
             subject: subjectFilter,
             questionsCount: 0,
             tokensUsed: 0,
@@ -740,7 +747,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => ({
             id: `gemini-${Date.now()}-${idx}`,
             subject_id: subjectFilter || 'sub-ai',
-            topic_name: q.topic_name || topicFilter || 'AI Practice',
+            topic_name: q.topic_name || topicSummary || 'AI Practice',
             question_text: q.question_text || q.question || '',
             options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['A', 'B', 'C', 'D'],
             correct_option_index: typeof q.correct_option_index === 'number' && q.correct_option_index >= 0 && q.correct_option_index <= 3 ? q.correct_option_index : 0,
@@ -758,7 +765,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           this.aiConfig.recordAiUsage({
             model,
             keyUsed: keyType,
-            topic: topicFilter,
+            topic: topicSummary,
             subject: subjectFilter,
             questionsCount: formattedQuestions.length,
             tokensUsed: totalTokens,
@@ -778,7 +785,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
         this.aiConfig.recordAiUsage({
           model,
           keyUsed: keyType,
-          topic: topicFilter,
+          topic: topicSummary,
           subject: subjectFilter,
           questionsCount: 0,
           tokensUsed: 0,
@@ -905,7 +912,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
    */
   async getQuestions(
     subjectFilter?: string,
-    topicFilter?: string,
+    topicFilter?: string | string[],
     count: number = 5,
     difficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'mixed',
     useAi: boolean = true
@@ -914,10 +921,15 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     const filter = (subjectFilter || '').toLowerCase();
     const now = Date.now();
 
+    const topicsList = Array.isArray(topicFilter)
+      ? topicFilter.map(t => t.trim().toLowerCase()).filter(Boolean)
+      : (topicFilter ? topicFilter.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : []);
+
     // Matching questions from stored bank
     const matching = bank.filter(q => {
       const matchSub = !filter || filter === 'all' || q.subject_id?.toLowerCase().includes(filter);
-      const matchTopic = !topicFilter || (q.topic_name && q.topic_name.toLowerCase().includes(topicFilter.toLowerCase()));
+      const qTop = (q.topic_name || '').toLowerCase();
+      const matchTopic = topicsList.length === 0 || topicsList.some(t => qTop.includes(t));
       const matchDiff = difficulty === 'mixed' || !q.difficulty || q.difficulty === difficulty;
       return matchSub && matchTopic && matchDiff;
     });
@@ -1001,20 +1013,32 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     return this.shuffle(unique).slice(0, count);
   }
 
-  public getFallbackQuestions(subjectFilter?: string, topicFilter?: string, count: number = 5): QuizQuestion[] {
-    if (topicFilter && topicFilter.trim()) {
-      const topicQuestions = this.patternEngine.generateQuizQuestionsForTopic(topicFilter, subjectFilter, count);
-      if (topicQuestions && topicQuestions.length > 0) {
-        return this.deduplicateQuestions(topicQuestions).slice(0, count);
+  public getFallbackQuestions(subjectFilter?: string, topicFilter?: string | string[], count: number = 5): QuizQuestion[] {
+    const topicsList = Array.isArray(topicFilter)
+      ? topicFilter.map(t => t.trim()).filter(Boolean)
+      : (topicFilter ? topicFilter.split(',').map(t => t.trim()).filter(Boolean) : []);
+
+    if (topicsList.length > 0) {
+      const perTopicCount = Math.max(1, Math.ceil(count / topicsList.length));
+      const topicQuestions: QuizQuestion[] = [];
+      for (const singleTopic of topicsList) {
+        const batch = this.patternEngine.generateQuizQuestionsForTopic(singleTopic, subjectFilter, perTopicCount);
+        if (batch && batch.length > 0) {
+          topicQuestions.push(...batch);
+        }
+      }
+      if (topicQuestions.length > 0) {
+        return this.deduplicateQuestions(this.shuffle(topicQuestions)).slice(0, count);
       }
     }
 
     let pool: QuizQuestion[] = [];
     const filter = (subjectFilter || '').toLowerCase();
+    const primaryTopic = topicsList[0] || undefined;
 
     // Check if filter matches Quant or is empty
     if (!filter || filter.includes('quant') || filter.includes('aptitude') || filter.includes('sub-quant')) {
-      pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 15), topicFilter));
+      pool = pool.concat(this.generateDynamicQuantQuestions(Math.max(count, 15), primaryTopic));
     }
     // Check if filter matches Reasoning or is empty
     if (!filter || filter.includes('reas') || filter.includes('reasoning') || filter.includes('sub-reasoning')) {
@@ -1035,12 +1059,16 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
     // If still empty (e.g. custom subject UUID), generate quant questions as guaranteed baseline
     if (pool.length === 0) {
-      pool = pool.concat(this.generateDynamicQuantQuestions(count, topicFilter));
+      pool = pool.concat(this.generateDynamicQuantQuestions(count, primaryTopic));
       pool = pool.concat(this.getReasoningQuestionPool());
     }
 
-    if (topicFilter) {
-      const topicMatches = pool.filter(q => q.topic_name?.toLowerCase().includes(topicFilter.toLowerCase()));
+    if (topicsList.length > 0) {
+      const lowerTopics = topicsList.map(t => t.toLowerCase());
+      const topicMatches = pool.filter(q => {
+        const qTop = (q.topic_name || '').toLowerCase();
+        return lowerTopics.some(t => qTop.includes(t));
+      });
       if (topicMatches.length > 0) {
         const uniqueTopicMatches = this.deduplicateQuestions(topicMatches);
         if (uniqueTopicMatches.length >= count) {
@@ -1055,7 +1083,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
     const uniquePool = this.deduplicateQuestions(pool);
     if (uniquePool.length < count) {
-      const extraDynamic = this.generateDynamicQuantQuestions(count - uniquePool.length, topicFilter);
+      const extraDynamic = this.generateDynamicQuantQuestions(count - uniquePool.length, primaryTopic);
       return this.deduplicateQuestions([...uniquePool, ...extraDynamic]).slice(0, count);
     }
 
