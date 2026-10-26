@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./src/**/*.{html,ts}",
   ],
@@ -7,36 +8,49 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb', // primary bank accent
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#f2f6f9',
+          100: '#e3ebf2',
+          200: '#cad9e6',
+          300: '#a3bfd4',
+          400: '#759ebe',
+          500: '#4e7fa8',
+          600: '#35658e',
+          700: '#2a5073',
+          800: '#1b3a57',
+          900: '#0f2942', // primary deep Oxford navy
+          950: '#091827',
+        },
+        court: {
+          50: '#fbf8f3',
+          100: '#f5eee1',
+          200: '#e9dac1',
+          300: '#d9be97',
+          400: '#c59d6a',
+          500: '#a97f47',
+          600: '#8c6333', // regal judicial bronze
+          700: '#704c26',
+          800: '#56381c',
+          900: '#3d2512',
+          950: '#231308',
         },
         success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
+          50: '#f2f9f5',
+          100: '#e1f2e8',
+          500: '#2e935a',
+          600: '#1e7542',
+          700: '#165c34',
         },
         warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          500: '#f59e0b',
-          600: '#d97706',
+          50: '#fdf9ee',
+          100: '#faefd4',
+          500: '#c2891d',
+          600: '#9e6d0e',
         },
         danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          500: '#ef4444',
-          600: '#dc2626',
+          50: '#fdf3f3',
+          100: '#fae3e3',
+          500: '#d93838',
+          600: '#b92424',
         }
       },
       fontFamily: {

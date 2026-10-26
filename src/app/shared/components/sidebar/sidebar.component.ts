@@ -1,8 +1,9 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PwaService } from '../../../core/services/pwa.service';
+import { ExamTrackService } from '../../../core/services/exam-track.service';
 
 interface NavItem {
   label: string;
@@ -32,15 +33,23 @@ interface NavItem {
       <!-- Brand Header -->
       <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100">
         <a routerLink="/dashboard" class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-            <!-- Bank Building / Trophy Icon -->
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xs"
+               [ngClass]="examTrack.isKeralaHca() ? 'bg-court-700' : 'bg-brand-900'">
+            @if (examTrack.isKeralaHca()) {
+              <svg class="w-5 h-5 text-amber-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+            } @else {
+              <svg class="w-5 h-5 text-slate-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            }
           </div>
           <div>
-            <span class="text-lg font-bold tracking-tight text-slate-900">Prep<span class="text-brand-600">Track</span></span>
-            <span class="block text-[10px] font-medium uppercase tracking-wider text-slate-400">Bank Exam Suite</span>
+            <span class="text-base font-bold tracking-tight text-slate-900">Prep<span [ngClass]="examTrack.isKeralaHca() ? 'text-court-700' : 'text-brand-900'">Track</span></span>
+            <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {{ examTrack.isKeralaHca() ? 'Kerala High Court' : (examTrack.isBank() ? 'Bank Exam Suite' : 'Multi-Exam Suite') }}
+            </span>
           </div>
         </a>
 
@@ -58,48 +67,32 @@ interface NavItem {
 
       <!-- Navigation Links -->
       <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        @for (item of navItems; track item.route) {
+        @for (item of filteredNavItems(); track item.route) {
           <a
             [routerLink]="item.route"
-            routerLinkActive="bg-brand-50 text-brand-700 font-semibold shadow-xs"
+            routerLinkActive="bg-slate-100 text-slate-900 font-semibold shadow-2xs border-l-2 border-brand-900"
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             (click)="closeMobile.emit()"
             class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors group"
           >
             <span
-              class="w-5 h-5 flex items-center justify-center text-slate-400 group-hover:text-slate-600 group-[.bg-brand-50]:text-brand-600"
+              class="w-5 h-5 flex items-center justify-center text-slate-400 group-hover:text-slate-700 group-[.font-semibold]:text-brand-900"
               [innerHTML]="item.iconSvg"
             ></span>
             <span>{{ item.label }}</span>
           </a>
-        }
-
-        <!-- PWA Install Button in Sidebar -->
-        @if (pwaService.canInstall() && !pwaService.isInstalled()) {
-          <div class="pt-3 pb-1">
-            <button
-              type="button"
-              (click)="pwaService.promptInstall()"
-              class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 transition-colors shadow-xs"
-            >
-              <svg class="w-4 h-4 text-brand-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Install App</span>
-            </button>
-          </div>
         }
       </nav>
 
       <!-- User footer -->
       <div class="p-4 border-t border-slate-100 bg-slate-50/50">
         <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-full bg-brand-100 border border-brand-200 text-brand-700 font-bold flex items-center justify-center text-sm shadow-xs">
+          <div class="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 text-slate-800 font-bold flex items-center justify-center text-sm shadow-2xs">
             {{ userInitial }}
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-xs font-semibold text-slate-800 truncate">
-              {{ authService.currentProfile()?.display_name || authService.currentUser()?.email || 'Bank Aspirant' }}
+              {{ authService.currentProfile()?.display_name || authService.currentUser()?.email || 'Aspirant' }}
             </p>
             <p class="text-[11px] text-slate-500">
               Target: {{ authService.currentProfile()?.daily_target_hours || 4 }} hrs/day
@@ -122,6 +115,7 @@ interface NavItem {
 export class SidebarComponent {
   public authService = inject(AuthService);
   public pwaService = inject(PwaService);
+  public examTrack = inject(ExamTrackService);
   public mobileOpen = input<boolean>(false);
   public closeMobile = output<void>();
 
@@ -130,6 +124,23 @@ export class SidebarComponent {
     return name.charAt(0).toUpperCase();
   }
 
+  public filteredNavItems = computed(() => {
+    const isAdmin = this.authService.isAdmin();
+    const isBank = this.examTrack.isBank();
+
+    return this.navItems.filter(item => {
+      // Admin Console visible ONLY to nibasnazeem@gmail.com
+      if (item.route === '/admin' && !isAdmin) {
+        return false;
+      }
+      // When Bank track is active, completely hide Kerala High Court
+      if (item.route === '/kerala-high-court' && isBank) {
+        return false;
+      }
+      return true;
+    });
+  });
+
   readonly navItems: NavItem[] = [
     {
       label: 'Dashboard',
@@ -137,9 +148,29 @@ export class SidebarComponent {
       iconSvg: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>`
     },
     {
+      label: 'Kerala High Court (HCA)',
+      route: '/kerala-high-court',
+      iconSvg: `<svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>`
+    },
+    {
+      label: 'Study Library',
+      route: '/study-library',
+      iconSvg: `<svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`
+    },
+    {
+      label: 'Descriptive Lab',
+      route: '/descriptive-lab',
+      iconSvg: `<svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>`
+    },
+    {
+      label: 'Smart Revision',
+      route: '/revision',
+      iconSvg: `<svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`
+    },
+    {
       label: 'My Syllabus',
       route: '/syllabus',
-      iconSvg: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>`
+      iconSvg: `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`
     },
     {
       label: 'Daily Goals',

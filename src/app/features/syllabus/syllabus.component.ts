@@ -11,6 +11,7 @@ import {
   LearningStatus,
   ExamStage,
 } from '../../core/models/database.types';
+import { ExamTrackService } from '../../core/services/exam-track.service';
 import confetti from 'canvas-confetti';
 
 @Component({
@@ -24,32 +25,36 @@ import confetti from 'canvas-confetti';
         <div>
           <div class="flex items-center space-x-2.5">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">Syllabus Tracker</h2>
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-100">
-              {{ selectedStage() | uppercase }}
+            <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              {{ trackService.isKeralaHca() ? (selectedStage() === 'prelims' ? 'Objective Test' : 'Descriptive Test') : (selectedStage() | uppercase) }}
             </span>
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">Master topics systematically for Indian Bank Prelims & Mains</p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            {{ trackService.isKeralaHca() 
+              ? 'High Court of Kerala Assistant syllabus: General English, GK, Basic Math & Descriptive Paper' 
+              : 'Master Quantitative Aptitude, Reasoning, English, GA, and Computer topics for Banking exams' }}
+          </p>
         </div>
 
         <!-- Right: Actions & Stage Toggle -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
           <!-- Stage Switcher -->
-          <div class="inline-flex w-full sm:w-auto p-1 bg-slate-100/90 rounded-xl border border-slate-200/60">
+          <div class="inline-flex w-full sm:w-auto p-1 bg-slate-100 rounded-lg border border-slate-200/80">
             <button
               type="button"
               (click)="selectStage('prelims')"
-              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-center"
-              [ngClass]="selectedStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all text-center"
+              [ngClass]="selectedStage() === 'prelims' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'"
             >
-              Prelims (3 Sub)
+              {{ trackService.isKeralaHca() ? 'Part A: Objective (100 M)' : 'Stage I / Prelims' }}
             </button>
             <button
               type="button"
               (click)="selectStage('mains')"
-              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-center"
-              [ngClass]="selectedStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              class="flex-1 sm:flex-initial px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all text-center"
+              [ngClass]="selectedStage() === 'mains' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'"
             >
-              Mains (5 Sub)
+              {{ trackService.isKeralaHca() ? 'Part B: Descriptive (60 M)' : 'Stage II / Mains' }}
             </button>
           </div>
 
@@ -66,6 +71,36 @@ import confetti from 'canvas-confetti';
           </button>
         </div>
       </div>
+
+      <!-- Multi-Exam Category Filter Pills (ONLY when track is 'all') -->
+      @if (trackService.isAll()) {
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            type="button"
+            (click)="setExamCategoryFilter('all')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer"
+            [ngClass]="examCategoryFilter() === 'all' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
+          >
+            <span>All Subjects ({{ allSubjects().length }})</span>
+          </button>
+          <button
+            type="button"
+            (click)="setExamCategoryFilter('bank')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer"
+            [ngClass]="examCategoryFilter() === 'bank' ? 'bg-brand-900 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
+          >
+            <span>Bank Exam Subjects</span>
+          </button>
+          <button
+            type="button"
+            (click)="setExamCategoryFilter('kerala_hca')"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer"
+            [ngClass]="examCategoryFilter() === 'kerala_hca' ? 'bg-court-700 text-white shadow-2xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'"
+          >
+            <span>Kerala High Court Assistant</span>
+          </button>
+        </div>
+      }
 
       <!-- Stage Mastery Meter Banner (Clean & Spacious) -->
       <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -456,11 +491,13 @@ import confetti from 'canvas-confetti';
 export class SyllabusComponent implements OnInit {
   private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
+  public trackService = inject(ExamTrackService);
 
   public allTopics = signal<Topic[]>([]);
   public allSubjects = signal<Subject[]>([]);
   public examSubjects = signal<ExamSubject[]>([]);
 
+  public examCategoryFilter = signal<'all' | 'bank' | 'kerala_hca'>('all');
   public selectedStage = signal<ExamStage>('prelims');
   public activeSubjectId = signal<string>('');
   public statusFilter = signal<string>('all');
@@ -483,15 +520,42 @@ export class SyllabusComponent implements OnInit {
     color: '#0891b2'
   };
 
-  // Subjects available for current stage
+  // Subjects available for current stage & track
   public stageSubjects = computed(() => {
-    const stage = this.selectedStage();
     const subs = this.allSubjects();
+    const activeTrack = this.trackService.activeTrack();
+    const track = activeTrack === 'all' ? this.examCategoryFilter() : activeTrack;
+    let trackSubs = subs;
+    if (track === 'bank') {
+      trackSubs = subs.filter(s => !s.name.toLowerCase().includes('kerala') && !s.name.toLowerCase().includes('hca'));
+    } else if (track === 'kerala_hca') {
+      trackSubs = subs.filter(s => s.name.toLowerCase().includes('kerala') || s.name.toLowerCase().includes('hca'));
+    }
+
+    const stage = this.selectedStage();
+    if (track === 'kerala_hca') {
+      if (stage === 'prelims') {
+        const objSubs = trackSubs.filter(s => !s.name.toLowerCase().includes('stage ii') && !s.name.toLowerCase().includes('descriptive'));
+        return objSubs.length > 0 ? objSubs : trackSubs;
+      } else {
+        const descSubs = trackSubs.filter(s => s.name.toLowerCase().includes('stage ii') || s.name.toLowerCase().includes('descriptive'));
+        return descSubs.length > 0 ? descSubs : trackSubs;
+      }
+    }
+
     const es = this.examSubjects().filter(item => item.stage === stage || item.stage === 'both');
     const validIds = new Set(es.map(item => item.subject_id));
-    const filtered = subs.filter(s => validIds.has(s.id));
-    return filtered.length > 0 ? filtered : subs;
+    const filtered = trackSubs.filter(s => validIds.has(s.id));
+    return filtered.length > 0 ? filtered : trackSubs;
   });
+
+  setExamCategoryFilter(filter: 'all' | 'bank' | 'kerala_hca'): void {
+    this.examCategoryFilter.set(filter);
+    const available = this.stageSubjects();
+    if (available.length > 0) {
+      this.activeSubjectId.set(available[0].id);
+    }
+  }
 
   // Topics for current stage
   public stageTopics = computed(() => {

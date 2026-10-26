@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AiConfigService, GeminiTokenConfig } from '../../core/services/ai-config.service';
 import { QuizService } from '../../core/services/quiz.service';
 import { QuestionPatternEngineService } from '../../core/services/question-pattern-engine.service';
@@ -1032,13 +1032,20 @@ interface StorageKeyReport {
             </div>
 
             <!-- Filters -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
               <input
                 type="text"
                 [(ngModel)]="searchBankQuery"
                 placeholder="Search question statement or topic..."
                 class="input-field text-xs"
               />
+
+              <select [(ngModel)]="filterBankTopic" class="input-field text-xs font-medium">
+                <option value="all">All Topics ({{ availableBankTopics().length }})</option>
+                @for (top of availableBankTopics(); track top) {
+                  <option [value]="top">{{ top }}</option>
+                }
+              </select>
 
               <select [(ngModel)]="filterBankDifficulty" class="input-field text-xs">
                 <option value="all">All Difficulties</option>
@@ -1677,6 +1684,7 @@ export class AdminComponent implements OnInit {
   public supabaseService = inject(SupabaseService);
   public authService = inject(AuthService);
   private toast = inject(ToastService);
+  private router = inject(Router);
 
   public activeTab = signal<'dashboard' | 'gemini' | 'bank' | 'patterns' | 'diagnostics'>('dashboard');
   public isLoading = signal<boolean>(false);
@@ -1726,6 +1734,7 @@ export class AdminComponent implements OnInit {
       'Coding-Decoding'
     ],
     'English Language': [
+      'Reading Comprehension',
       'Error Spotting & Grammar',
       'Cloze Test & Fillers',
       'Sentence Rearrangement (Para Jumbles)',
@@ -1752,8 +1761,18 @@ export class AdminComponent implements OnInit {
   // Question bank explorer
   public cachedBank = signal<QuizQuestion[]>([]);
   public searchBankQuery: string = '';
+  public filterBankTopic: string = 'all';
   public filterBankDifficulty: string = 'all';
   public filterBankMastery: string = 'all';
+
+  public availableBankTopics = computed(() => {
+    const bank = this.cachedBank();
+    const set = new Set<string>();
+    for (const q of bank) {
+      if (q.topic_name) set.add(q.topic_name.trim());
+    }
+    return Array.from(set).sort();
+  });
 
   // Blueprints & Patterns
   public blueprints: MockExamBlueprint[] = [];
@@ -1895,10 +1914,13 @@ export class AdminComponent implements OnInit {
 
   public filteredBankQuestions = computed(() => {
     const query = this.searchBankQuery.trim().toLowerCase();
+    const topic = this.filterBankTopic;
     const diff = this.filterBankDifficulty;
     const mastery = this.filterBankMastery;
 
     return this.cachedBank().filter(q => {
+      const matchTopic = topic === 'all' || (q.topic_name && q.topic_name.toLowerCase() === topic.toLowerCase());
+
       const matchText = !query ||
         q.question_text.toLowerCase().includes(query) ||
         (q.topic_name && q.topic_name.toLowerCase().includes(query)) ||
@@ -1913,11 +1935,16 @@ export class AdminComponent implements OnInit {
       else if (mastery === 'review') matchMastery = ic > c;
       else if (mastery === 'unattempted') matchMastery = c === 0 && ic === 0;
 
-      return matchText && matchDiff && matchMastery;
+      return matchTopic && matchText && matchDiff && matchMastery;
     });
   });
 
   ngOnInit(): void {
+    if (!this.authService.isAdmin()) {
+      this.toast.error('Access restricted to platform administrator (nibasnazeem@gmail.com)');
+      this.router.navigate(['/dashboard']);
+      return;
+    }
     this.syncFormWithConfig();
     this.refreshAllDiagnostics();
   }

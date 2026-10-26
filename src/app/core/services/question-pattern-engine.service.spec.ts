@@ -120,4 +120,26 @@ describe('QuestionPatternEngineService', () => {
     const sylTexts = new Set(sylQuestions.map(q => q.question_text.trim().toLowerCase()));
     expect(sylTexts.size).toBe(sylQuestions.length);
   });
+
+  it('should generate authentic Reading Comprehension questions with passages', () => {
+    const rcQuestions = service.generateQuizQuestionsForTopic('Reading Comprehension', undefined, 5);
+    expect(rcQuestions.length).toBe(5);
+
+    for (const q of rcQuestions) {
+      expect(q.subject_id).toBe('sub-english');
+      expect(q.passage_text).toBeTruthy();
+      expect(q.question_text).toContain(q.passage_text!);
+      expect(q.options.length).toBe(4);
+      expect(q.correct_option_index).toBeGreaterThanOrEqual(0);
+      expect(q.correct_option_index).toBeLessThan(4);
+      expect(q.explanation).toBeTruthy();
+    }
+  });
+
+  it('should support multiple Reading Comprehension passage sets when requesting 10 questions', () => {
+    const rcQuestions = service.generateQuizQuestionsForTopic('Reading Comprehension', undefined, 10);
+    expect(rcQuestions.length).toBe(10);
+    const passages = new Set(rcQuestions.map(q => q.passage_text).filter(Boolean));
+    expect(passages.size).toBeGreaterThanOrEqual(2);
+  });
 });

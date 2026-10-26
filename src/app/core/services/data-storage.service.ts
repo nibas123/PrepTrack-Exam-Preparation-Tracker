@@ -76,21 +76,32 @@ export class DataStorageService {
 
   // --- INITIAL SEEDING FOR NEW / LOCAL USERS ---
   public ensureInitializedLocalData(): void {
-    const existingSubs = this.getLocal<Subject[]>('subjects', []);
-    if (existingSubs && existingSubs.length > 0 && this.isValidUuid(existingSubs[0].id)) return;
-
     const subReasId = '11111111-1111-4111-8111-111111111101';
     const subQuantId = '11111111-1111-4111-8111-111111111102';
     const subEngId = '11111111-1111-4111-8111-111111111103';
     const subGaId = '11111111-1111-4111-8111-111111111104';
     const subCompId = '11111111-1111-4111-8111-111111111105';
 
+    // Kerala High Court Assistant Subjects
+    const subHcaEngId = '11111111-1111-4111-8111-111111111106';
+    const subHcaGkConstId = '11111111-1111-4111-8111-111111111107';
+    const subHcaKeralaId = '11111111-1111-4111-8111-111111111108';
+    const subHcaMathReasId = '11111111-1111-4111-8111-111111111109';
+    const subHcaDescriptiveId = '11111111-1111-4111-8111-111111111110';
+
     const defaultSubjects: Subject[] = [
+      // Banking
       { id: subReasId, user_id: this.userId, name: 'Reasoning Ability', color: '#2563eb', display_order: 1 },
       { id: subQuantId, user_id: this.userId, name: 'Quantitative Aptitude', color: '#0891b2', display_order: 2 },
       { id: subEngId, user_id: this.userId, name: 'English Language', color: '#7c3aed', display_order: 3 },
       { id: subGaId, user_id: this.userId, name: 'General & Banking Awareness', color: '#d97706', display_order: 4 },
-      { id: subCompId, user_id: this.userId, name: 'Computer Aptitude', color: '#059669', display_order: 5 }
+      { id: subCompId, user_id: this.userId, name: 'Computer Aptitude', color: '#059669', display_order: 5 },
+      // Kerala High Court Assistant
+      { id: subHcaEngId, user_id: this.userId, name: 'General English (Kerala HCA)', color: '#4f46e5', display_order: 6 },
+      { id: subHcaGkConstId, user_id: this.userId, name: 'Indian Constitution & Legal GK (Kerala HCA)', color: '#b45309', display_order: 7 },
+      { id: subHcaKeralaId, user_id: this.userId, name: 'Facts about Kerala & Renaissance (Kerala HCA)', color: '#047857', display_order: 8 },
+      { id: subHcaMathReasId, user_id: this.userId, name: 'Basic Mathematics & Reasoning (Kerala HCA)', color: '#0284c7', display_order: 9 },
+      { id: subHcaDescriptiveId, user_id: this.userId, name: 'Descriptive English (Kerala HCA Stage II)', color: '#c026d3', display_order: 10 }
     ];
 
     const defaultTopics: Topic[] = [
@@ -129,23 +140,123 @@ export class DataStorageService {
       // Computer
       { id: '22222222-2222-4222-8222-222222222229', user_id: this.userId, subject_id: subCompId, name: 'Computer Hardware & Memory', priority: 'medium', learning_status: 'not_started', display_order: 1 },
       { id: '22222222-2222-4222-8222-222222222230', user_id: this.userId, subject_id: subCompId, name: 'Networking & Cyber Security', priority: 'medium', learning_status: 'not_started', display_order: 2 },
-      { id: '22222222-2222-4222-8222-222222222231', user_id: this.userId, subject_id: subCompId, name: 'Keyboard Shortcuts & MS Office', priority: 'high', learning_status: 'not_started', display_order: 3 }
+      { id: '22222222-2222-4222-8222-222222222231', user_id: this.userId, subject_id: subCompId, name: 'Keyboard Shortcuts & MS Office', priority: 'high', learning_status: 'not_started', display_order: 3 },
+
+      // --- KERALA HIGH COURT ASSISTANT TOPICS ---
+      // 1. General English (HCA - 50 Marks Weightage)
+      { id: '22222222-2222-4222-8222-222222222240', user_id: this.userId, subject_id: subHcaEngId, name: 'Tenses & Subject-Verb Agreement', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: '22222222-2222-4222-8222-222222222241', user_id: this.userId, subject_id: subHcaEngId, name: 'Active & Passive Voice', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: '22222222-2222-4222-8222-222222222242', user_id: this.userId, subject_id: subHcaEngId, name: 'Direct & Indirect Speech', priority: 'high', learning_status: 'not_started', display_order: 3 },
+      { id: '22222222-2222-4222-8222-222222222243', user_id: this.userId, subject_id: subHcaEngId, name: 'Synonyms & Antonyms (Legal & Formal Vocabulary)', priority: 'high', learning_status: 'not_started', display_order: 4 },
+      { id: '22222222-2222-4222-8222-222222222244', user_id: this.userId, subject_id: subHcaEngId, name: 'Idioms, Phrases & Phrasal Verbs', priority: 'high', learning_status: 'not_started', display_order: 5 },
+      { id: '22222222-2222-4222-8222-222222222245', user_id: this.userId, subject_id: subHcaEngId, name: 'One-Word Substitutions & Legal Terms', priority: 'high', learning_status: 'not_started', display_order: 6 },
+      { id: '22222222-2222-4222-8222-222222222246', user_id: this.userId, subject_id: subHcaEngId, name: 'Error Spotting & Sentence Correction', priority: 'high', learning_status: 'not_started', display_order: 7 },
+      { id: '22222222-2222-4222-8222-222222222247', user_id: this.userId, subject_id: subHcaEngId, name: 'Reading Comprehension & Cloze Test', priority: 'high', learning_status: 'not_started', display_order: 8 },
+
+      // 2. Indian Constitution & Legal GK (HCA)
+      { id: '22222222-2222-4222-8222-222222222250', user_id: this.userId, subject_id: subHcaGkConstId, name: 'Preamble & Salient Features of Constitution', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: '22222222-2222-4222-8222-222222222251', user_id: this.userId, subject_id: subHcaGkConstId, name: 'Fundamental Rights & Duties (Articles 12-51A)', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: '22222222-2222-4222-8222-222222222252', user_id: this.userId, subject_id: subHcaGkConstId, name: 'Directive Principles of State Policy (DPSP)', priority: 'medium', learning_status: 'not_started', display_order: 3 },
+      { id: '22222222-2222-4222-8222-222222222253', user_id: this.userId, subject_id: subHcaGkConstId, name: 'High Courts & Supreme Court: Powers & Jurisdiction', priority: 'high', learning_status: 'not_started', display_order: 4 },
+      { id: '22222222-2222-4222-8222-222222222254', user_id: this.userId, subject_id: subHcaGkConstId, name: 'Article 226: Writs (Habeas Corpus, Mandamus, Quo Warranto)', priority: 'high', learning_status: 'not_started', display_order: 5 },
+      { id: '22222222-2222-4222-8222-222222222255', user_id: this.userId, subject_id: subHcaGkConstId, name: 'Landmark Judicial Precedents & Constitutional Amendments', priority: 'high', learning_status: 'not_started', display_order: 6 },
+      { id: '22222222-2222-4222-8222-222222222256', user_id: this.userId, subject_id: subHcaGkConstId, name: 'General Science & Information Technology Basics', priority: 'medium', learning_status: 'not_started', display_order: 7 },
+      { id: '22222222-2222-4222-8222-222222222257', user_id: this.userId, subject_id: subHcaGkConstId, name: 'National & International Current Affairs', priority: 'high', learning_status: 'not_started', display_order: 8 },
+
+      // 3. Facts about Kerala & Renaissance (HCA)
+      { id: '22222222-2222-4222-8222-222222222260', user_id: this.userId, subject_id: subHcaKeralaId, name: 'Kerala Renaissance Leaders (Guru, Chattampi, Ayyankali)', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: '22222222-2222-4222-8222-222222222261', user_id: this.userId, subject_id: subHcaKeralaId, name: 'Reform Movements (Vaikom, Guruvayur, Temple Entry)', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: '22222222-2222-4222-8222-222222222262', user_id: this.userId, subject_id: subHcaKeralaId, name: 'Kerala Geography, Rivers, Forests & Wildlife', priority: 'medium', learning_status: 'not_started', display_order: 3 },
+      { id: '22222222-2222-4222-8222-222222222263', user_id: this.userId, subject_id: subHcaKeralaId, name: 'History of Travancore, Cochin, and Malabar', priority: 'medium', learning_status: 'not_started', display_order: 4 },
+      { id: '22222222-2222-4222-8222-222222222264', user_id: this.userId, subject_id: subHcaKeralaId, name: 'Art, Culture, Literature & Festivals of Kerala', priority: 'medium', learning_status: 'not_started', display_order: 5 },
+
+      // 4. Basic Mathematics & Reasoning (HCA - 10 Marks Weightage)
+      { id: '22222222-2222-4222-8222-222222222270', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Number Systems, Fractions & Decimals', priority: 'medium', learning_status: 'not_started', display_order: 1 },
+      { id: '22222222-2222-4222-8222-222222222271', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Percentages, Profit & Loss, Interest', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: '22222222-2222-4222-8222-222222222272', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Ratio, Proportion, Average & Ages', priority: 'medium', learning_status: 'not_started', display_order: 3 },
+      { id: '22222222-2222-4222-8222-222222222273', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Time & Work, Time & Distance', priority: 'medium', learning_status: 'not_started', display_order: 4 },
+      { id: '22222222-2222-4222-8222-222222222274', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Coding-Decoding, Letter & Number Series', priority: 'high', learning_status: 'not_started', display_order: 5 },
+      { id: '22222222-2222-4222-8222-222222222275', user_id: this.userId, subject_id: subHcaMathReasId, name: 'Blood Relations & Direction Sense', priority: 'medium', learning_status: 'not_started', display_order: 6 },
+
+      // 5. Descriptive English (Stage II - 60 Marks)
+      { id: '22222222-2222-4222-8222-222222222280', user_id: this.userId, subject_id: subHcaDescriptiveId, name: 'Precis Writing: Rules, Structure & Exercises', priority: 'high', learning_status: 'not_started', display_order: 1 },
+      { id: '22222222-2222-4222-8222-222222222281', user_id: this.userId, subject_id: subHcaDescriptiveId, name: 'Reading Comprehension (Descriptive Analysis)', priority: 'high', learning_status: 'not_started', display_order: 2 },
+      { id: '22222222-2222-4222-8222-222222222282', user_id: this.userId, subject_id: subHcaDescriptiveId, name: 'Short Essay Writing: Legal & Contemporary Themes', priority: 'high', learning_status: 'not_started', display_order: 3 }
     ];
 
     const defaultExams: Exam[] = this.getDefaultBankExams(this.userId);
 
-    const currentExams = this.getLocal<Exam[]>('exams', []);
-    if (!currentExams || currentExams.length < defaultExams.length) {
-      this.setLocal('exams', defaultExams);
+    const existingSubs = this.getLocal<Subject[]>('subjects', []);
+    if (!existingSubs || existingSubs.length === 0) {
+      this.setLocal('subjects', defaultSubjects);
+      this.setLocal('topics', defaultTopics);
+    } else {
+      // Intelligently check if Kerala HCA subjects are missing in existing storage
+      const hasHca = existingSubs.some(s => s.name.toLowerCase().includes('kerala') || s.name.toLowerCase().includes('hca'));
+      if (!hasHca) {
+        const hcaSubs = defaultSubjects.filter(s => s.name.toLowerCase().includes('kerala') || s.name.toLowerCase().includes('hca'));
+        const updatedSubs = [...existingSubs, ...hcaSubs];
+        this.setLocal('subjects', updatedSubs);
+
+        const existingTopics = this.getLocal<Topic[]>('topics', []);
+        const hcaSubIds = new Set(hcaSubs.map(s => s.id));
+        const hcaTopics = defaultTopics.filter(t => hcaSubIds.has(t.subject_id));
+        const updatedTopics = [...existingTopics, ...hcaTopics];
+        this.setLocal('topics', updatedTopics);
+      }
     }
-    this.setLocal('subjects', defaultSubjects);
-    this.setLocal('topics', defaultTopics);
+
+    const currentExams = this.getLocal<Exam[]>('exams', []);
+    if (!currentExams || currentExams.length === 0) {
+      this.setLocal('exams', defaultExams);
+    } else {
+      // Check if Kerala HCA is present
+      const hasHcaExam = currentExams.some(e => e.name.toLowerCase().includes('kerala') || e.name.toLowerCase().includes('high court'));
+      if (!hasHcaExam) {
+        const hcaExam = defaultExams.find(e => e.name.toLowerCase().includes('high court'));
+        if (hcaExam) {
+          currentExams.unshift(hcaExam);
+          this.setLocal('exams', currentExams);
+        }
+      }
+    }
+
+    // Default Events (ensure Kerala High Court events exist)
+    const currentEvents = this.getLocal<ExamEvent[]>('exam_events', []);
+    const hasHcaEvent = currentEvents.some(e => e.title.toLowerCase().includes('high court') || e.title.toLowerCase().includes('hca'));
+    if (!hasHcaEvent) {
+      const hcaEvents: ExamEvent[] = [
+        {
+          id: 'event-hca-2026-objective',
+          user_id: this.userId,
+          exam_id: '33333333-3333-4333-8333-333333333315',
+          title: 'Kerala High Court Assistant - Stage 1 Objective Written Exam',
+          event_type: 'exam_date',
+          event_date: '2026-09-15',
+          date_status: 'confirmed',
+          description: '100 Questions (50 English, 40 GK/Constitution, 10 Math), 75 Minutes, -0.25 penalty.',
+          reminder_enabled: true
+        },
+        {
+          id: 'event-hca-2026-descriptive',
+          user_id: this.userId,
+          exam_id: '33333333-3333-4333-8333-333333333315',
+          title: 'Kerala High Court Assistant - Stage 2 Descriptive Test',
+          event_type: 'exam_date',
+          event_date: '2026-11-20',
+          date_status: 'tentative',
+          description: '60 Marks (Precis Writing, Comprehension, Short Essay), 60 Minutes.',
+          reminder_enabled: true
+        }
+      ];
+      this.setLocal('exam_events', [...currentEvents, ...hcaEvents]);
+    }
+
     if (!this.getLocal('initialized', false)) {
       this.setLocal('daily_goals', []);
       this.setLocal('daily_goal_topics', []);
       this.setLocal('study_sessions', []);
       this.setLocal('mock_exams', []);
-      this.setLocal('exam_events', []);
       this.setLocal('initialized', true);
     }
   }
@@ -262,6 +373,20 @@ export class DataStorageService {
   public getDefaultBankExams(userId: string = this.userId): Exam[] {
     return [
       {
+        id: '33333333-3333-4333-8333-333333333315',
+        user_id: userId,
+        name: 'Kerala High Court Assistant (HCA) 2026',
+        description: 'High Court of Kerala Assistant Recruitment - Objective Test (100 M), Descriptive Test (60 M) & Viva-Voce',
+        conducting_body: 'High Court of Kerala',
+        vacancies: 45,
+        notification_status: 'announced',
+        prelims_date: '2026-09-15',
+        mains_date: '2026-11-20',
+        official_url: 'https://hckrecruitment.keralacourts.in',
+        is_active: true,
+        display_order: 1
+      },
+      {
         id: '33333333-3333-4333-8333-333333333301',
         user_id: userId,
         name: 'IBPS PO 2026',
@@ -273,7 +398,7 @@ export class DataStorageService {
         mains_date: '2026-11-28',
         official_url: 'https://www.ibps.in',
         is_active: true,
-        display_order: 1
+        display_order: 2
       },
       {
         id: '33333333-3333-4333-8333-333333333302',
@@ -1461,5 +1586,83 @@ export class DataStorageService {
       if (!error && data) return data as MockExamAttempt[];
     }
     return this.getLocal<MockExamAttempt[]>('preptrack_mock_exam_simulator_attempts', []);
+  }
+
+  // --- SMART REVISION & QUESTION BOOKMARKS ---
+  getBookmarkedQuestionIds(): string[] {
+    return this.getLocal<string[]>('preptrack_bookmarked_questions', []);
+  }
+
+  isQuestionBookmarked(questionId: string): boolean {
+    if (!questionId) return false;
+    const current = this.getBookmarkedQuestionIds();
+    return current.includes(questionId);
+  }
+
+  toggleBookmarkQuestion(questionId: string): boolean {
+    if (!questionId) return false;
+    const current = this.getBookmarkedQuestionIds();
+    const index = current.indexOf(questionId);
+    let bookmarked = false;
+    if (index >= 0) {
+      current.splice(index, 1);
+      bookmarked = false;
+    } else {
+      current.push(questionId);
+      bookmarked = true;
+    }
+    this.setLocal('preptrack_bookmarked_questions', current);
+    return bookmarked;
+  }
+
+  getIncorrectQuestions(): {
+    questionId: string;
+    questionText: string;
+    selectedOption: string;
+    correctOption: string;
+    explanation: string;
+    subjectName: string;
+    topicName: string;
+    failedDate: string;
+    attemptCount: number;
+  }[] {
+    return this.getLocal<any[]>('preptrack_incorrect_questions', []);
+  }
+
+  recordIncorrectQuestion(item: {
+    questionId: string;
+    questionText: string;
+    selectedOption: string;
+    correctOption: string;
+    explanation: string;
+    subjectName?: string;
+    topicName?: string;
+  }): void {
+    if (!item.questionId || !item.questionText) return;
+    const current = this.getIncorrectQuestions();
+    const existing = current.find(q => q.questionId === item.questionId);
+    if (existing) {
+      existing.attemptCount = (existing.attemptCount || 1) + 1;
+      existing.failedDate = new Date().toISOString();
+      existing.selectedOption = item.selectedOption;
+    } else {
+      current.unshift({
+        questionId: item.questionId,
+        questionText: item.questionText,
+        selectedOption: item.selectedOption,
+        correctOption: item.correctOption,
+        explanation: item.explanation,
+        subjectName: item.subjectName || 'General',
+        topicName: item.topicName || 'Mixed Practice',
+        failedDate: new Date().toISOString(),
+        attemptCount: 1
+      });
+    }
+    this.setLocal('preptrack_incorrect_questions', current.slice(0, 200));
+  }
+
+  removeIncorrectQuestion(questionId: string): void {
+    const current = this.getIncorrectQuestions().filter(q => q.questionId !== questionId);
+    this.setLocal('preptrack_incorrect_questions', current);
   }
 }

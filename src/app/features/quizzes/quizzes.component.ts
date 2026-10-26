@@ -6,6 +6,7 @@ import { QuizService } from '../../core/services/quiz.service';
 import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
 import { QuizQuestion, QuizAttempt, PreviousPaper, Subject, Topic } from '../../core/models/database.types';
+import { ExamTrackService } from '../../core/services/exam-track.service';
 import confetti from 'canvas-confetti';
 
 @Component({
@@ -54,9 +55,10 @@ import confetti from 'canvas-confetti';
           </button>
           <a
             routerLink="/growth-stats"
-            class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all text-indigo-700 hover:text-indigo-900 hover:bg-white/60 flex items-center space-x-1"
+            class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-700 hover:text-slate-900 hover:bg-white/60 flex items-center space-x-1.5"
           >
-            <span>📈 Growth & Outside Stats</span>
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            <span>Growth & Outside Stats</span>
           </a>
         </div>
       </div>
@@ -72,7 +74,7 @@ import confetti from 'canvas-confetti';
                   Question {{ currentQuestionIndex() + 1 }} of {{ activeQuestions().length }}
                 </span>
                 @if (activeQuestions()[currentQuestionIndex()]?.difficulty; as diff) {
-                  <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
                     [ngClass]="{
                       'bg-emerald-50 text-emerald-700 border border-emerald-200': diff === 'easy',
                       'bg-amber-50 text-amber-700 border border-amber-200': diff === 'medium',
@@ -99,9 +101,28 @@ import confetti from 'canvas-confetti';
 
           <!-- Question Content -->
           <div class="space-y-4">
-            <p class="text-base font-semibold text-slate-800 whitespace-pre-line leading-relaxed">
-              {{ activeQuestions()[currentQuestionIndex()]?.question_text }}
-            </p>
+            @if (getQuestionDisplay(activeQuestions()[currentQuestionIndex()]); as qDisplay) {
+              @if (qDisplay.passage) {
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-xs leading-relaxed space-y-2 shadow-2xs max-h-72 overflow-y-auto">
+                  <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-1.5">
+                    <span class="flex items-center space-x-1.5">
+                      <svg class="w-3.5 h-3.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      <span>Reading Passage</span>
+                    </span>
+                    <span class="text-slate-400 font-medium">Scroll to read full context</span>
+                  </div>
+                  <div class="whitespace-pre-line text-slate-700 font-normal leading-relaxed text-xs">
+                    {{ qDisplay.passage }}
+                  </div>
+                </div>
+              }
+
+              <p class="text-base font-semibold text-slate-800 whitespace-pre-line leading-relaxed">
+                {{ qDisplay.question }}
+              </p>
+            }
 
             <!-- Options Radio List -->
             <div class="space-y-2.5 pt-2">
@@ -179,14 +200,22 @@ import confetti from 'canvas-confetti';
             <h4 class="text-sm font-bold text-slate-900">Detailed Answer Review</h4>
             @for (q of activeQuestions(); track q.id; let i = $index) {
               <div class="p-4 rounded-xl border text-xs space-y-2" [ngClass]="lastAttempt()?.answers?.[i]?.is_correct ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="font-bold text-slate-800">
-                    Q{{ i + 1 }}. {{ q.question_text }}
+                @if (getQuestionDisplay(q); as qDisplay) {
+                  @if (qDisplay.passage) {
+                    <div class="p-3 bg-white/90 border border-slate-200 rounded-lg text-slate-600 text-xs whitespace-pre-line leading-relaxed max-h-40 overflow-y-auto mb-2">
+                      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Passage Reference:</div>
+                      {{ qDisplay.passage }}
+                    </div>
+                  }
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="font-bold text-slate-800">
+                      Q{{ i + 1 }}. {{ qDisplay.question }}
+                    </div>
+                    <span class="px-2 py-0.5 rounded-md font-bold text-[10px] uppercase" [ngClass]="lastAttempt()?.answers?.[i]?.is_correct ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
+                      {{ lastAttempt()?.answers?.[i]?.is_correct ? 'Correct' : 'Incorrect' }}
+                    </span>
                   </div>
-                  <span class="px-2 py-0.5 rounded-md font-bold text-[10px] uppercase" [ngClass]="lastAttempt()?.answers?.[i]?.is_correct ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'">
-                    {{ lastAttempt()?.answers?.[i]?.is_correct ? 'Correct' : 'Incorrect' }}
-                  </span>
-                </div>
+                }
 
                 <div class="text-[11px] text-slate-600 mt-2 space-y-1">
                   <div>
@@ -232,7 +261,7 @@ import confetti from 'canvas-confetti';
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Subject</label>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                  @for (sub of subjects(); track sub.id) {
+                  @for (sub of filteredSubjects(); track sub.id) {
                     <button
                       type="button"
                       (click)="selectedSubjectId.set(sub.id); clearTopicFilter()"
@@ -507,7 +536,7 @@ import confetti from 'canvas-confetti';
                           [ngClass]="selectedDifficulty() === diff.value ? 'bg-brand-600 text-white border-brand-600 shadow-xs' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'"
                         >
                           <span>{{ diff.label }}</span>
-                          <span class="text-[9px] font-normal opacity-80">{{ diff.desc }}</span>
+                          <span class="text-[10px] font-normal opacity-80">{{ diff.desc }}</span>
                         </button>
                       }
                     </div>
@@ -589,40 +618,73 @@ import confetti from 'canvas-confetti';
         }
 
         @if (activeTab() === 'papers') {
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @for (paper of previousPapers(); track paper.id) {
-              <div class="card p-5 flex flex-col justify-between space-y-4">
-                <div>
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-50 text-brand-700 border border-brand-200">
-                      {{ paper.stage }} ({{ paper.year }})
-                    </span>
-                    <span class="text-xs font-bold text-slate-700">{{ paper.duration_minutes }} mins</span>
-                  </div>
-                  <h3 class="text-sm font-bold text-slate-900 mt-2">{{ paper.exam_name }}</h3>
-                  <p class="text-[11px] text-slate-400 mt-0.5">License: {{ paper.official_source_license }}</p>
-
-                  <div class="mt-3 space-y-1 text-xs text-slate-600">
-                    @for (sec of paper.sections; track sec.subject_name) {
-                      <div class="flex justify-between text-[11px]">
-                        <span>{{ sec.subject_name }}</span>
-                        <span class="font-bold">{{ sec.questions_count }} Qs</span>
-                      </div>
-                    }
-                  </div>
-                </div>
-
-                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <button
-                    type="button"
-                    (click)="startPreviousPaper(paper)"
-                    class="w-full btn-primary text-xs py-2 font-bold text-center"
-                  >
-                    Start Timed Mock Paper
-                  </button>
-                </div>
+          <div class="space-y-4">
+            <!-- Track Filter Buttons (Only shown in 'all' multi-exam mode) -->
+            @if (examTrack.isAll()) {
+              <div class="flex items-center space-x-2">
+                <button
+                  type="button"
+                  (click)="paperTrackFilter.set('all')"
+                  class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  [ngClass]="paperTrackFilter() === 'all' ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  All Papers ({{ previousPapers().length }})
+                </button>
+                <button
+                  type="button"
+                  (click)="paperTrackFilter.set('bank')"
+                  class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  [ngClass]="paperTrackFilter() === 'bank' ? 'bg-brand-900 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Banking Papers
+                </button>
+                <button
+                  type="button"
+                  (click)="paperTrackFilter.set('kerala_hca')"
+                  class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  [ngClass]="paperTrackFilter() === 'kerala_hca' ? 'bg-court-700 text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                >
+                  Kerala High Court Assistant
+                </button>
               </div>
             }
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              @for (paper of filteredPreviousPapers(); track paper.id) {
+                <div class="card p-5 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+                        [ngClass]="paper.id.includes('kerala-hca') ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-brand-50 text-brand-700 border border-brand-200'">
+                        {{ paper.id.includes('kerala-hca') ? 'High Court of Kerala' : paper.stage }} ({{ paper.year }})
+                      </span>
+                      <span class="text-xs font-bold text-slate-700">{{ paper.duration_minutes }} mins</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-900 mt-2">{{ paper.exam_name }}</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">License: {{ paper.official_source_license }}</p>
+
+                    <div class="mt-3 space-y-1 text-xs text-slate-600">
+                      @for (sec of paper.sections; track sec.subject_name) {
+                        <div class="flex justify-between text-[11px]">
+                          <span>{{ sec.subject_name }}</span>
+                          <span class="font-bold">{{ sec.questions_count }} Qs</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <button
+                      type="button"
+                      (click)="startPreviousPaper(paper)"
+                      class="w-full btn-primary text-xs py-2 font-bold text-center"
+                    >
+                      Start Timed Mock Paper
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         }
 
@@ -689,12 +751,48 @@ export class QuizzesComponent implements OnInit {
   private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
+  public examTrack = inject(ExamTrackService);
 
   public activeTab = signal<'builder' | 'papers' | 'history'>('builder');
   public subjects = signal<Subject[]>([]);
   public topics = signal<Topic[]>([]);
   public previousPapers = signal<PreviousPaper[]>([]);
   public pastAttempts = signal<QuizAttempt[]>([]);
+  public paperTrackFilter = signal<'all' | 'bank' | 'kerala_hca'>('all');
+
+  // Filtered Subjects based on active track
+  public filteredSubjects = computed(() => {
+    const all = this.subjects();
+    const track = this.examTrack.activeTrack();
+    if (track === 'kerala_hca') {
+      return all.filter(s => s.id.includes('hca') || s.name.toLowerCase().includes('kerala') || s.name.toLowerCase().includes('constitution'));
+    } else if (track === 'bank') {
+      return all.filter(s => !s.id.includes('hca') && !s.name.toLowerCase().includes('kerala'));
+    }
+    return all;
+  });
+
+  // Filtered Previous Papers based on selected paper track filter
+  public filteredPreviousPapers = computed(() => {
+    const list = this.previousPapers();
+    const isKerala = this.examTrack.isKeralaHca();
+    const isBank = this.examTrack.isBank();
+
+    if (isKerala) {
+      return list.filter(p => p.id.includes('kerala-hca') || p.exam_name.toLowerCase().includes('high court'));
+    }
+    if (isBank) {
+      return list.filter(p => !p.id.includes('kerala-hca') && !p.exam_name.toLowerCase().includes('high court'));
+    }
+
+    const filter = this.paperTrackFilter();
+    if (filter === 'kerala_hca') {
+      return list.filter(p => p.id.includes('kerala-hca') || p.exam_name.toLowerCase().includes('high court'));
+    } else if (filter === 'bank') {
+      return list.filter(p => !p.id.includes('kerala-hca') && !p.exam_name.toLowerCase().includes('high court'));
+    }
+    return list;
+  });
 
   // Builder configuration
   public selectedSubjectId = signal<string>('all');
@@ -720,6 +818,9 @@ export class QuizzesComponent implements OnInit {
     const subId = this.selectedSubjectId();
     const all = this.topics();
     if (subId === 'all') {
+      if (this.examTrack.isKeralaHca()) {
+        return all.filter(t => t.subject_id.includes('hca') || (t as any).is_hca);
+      }
       return all;
     }
     return all.filter(t => t.subject_id === subId);
@@ -748,6 +849,18 @@ export class QuizzesComponent implements OnInit {
 
   public popularTopicSuggestions = computed(() => {
     const curSubId = this.selectedSubjectId();
+    if (this.examTrack.isKeralaHca() && curSubId === 'all') {
+      return [
+        'Articles 226 & 227 (High Court Writs)',
+        'Fundamental Rights & DPSP',
+        'Kerala Renaissance & Reformers',
+        'Direct & Indirect Speech',
+        'Idioms & Phrases',
+        'Prepositions & Phrasal Verbs',
+        'Legal Glossary & Latin Maxims',
+        'Basic Arithmetic & Reasoning'
+      ];
+    }
     if (curSubId === 'all') {
       return [
         'Percentage',
@@ -803,6 +916,7 @@ export class QuizzesComponent implements OnInit {
     this.topics.set(allTopics);
     this.previousPapers.set(papers);
     this.pastAttempts.set(attempts);
+    this.paperTrackFilter.set(this.examTrack.activeTrack());
 
     // Check query params if user clicked "Take Quiz" from syllabus topic
     this.route.queryParams.subscribe(params => {
@@ -1043,6 +1157,31 @@ export class QuizzesComponent implements OnInit {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       } catch {}
     }
+  }
+
+  public getQuestionDisplay(q: QuizQuestion | undefined): { passage: string | null; question: string } {
+    if (!q) return { passage: null, question: '' };
+    if (q.passage_text) {
+      let qText = (q.question_text || '').trim();
+      const pText = q.passage_text.trim();
+      if (qText.startsWith(pText)) {
+        qText = qText.substring(pText.length).trim();
+      }
+      return { passage: q.passage_text, question: qText || q.question_text };
+    }
+
+    const text = q.question_text || '';
+    if (text.includes('Directions') && (text.includes('\n\nAccording') || text.includes('\n\nWhich') || text.includes('\n\nWhat') || text.includes('\n\nWhy') || text.includes('\n\nSelect') || text.includes('\n\nQuestion:'))) {
+      const parts = text.split(/\n\n(?=According|Which|What|Why|Select|Question:)/i);
+      if (parts.length >= 2) {
+        return {
+          passage: parts[0].trim(),
+          question: parts.slice(1).join('\n\n').trim()
+        };
+      }
+    }
+
+    return { passage: null, question: text };
   }
 
   quitQuiz(): void {

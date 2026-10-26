@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { DataStorageService } from '../../core/services/data-storage.service';
 import { ToastService } from '../../core/services/toast.service';
 import {
@@ -9,6 +10,7 @@ import {
   EventType,
   DateStatus,
 } from '../../core/models/database.types';
+import { ExamTrackService } from '../../core/services/exam-track.service';
 
 @Component({
   selector: 'app-exam-calendar',
@@ -20,12 +22,12 @@ import {
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
           <div class="flex items-center space-x-2.5">
-            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Bank Exam Hub & Deadlines</h2>
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Competitive Exam Hub & Deadlines</h2>
             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-100">
               {{ activeView() === 'announced' ? 'Announced Exams' : 'Deadlines Calendar' }}
             </span>
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">Track officially announced bank exams, registration windows, and countdowns</p>
+          <p class="text-xs text-slate-500 mt-0.5">Track officially announced bank exams, Kerala High Court Assistant, and regulatory countdowns</p>
         </div>
 
         <div class="flex items-center space-x-2.5">
@@ -55,86 +57,212 @@ import {
         </div>
       </div>
 
-      <!-- Main Navigation Tabs: Announced Exams vs Deadlines Calendar -->
-      <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
-        <button
-          type="button"
-          (click)="activeView.set('announced')"
-          class="px-4 py-2 rounded-xl text-xs font-bold transition-all"
-          [ngClass]="activeView() === 'announced' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
-        >
-          🏆 Announced Exams ({{ exams().length }})
-        </button>
+      <!-- Main Navigation Tabs & Exam Track Filter Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div class="flex items-center space-x-2">
+          <button
+            type="button"
+            (click)="activeView.set('announced')"
+            class="px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5"
+            [ngClass]="activeView() === 'announced' ? 'bg-slate-900 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+            <span>Announced Exams ({{ filteredExams().length }})</span>
+          </button>
 
-        <button
-          type="button"
-          (click)="activeView.set('calendar')"
-          class="px-4 py-2 rounded-xl text-xs font-bold transition-all"
-          [ngClass]="activeView() === 'calendar' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
-        >
-          📅 Deadlines & Milestones ({{ events().length }})
-        </button>
+          <button
+            type="button"
+            (click)="activeView.set('calendar')"
+            class="px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5"
+            [ngClass]="activeView() === 'calendar' ? 'bg-slate-900 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>Deadlines & Milestones ({{ filteredEvents().length }})</span>
+          </button>
+        </div>
+
+        @if (examTrack.isAll()) {
+          <!-- Track Filter Pills (Only shown in 'all' multi-exam mode) -->
+          <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 text-xs">
+            <button
+              type="button"
+              (click)="trackFilter.set('all')"
+              class="px-3 py-1 rounded-lg font-semibold transition-all"
+              [ngClass]="trackFilter() === 'all' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+            >
+              All Tracks
+            </button>
+            <button
+              type="button"
+              (click)="trackFilter.set('bank')"
+              class="px-3 py-1 rounded-lg font-semibold transition-all"
+              [ngClass]="trackFilter() === 'bank' ? 'bg-white text-brand-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+            >
+              Banking
+            </button>
+            <button
+              type="button"
+              (click)="trackFilter.set('kerala_hca')"
+              class="px-3 py-1 rounded-lg font-semibold transition-all"
+              [ngClass]="trackFilter() === 'kerala_hca' ? 'bg-white text-court-700 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+            >
+              Kerala High Court
+            </button>
+          </div>
+        }
       </div>
 
-      <!-- VIEW 1: ANNOUNCED BANK EXAMS TRACKER -->
+      <!-- VIEW 1: ANNOUNCED BANK & HIGH COURT EXAMS TRACKER -->
       @if (activeView() === 'announced') {
-        <div class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @for (exam of exams(); track exam.id) {
-              <div class="card card-hover p-5 space-y-4 flex flex-col justify-between relative">
-                <div>
-                  <!-- Header: Name & Tracking Toggle -->
+        <div class="space-y-6">
+          <!-- Summary Status Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Targeted Recruits</span>
+              <span class="text-2xl font-bold text-slate-900 dark:text-white mt-1 block">{{ filteredExams().length }}</span>
+              <span class="text-[11px] text-slate-400">Total verified posts</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <span class="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Active Preparation</span>
+              <span class="text-2xl font-bold text-emerald-600 mt-1 block">{{ countActiveTargetedExams() }}</span>
+              <span class="text-[11px] text-slate-400">Actively tracking syllabus</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <span class="text-[11px] font-semibold text-amber-600 uppercase tracking-wider block">High Court Posts</span>
+              <span class="text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1 block">{{ countHighCourtExams() }}</span>
+              <span class="text-[11px] text-slate-400">Judicial recruitment</span>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <span class="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider block">Banking Suite</span>
+              <span class="text-2xl font-bold text-indigo-700 dark:text-indigo-400 mt-1 block">{{ filteredExams().length - countHighCourtExams() }}</span>
+              <span class="text-[11px] text-slate-400">IBPS, SBI & RBI</span>
+            </div>
+          </div>
+
+          <!-- Exams Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            @for (exam of filteredExams(); track exam.id) {
+              <div
+                class="rounded-2xl transition-all duration-200 flex flex-col justify-between relative overflow-hidden border shadow-sm hover:shadow-md"
+                [ngClass]="isHighCourtExam(exam) 
+                  ? 'bg-gradient-to-br from-amber-500/5 via-white to-amber-500/10 dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border-amber-300/80 dark:border-amber-700/60' 
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-800'"
+              >
+                <!-- Card Header Accent Line -->
+                <div class="h-1.5 w-full"
+                  [ngClass]="isHighCourtExam(exam) ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700' : 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-slate-700'">
+                </div>
+
+                <div class="p-5 sm:p-6 space-y-4 flex-1">
+                  <!-- Category, Authority & Status Badge Row -->
                   <div class="flex items-start justify-between gap-3">
-                    <div>
-                      <div class="flex items-center space-x-2">
-                        <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200">
-                          {{ exam.conducting_body || 'IBPS' }}
-                        </span>
-
-                        @if (exam.vacancies) {
-                          <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            {{ exam.vacancies | number }} Vacancies
-                          </span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span
+                        class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"
+                        [ngClass]="isHighCourtExam(exam) ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'">
+                        @if (isHighCourtExam(exam)) {
+                          <svg class="w-3 h-3 text-amber-700 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                          </svg>
                         }
-                      </div>
+                        <span>{{ exam.conducting_body || 'Recruitment Board' }}</span>
+                      </span>
 
-                      <h3 class="text-base font-bold text-slate-900 mt-2">{{ exam.name }}</h3>
-                      @if (exam.description) {
-                        <p class="text-xs text-slate-500 mt-0.5">{{ exam.description }}</p>
+                      @if (exam.vacancies) {
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                          {{ exam.vacancies | number }} Vacancies
+                        </span>
                       }
                     </div>
 
-                    <!-- Tracking Toggle Button -->
-                    <button
-                      type="button"
-                      (click)="toggleTracking(exam)"
-                      class="px-3 py-1 rounded-full text-xs font-bold transition-colors border"
-                      [ngClass]="exam.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-500 border-slate-200'"
-                      title="Toggle actively targeting this exam"
-                    >
-                      {{ exam.is_active ? '✓ Tracking' : 'Paused' }}
-                    </button>
+                    <!-- Clear Status Indicator -->
+                    <div class="shrink-0">
+                      @if (exam.is_active) {
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>Ongoing Prep</span>
+                        </span>
+                      } @else {
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                          <span>Available</span>
+                        </span>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Exam Title & Description -->
+                  <div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                      {{ exam.name }}
+                    </h3>
+                    @if (exam.description) {
+                      <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mt-1 line-clamp-2">
+                        {{ exam.description }}
+                      </p>
+                    }
+                  </div>
+
+                  <!-- Selection Stages Pathway -->
+                  <div class="p-2.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                      Recruitment Selection Stages
+                    </span>
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
+                      @if (isHighCourtExam(exam)) {
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px]">
+                          Stage 1: Objective (100 M)
+                        </span>
+                        <span class="text-slate-400">&rarr;</span>
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px]">
+                          Stage 2: Descriptive (60 M)
+                        </span>
+                        <span class="text-slate-400">&rarr;</span>
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px]">
+                          Viva-Voce (10 M)
+                        </span>
+                      } @else {
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px]">
+                          Prelims Examination (100 M)
+                        </span>
+                        <span class="text-slate-400">&rarr;</span>
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-[11px]">
+                          Mains Examination (200 M)
+                        </span>
+                        <span class="text-slate-400">&rarr;</span>
+                        <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px]">
+                          Interview / GD
+                        </span>
+                      }
+                    </div>
                   </div>
 
                   <!-- Key Exam Schedule Grid -->
-                  <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 text-xs">
-                    <div class="p-2.5 bg-slate-50 rounded-xl">
-                      <span class="text-[10px] uppercase font-bold text-slate-400 block">Prelims Date</span>
-                      <span class="font-bold text-slate-800">{{ exam.prelims_date || 'Tentative / TBA' }}</span>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                      <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-400 block">
+                        {{ isHighCourtExam(exam) ? 'Stage 1 Written Date' : 'Preliminary Exam' }}
+                      </span>
+                      <span class="font-bold text-slate-800 dark:text-slate-200 block mt-0.5">
+                        {{ exam.prelims_date || 'Tentative / TBA' }}
+                      </span>
                     </div>
 
-                    <div class="p-2.5 bg-slate-50 rounded-xl">
-                      <span class="text-[10px] uppercase font-bold text-slate-400 block">Mains Date</span>
-                      <span class="font-bold text-slate-800">{{ exam.mains_date || 'Tentative / TBA' }}</span>
+                    <div class="p-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+                      <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-400 block">
+                        {{ isHighCourtExam(exam) ? 'Stage 2 Descriptive' : 'Mains Examination' }}
+                      </span>
+                      <span class="font-bold text-slate-800 dark:text-slate-200 block mt-0.5">
+                        {{ exam.mains_date || 'Tentative / TBA' }}
+                      </span>
                     </div>
 
                     @if (exam.application_end_date) {
-                      <div class="p-2.5 bg-amber-50/60 rounded-xl col-span-2 border border-amber-200/60 flex items-center justify-between">
+                      <div class="p-3 bg-amber-50/70 dark:bg-amber-950/40 rounded-xl col-span-2 border border-amber-200/70 dark:border-amber-900/60 flex items-center justify-between">
                         <div>
-                          <span class="text-[10px] uppercase font-bold text-amber-700 block">Application Deadline</span>
-                          <span class="font-bold text-amber-900">{{ exam.application_end_date }}</span>
+                          <span class="text-[10px] uppercase font-bold text-amber-800 dark:text-amber-300 block">Registration Deadline</span>
+                          <span class="font-bold text-amber-950 dark:text-amber-200">{{ exam.application_end_date }}</span>
                         </div>
-                        <span class="text-[11px] font-bold text-amber-800">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200/70 dark:bg-amber-900 text-amber-900 dark:text-amber-200">
                           {{ getCountdownText(exam.application_end_date) }}
                         </span>
                       </div>
@@ -142,30 +270,64 @@ import {
                   </div>
                 </div>
 
-                <!-- Footer: Actions & Website Link -->
-                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                  @if (exam.official_url) {
-                    <a
-                      [href]="exam.official_url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-brand-600 hover:text-brand-700 font-semibold flex items-center space-x-1"
-                    >
-                      <span>Official Portal</span>
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  } @else {
-                    <span class="text-slate-400 text-[11px]">Official notification tracked</span>
-                  }
+                <!-- Footer: Primary Action Buttons & Status Toggle -->
+                <div class="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/40 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
+                  <div class="flex items-center gap-2">
+                    @if (isHighCourtExam(exam)) {
+                      <a
+                        routerLink="/kerala-high-court"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold bg-amber-600 hover:bg-amber-700 text-white transition-colors shadow-xs"
+                      >
+                        <span>Open Prep Hub</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
+                    } @else {
+                      <a
+                        routerLink="/syllabus"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-xs"
+                      >
+                        <span>View Syllabus</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
+                    }
 
-                  <div class="flex items-center space-x-1.5">
+                    @if (exam.official_url) {
+                      <a
+                        [href]="exam.official_url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium flex items-center gap-1 transition-colors px-2 py-1"
+                        title="Official portal & notifications"
+                      >
+                        <span>Official Portal</span>
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    }
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      (click)="toggleTracking(exam)"
+                      class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
+                      [ngClass]="exam.is_active 
+                        ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-200' 
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100'"
+                    >
+                      {{ exam.is_active ? '✓ Active Target' : '+ Target Exam' }}
+                    </button>
+
                     <button
                       type="button"
                       (click)="deleteExam(exam)"
-                      class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
-                      title="Remove exam"
+                      class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                      title="Remove exam from list"
                     >
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -285,9 +447,30 @@ import {
             </div>
 
             <!-- Quick Template Pickers -->
-            <div class="mt-3 p-3 bg-brand-50/60 rounded-xl border border-brand-100">
-              <span class="text-[11px] font-bold text-brand-800 uppercase block mb-1.5">⚡ Popular Exam Templates</span>
+            <div class="mt-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[11px] font-bold text-slate-800 uppercase block mb-1.5">⚡ Popular Exam Templates</span>
               <div class="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('Kerala High Court Assistant 2026', 'High Court of Kerala', 45, '2026-09-15', '2026-11-20', 'https://hckrecruitment.keralacourts.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-amber-50 text-amber-800 rounded-lg border border-amber-300 hover:bg-amber-100"
+                >
+                  + Kerala High Court Assistant
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('Kerala Judicial Service (Munsiff-Magistrate) 2026', 'High Court of Kerala', 52, '2026-08-20', '2026-11-10', 'https://hckrecruitment.keralacourts.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-amber-50 text-amber-800 rounded-lg border border-amber-300 hover:bg-amber-100"
+                >
+                  + Judicial Service (Munsiff)
+                </button>
+                <button
+                  type="button"
+                  (click)="applyExamTemplate('High Court Confidential Assistant / Steno 2026', 'High Court of Kerala', 28, '2026-09-01', '2026-10-15', 'https://hckrecruitment.keralacourts.in')"
+                  class="px-2.5 py-1 text-[11px] font-bold bg-amber-50 text-amber-800 rounded-lg border border-amber-300 hover:bg-amber-100"
+                >
+                  + HC Stenographer
+                </button>
                 <button
                   type="button"
                   (click)="applyExamTemplate('IBPS PO 2026', 'IBPS', 4455, '2026-10-18', '2026-11-29', 'https://ibps.in')"
@@ -301,13 +484,6 @@ import {
                   class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
                 >
                   + SBI PO
-                </button>
-                <button
-                  type="button"
-                  (click)="applyExamTemplate('SBI Clerk 2026', 'SBI', 8283, '2026-10-25', '2026-12-06', 'https://sbi.bank/web/careers')"
-                  class="px-2.5 py-1 text-[11px] font-bold bg-white text-brand-700 rounded-lg border border-brand-200 hover:bg-brand-50"
-                >
-                  + SBI Clerk
                 </button>
                 <button
                   type="button"
@@ -517,12 +693,14 @@ import {
 export class ExamCalendarComponent implements OnInit {
   private dataStorage = inject(DataStorageService);
   private toast = inject(ToastService);
+  public examTrack = inject(ExamTrackService);
 
   public events = signal<ExamEvent[]>([]);
   public exams = signal<Exam[]>([]);
 
   public activeView = signal<'announced' | 'calendar'>('announced');
   public calendarFilter = signal<'upcoming' | 'past' | 'all'>('upcoming');
+  public trackFilter = signal<'all' | 'bank' | 'kerala_hca'>('all');
 
   // Modals
   public showAnnounceExamModal = signal<boolean>(false);
@@ -550,10 +728,49 @@ export class ExamCalendarComponent implements OnInit {
     reminder_enabled: true
   };
 
+  public filteredExams = computed(() => {
+    const list = this.exams();
+    const activeTrack = this.examTrack.activeTrack();
+    const filter = activeTrack === 'all' ? this.trackFilter() : activeTrack;
+    if (filter === 'kerala_hca') {
+      return list.filter(e => e.conducting_body === 'High Court of Kerala' || e.name.toLowerCase().includes('high court'));
+    } else if (filter === 'bank') {
+      return list.filter(e => e.conducting_body !== 'High Court of Kerala' && !e.name.toLowerCase().includes('high court'));
+    }
+    return list;
+  });
+
+  isHighCourtExam(exam: Exam): boolean {
+    if (!exam) return false;
+    const body = (exam.conducting_body || '').toLowerCase();
+    const name = (exam.name || '').toLowerCase();
+    return body.includes('high court') || name.includes('high court') || name.includes('hca') || name.includes('judicial');
+  }
+
+  countActiveTargetedExams(): number {
+    return this.filteredExams().filter(e => e.is_active).length;
+  }
+
+  countHighCourtExams(): number {
+    return this.filteredExams().filter(e => this.isHighCourtExam(e)).length;
+  }
+
+  public filteredEvents = computed(() => {
+    const list = this.events();
+    const activeTrack = this.examTrack.activeTrack();
+    const filter = activeTrack === 'all' ? this.trackFilter() : activeTrack;
+    if (filter === 'kerala_hca') {
+      return list.filter(e => e.title.toLowerCase().includes('high court') || e.title.toLowerCase().includes('hca'));
+    } else if (filter === 'bank') {
+      return list.filter(e => !e.title.toLowerCase().includes('high court') && !e.title.toLowerCase().includes('hca'));
+    }
+    return list;
+  });
+
   public upcomingEvents = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return this.events().filter(e => {
+    return this.filteredEvents().filter(e => {
       const d = new Date(e.event_date);
       d.setHours(0, 0, 0, 0);
       return d.getTime() >= today.getTime();
@@ -563,7 +780,7 @@ export class ExamCalendarComponent implements OnInit {
   public pastEvents = computed(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return this.events().filter(e => {
+    return this.filteredEvents().filter(e => {
       const d = new Date(e.event_date);
       d.setHours(0, 0, 0, 0);
       return d.getTime() < today.getTime();
@@ -574,11 +791,12 @@ export class ExamCalendarComponent implements OnInit {
     switch (this.calendarFilter()) {
       case 'upcoming': return this.upcomingEvents();
       case 'past': return this.pastEvents();
-      default: return this.events();
+      default: return this.filteredEvents();
     }
   });
 
   async ngOnInit(): Promise<void> {
+    this.trackFilter.set(this.examTrack.activeTrack());
     await this.loadData();
   }
 

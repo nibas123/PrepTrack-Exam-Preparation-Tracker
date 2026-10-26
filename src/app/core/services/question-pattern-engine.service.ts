@@ -6,6 +6,12 @@ import {
   ExamSubjectCode,
   QuizQuestion
 } from '../models/database.types';
+import {
+  KERALA_HCA_ENGLISH_POOL,
+  KERALA_HCA_GK_POOL,
+  KERALA_HCA_MATH_REASONING_POOL,
+  convertToExamQuestionItem
+} from './kerala-hca-questions';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +24,96 @@ export class QuestionPatternEngineService {
 
   getDefaultBlueprints(): MockExamBlueprint[] {
     return [
+      {
+        id: 'kerala-hca-objective-mock-1',
+        title: 'Kerala High Court Assistant All-Kerala Live Mock #1',
+        description: 'Official 100-Question Objective Examination: 50 General English, 40 GK & Constitution, 10 Basic Math & Reasoning. 75 Mins, -0.25 penalty.',
+        exam_category: 'KERALA_HCA',
+        exam_stage: 'prelims',
+        total_duration_minutes: 75,
+        has_sectional_timing: false,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 62.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english_hca',
+            name: 'General English',
+            subjectCode: 'english_hca',
+            questionsCount: 50,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 25.0
+          },
+          {
+            code: 'gk_hca',
+            name: 'General Knowledge & Constitution',
+            subjectCode: 'gk_hca',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 20.0
+          },
+          {
+            code: 'math_reasoning_hca',
+            name: 'Basic Mathematics & Reasoning',
+            subjectCode: 'math_reasoning_hca',
+            questionsCount: 10,
+            durationMinutes: 10,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 5.0
+          }
+        ]
+      },
+      {
+        id: 'kerala-hca-objective-mock-2',
+        title: 'Kerala High Court Assistant High-Scoring Benchmark Mock #2',
+        description: 'Second full-length Kerala High Court Assistant Objective Exam featuring Legal Vocabulary, Kerala Renaissance, and Constitutional Powers.',
+        exam_category: 'KERALA_HCA',
+        exam_stage: 'prelims',
+        total_duration_minutes: 75,
+        has_sectional_timing: false,
+        total_marks: 100,
+        negative_marking: 0.25,
+        target_cutoff: 65.0,
+        is_active: true,
+        sections_config: [
+          {
+            code: 'english_hca',
+            name: 'General English',
+            subjectCode: 'english_hca',
+            questionsCount: 50,
+            durationMinutes: 35,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 26.0
+          },
+          {
+            code: 'gk_hca',
+            name: 'General Knowledge & Constitution',
+            subjectCode: 'gk_hca',
+            questionsCount: 40,
+            durationMinutes: 30,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 22.0
+          },
+          {
+            code: 'math_reasoning_hca',
+            name: 'Basic Mathematics & Reasoning',
+            subjectCode: 'math_reasoning_hca',
+            questionsCount: 10,
+            durationMinutes: 10,
+            marksPerQuestion: 1,
+            negativeMarks: 0.25,
+            cutoffEstimate: 6.0
+          }
+        ]
+      },
       {
         id: 'ibps-po-prelims-live-1',
         title: 'IBPS PO Prelims All-India Live Mock #1',
@@ -1173,6 +1269,17 @@ export class QuestionPatternEngineService {
       let sectionQuestions: ExamQuestionItem[] = [];
 
       switch (section.subjectCode) {
+        case 'english_hca':
+          sectionQuestions = this.generateKeralaHcaEnglishSection(section.questionsCount, section.code, section.name);
+          break;
+        case 'gk_hca':
+        case 'legal_gk':
+        case 'kerala_gk':
+          sectionQuestions = this.generateKeralaHcaGkSection(section.questionsCount, section.code, section.name);
+          break;
+        case 'math_reasoning_hca':
+          sectionQuestions = this.generateKeralaHcaMathSection(section.questionsCount, section.code, section.name);
+          break;
         case 'quant':
           sectionQuestions = this.generateQuantSection(section.questionsCount, section.code, section.name);
           break;
@@ -1204,6 +1311,46 @@ export class QuestionPatternEngineService {
     }
 
     return allQuestions;
+  }
+
+  // =========================================================================
+  // KERALA HIGH COURT ASSISTANT GENERATORS
+  // =========================================================================
+
+  private generateKeralaHcaEnglishSection(count: number, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const pool = [...KERALA_HCA_ENGLISH_POOL];
+    const items: ExamQuestionItem[] = [];
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const def = pool[i % pool.length];
+      items.push(convertToExamQuestionItem(def, `hca-eng-${runId}-${i + 1}`, sectionCode, sectionName, i + 1));
+    }
+    return items;
+  }
+
+  private generateKeralaHcaGkSection(count: number, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const pool = [...KERALA_HCA_GK_POOL];
+    const items: ExamQuestionItem[] = [];
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const def = pool[i % pool.length];
+      items.push(convertToExamQuestionItem(def, `hca-gk-${runId}-${i + 1}`, sectionCode, sectionName, i + 1));
+    }
+    return items;
+  }
+
+  private generateKeralaHcaMathSection(count: number, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const pool = [...KERALA_HCA_MATH_REASONING_POOL];
+    const items: ExamQuestionItem[] = [];
+    const runId = Math.random().toString(36).substring(2, 7);
+
+    for (let i = 0; i < count; i++) {
+      const def = pool[i % pool.length];
+      items.push(convertToExamQuestionItem(def, `hca-math-${runId}-${i + 1}`, sectionCode, sectionName, i + 1));
+    }
+    return items;
   }
 
   // =========================================================================
@@ -2884,7 +3031,7 @@ export class QuestionPatternEngineService {
     }
 
     if (rcCount > 0) {
-      items.push(...this.buildReadingComprehensionSet(`${runId}-rc`, sectionCode, sectionName));
+      items.push(...this.generateReadingComprehensionQuestions(rcCount, sectionCode, sectionName));
     }
 
     for (let i = 0; i < remCount; i++) {
@@ -3382,6 +3529,511 @@ export class QuestionPatternEngineService {
         negativeMarks: 0.25
       }
     ];
+  }
+
+  private buildReadingComprehensionSet2(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const passage =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `India's Unified Payments Interface (UPI), developed by the National Payments Corporation of India (NPCI), has emerged as a globally recognized benchmark for digital public infrastructure (DPI). By interoperably linking bank accounts to virtual payment addresses via smartphones, UPI democratized retail electronic payments across socio-economic strata. The rapid transition from cash to digital micro-transactions was accelerated by the zero-Merchant Discount Rate (MDR) policy on UPI and RuPay debit card transactions, which incentivized millions of small kirana merchants to adopt QR code acceptance without bearing interchange overheads.\n\n` +
+      `Nonetheless, the ecosystem contends with systemic operational challenges. A key concern centers on the financial sustainability of acquiring payment aggregators and commercial banks, who incur substantial infrastructure, fraud detection, and transaction processing costs without direct transaction revenue. Concurrently, the exponential growth in payment volumes has exposed vulnerable rural first-time users to social engineering frauds and deceptive payment requests. Regulators must therefore strike a delicate equilibrium between promoting frictionless digital inclusion and ensuring the robust cybersecurity and economic viability of participant financial institutions.`;
+
+    return [
+      {
+        id: `${idPrefix}-1`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_06',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `According to the passage, what policy directly encouraged small merchants to adopt QR code payments?`,
+        options: [
+          'Zero-Merchant Discount Rate (MDR) policy on UPI and RuPay',
+          'Mandatory government subsidization of smartphone hardware',
+          'Imposition of penalty taxes on physical cash withdrawals',
+          'Complete elimination of commercial bank transaction servers',
+          'Free insurance coverage provided by payment aggregators'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The first paragraph explicitly states that the transition was accelerated by the zero-Merchant Discount Rate (MDR) policy on UPI and RuPay debit cards, saving merchants interchange overheads.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-2`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_07',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What primary financial challenge do commercial banks and payment aggregators face in the UPI ecosystem?`,
+        options: [
+          'Incurring infrastructure and processing costs without direct transaction fee revenue',
+          'High default rates on unsecured consumer loans',
+          'Inability to link multiple bank accounts to a single mobile number',
+          'Mandatory physical verification for every peer-to-peer micro-transaction',
+          'Extreme currency exchange rate fluctuations'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The second paragraph highlights that acquiring banks and aggregators bear substantial infrastructure, security, and processing expenses without receiving direct transaction revenues under zero-MDR.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-3`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_08',
+        difficulty: 'hard',
+        passageText: passage,
+        questionText: `What operational risk emerging from exponential digital payment growth among rural users is highlighted by the author?`,
+        options: [
+          'Susceptibility of first-time users to social engineering fraud and deceptive requests',
+          'Rapid depreciation of the Indian Rupee against foreign currencies',
+          'Total breakdown of physical cash distribution networks',
+          'Complete refusal of rural merchants to accept digital receipts',
+          'Exhaustion of sovereign digital reserves by payment aggregators'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage notes that volume expansion has exposed vulnerable rural first-time users to social engineering frauds and deceptive payment requests.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-4`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_09',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which of the following is most nearly SIMILAR in meaning to the word 'EQUILIBRIUM' as used in the passage?`,
+        options: ['Balance', 'Disparity', 'Extremity', 'Agitation', 'Stagnation'],
+        correctOptionIndex: 0,
+        explanation: 'In the context of balancing frictionless digital inclusion with cybersecurity and bank viability, "equilibrium" means a state of balance.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-5`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_10',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What is the central message of the author regarding the UPI ecosystem?`,
+        options: [
+          'It is a transformative payment benchmark, but requires sustainable bank economics and vigilant fraud protection',
+          'It should be discontinued immediately in favor of traditional physical bank notes',
+          'It should be made completely inaccessible to rural and semi-urban populations',
+          'Payment aggregators should be prohibited from installing digital payment infrastructure',
+          'The National Payments Corporation of India should be dissolved'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The author recognizes UPI as a global benchmark for digital public infrastructure while urging solutions for aggregator financial sustainability and cybersecurity.',
+        marks: 1,
+        negativeMarks: 0.25
+      }
+    ];
+  }
+
+  private buildReadingComprehensionSet3(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const passage =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `Prior to the enactment of the Insolvency and Bankruptcy Code (IBC) in 2016, the Indian banking system was burdened by the persistent 'twin balance sheet' problem—where both corporate balance sheets and public sector bank asset portfolios were severely impaired by bad loans. Archaic recovery mechanisms like the SARFAESI Act and Debt Recovery Tribunals (DRTs) proved protracted, resulting in deep asset value erosion and enabling chronic defaulters to retain operational control through legal stalling.\n\n` +
+      `The IBC fundamentally overhauled corporate credit culture by introducing a time-bound, creditor-in-control resolution mechanism. Under Section 29A of the Code, wilful defaulters and erstwhile promoters of stressed enterprises were barred from participating in resolution bidding, effectively curbing moral hazard. While critics frequently point to steep 'haircuts'—the percentage loss absorbed by financial creditors relative to their admitted claims—proponents emphasize that realized recovery amounts must be measured against liquidation benchmark values rather than inflated book values. By facilitating swift capital reallocation from distressed assets back into productive economic activities, the IBC restored financial discipline to the sovereign lending apparatus.`;
+
+    return [
+      {
+        id: `${idPrefix}-1`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_11',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What core shortcoming of pre-IBC recovery mechanisms led to asset value erosion?`,
+        options: [
+          'Protracted legal delays enabling chronic defaulters to retain operational control',
+          'Strict daily limits on interbank call money borrowings',
+          'Immediate liquidation of enterprises upon their first missed repayment',
+          'Excessive central bank caps on commercial lending margins',
+          'Compulsory conversion of corporate loans into sovereign treasury bonds'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage notes that archaic mechanisms like DRTs proved protracted, resulting in deep asset value erosion and enabling chronic defaulters to retain operational control through legal stalling.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-2`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_12',
+        difficulty: 'hard',
+        passageText: passage,
+        questionText: `Why does Section 29A of the IBC bar erstwhile promoters of stressed entities from submitting resolution plans?`,
+        options: [
+          'To curb moral hazard by ensuring wilful defaulters cannot repurchase assets at discounted valuations',
+          'To mandate that only foreign sovereign funds can purchase distressed Indian companies',
+          'To force commercial banks to liquidate all manufacturing entities within thirty days',
+          'To replace the Committee of Creditors with government appointees',
+          'Because former promoters are legally disqualified from holding bank savings accounts'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'Section 29A prevents moral hazard by barring wilful defaulters and past promoters from bidding to buy back their own distressed enterprises at distressed rates.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-3`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_13',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What counter-argument do proponents offer against criticisms regarding large 'haircuts' taken by lenders?`,
+        options: [
+          'Recoveries must be benchmarked against actual liquidation value rather than inflated book values',
+          'All haircuts are fully compensated by direct central bank cash disbursements',
+          'Lenders never suffer any real balance sheet loss during corporate insolvency',
+          'The IBC provides a legal guarantee of 100 percent principal recovery',
+          'Haircuts are restricted entirely to foreign institutional investors'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'Proponents argue that realized recoveries must be assessed relative to the realistic liquidation benchmark value of stressed assets rather than obsolete book values.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-4`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_14',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which of the following is most nearly OPPOSITE in meaning to the word 'PROTRACTED' as used in the passage?`,
+        options: ['Expedited', 'Prolonged', 'Enduring', 'Circuitous', 'Perpetuated'],
+        correctOptionIndex: 0,
+        explanation: '"Protracted" means prolonged or drawn out over an extended time. Its opposite is "expedited" (speeded up or resolved promptly).',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-5`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_15',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `What fundamental shift did the IBC introduce to corporate credit resolution?`,
+        options: [
+          'A time-bound, creditor-in-control resolution mechanism',
+          'An indefinite debtor-in-possession system with promoter immunity',
+          'An automatic blanket waiver of all corporate non-performing assets',
+          'The permanent closure of the National Company Law Tribunal',
+          'Complete prohibition of insolvency proceedings against private corporations'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The second paragraph explicitly states that the IBC introduced a time-bound, creditor-in-control resolution mechanism.',
+        marks: 1,
+        negativeMarks: 0.25
+      }
+    ];
+  }
+
+  private buildReadingComprehensionSet4(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const passage =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `Priority Sector Lending (PSL) remains a cornerstone of the Reserve Bank of India's redistributive credit mandate, requiring domestic commercial banks to allocate at least 40 percent of their Adjusted Net Bank Credit (ANBC) to designated priority sectors, including agriculture, micro, small, and medium enterprises (MSMEs), export credit, and education. To foster equitable grassroots development, sub-targets have been enforced specifically for Small and Marginal Farmers (SMFs) and Weaker Sections, counteracting commercial lenders' innate bias toward urban industrial credit.\n\n` +
+      `In the agrarian sphere, the Kisan Credit Card (KCC) scheme, paired with short-term crop loan interest subvention, has significantly reduced farmers' dependence on predatory informal moneylenders. Nonetheless, regional credit disparities persist: industrialized states absorb an outsized portion of total agricultural credit, whereas agrarian communities in eastern and northeastern states face structural credit gaps. Furthermore, high operational overheads in processing micro-loans tempt lenders to fulfill their PSL quotas passively through Priority Sector Lending Certificates (PSLCs) rather than originating direct grassroots loans. Enhancing direct rural branch outreach and leveraging agri-fintech credit scoring are essential to bridge this credit asymmetry.`;
+
+    return [
+      {
+        id: `${idPrefix}-1`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_16',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `What minimum proportion of Adjusted Net Bank Credit (ANBC) must domestic commercial banks allocate to priority sectors?`,
+        options: [
+          'At least 40 percent',
+          'Exactly 10 percent',
+          'Up to 25 percent',
+          'At least 75 percent',
+          'Exactly 50 percent'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage explicitly states that domestic commercial banks must allocate at least 40 percent of ANBC to priority sectors.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-2`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_17',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `According to the author, how do some commercial banks passively fulfill their priority sector quotas?`,
+        options: [
+          'By purchasing Priority Sector Lending Certificates (PSLCs)',
+          'By closing rural and semi-urban customer service points',
+          'By writing off all existing agricultural crop borrowings',
+          'By transferring their lending licenses to microfinance firms',
+          'By converting rural savings accounts into sovereign bonds'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage observes that high overheads tempt lenders to fulfill their PSL quotas passively through Priority Sector Lending Certificates (PSLCs) rather than originating grassroots loans.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-3`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_18',
+        difficulty: 'hard',
+        passageText: passage,
+        questionText: `What persistent geographical disparity in farm credit distribution is highlighted in the text?`,
+        options: [
+          'Industrialized states absorb disproportionate credit while eastern/northeastern states face structural gaps',
+          'Southern states receive zero priority sector allocations from scheduled banks',
+          'Metropolitan regions are barred from receiving small enterprise credit',
+          'Eastern states receive all available crop loan interest subventions',
+          'Agrarian communities in northern India are prohibited from using Kisan Credit Cards'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The author notes that industrialized states absorb an outsized portion of agricultural credit, whereas agrarian communities in eastern and northeastern states face structural gaps.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-4`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_19',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which of the following is most nearly SIMILAR in meaning to the word 'ASYMMETRY' as used in the passage?`,
+        options: ['Imbalance', 'Symmetry', 'Uniformity', 'Cohesion', 'Equivalence'],
+        correctOptionIndex: 0,
+        explanation: 'In the context of regional disparities in credit distribution, "asymmetry" refers to an unequal distribution or imbalance.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-5`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_20',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What primary benefit of the Kisan Credit Card (KCC) scheme is cited by the author?`,
+        options: [
+          'Reducing farmers\' reliance on exploitative informal moneylenders via subsidized credit',
+          'Offering free foreign exchange services to rural artisans',
+          'Allowing farmers to trade speculative commodity futures without collateral',
+          'Compelling farming households to relocate to urban industrial centers',
+          'Guaranteeing employment in public sector banking institutions'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage notes that the KCC scheme, along with interest subvention, has significantly reduced farmers\' dependence on predatory informal moneylenders.',
+        marks: 1,
+        negativeMarks: 0.25
+      }
+    ];
+  }
+
+  private buildReadingComprehensionSet5(idPrefix: string, sectionCode: string, sectionName: string): ExamQuestionItem[] {
+    const passage =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `As extreme climate phenomena increasingly threaten physical infrastructure and macroeconomic stability, central banks globally are integrating Environmental, Social, and Governance (ESG) considerations into their prudential supervision. The Reserve Bank of India (RBI) has issued a comprehensive framework on Climate-Related Financial Risks, urging regulated financial entities to establish transparent governance structures for evaluating both physical risks—such as cyclone and drought damages to loan collateral—and transition risks, including stranded asset liabilities in fossil-fuel sectors facing carbon-reduction mandates.\n\n` +
+      `To catalyze investments in sustainable technology, India introduced Sovereign Green Bonds (SGrBs), directing proceeds exclusively toward renewable energy, clean transportation, and energy-efficiency projects. However, the burgeoning green finance sector faces the pervasive risk of 'greenwashing'—where entities deceptively overstate environmental benefits to secure cheaper capital. Regulated lenders must therefore establish rigorous carbon-accounting taxonomies and verify end-use utilization. Sustainable banking is no longer a cosmetic corporate social responsibility gesture, but a fundamental imperative for safeguarding bank solvency against systemic climate shocks.`;
+
+    return [
+      {
+        id: `${idPrefix}-1`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_21',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `According to the passage, how do transition risks fundamentally differ from physical climate risks?`,
+        options: [
+          'Transition risks involve stranded asset liabilities from carbon mandates, while physical risks involve direct asset damages from weather events',
+          'Transition risks affect only agricultural crops, while physical risks affect electronic payments',
+          'Physical risks are entirely compensated by international relief funds, while transition risks carry no cost',
+          'Transition risks denote software failures in commercial bank databases',
+          'The passage indicates that both terms represent identical financial phenomena'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage explains that physical risks stem from weather damages to collateral, whereas transition risks stem from stranded assets in carbon-intensive sectors facing emission mandates.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-2`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_22',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `What is the explicit purpose of Sovereign Green Bonds (SGrBs) as outlined in the passage?`,
+        options: [
+          'Channeling proceeds exclusively toward renewable energy, clean transit, and energy efficiency',
+          'Financing coal-fired thermal power plants during peak industrial demand',
+          'Providing unsecured consumer credit to retail banking customers',
+          'Eliminating prudential reserve requirements for public sector commercial banks',
+          'Subsidizing foreign sovereign borrowing in overseas markets'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage explicitly states that proceeds from Sovereign Green Bonds are directed exclusively toward renewable energy, clean transportation, and energy-efficiency projects.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-3`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_23',
+        difficulty: 'hard',
+        passageText: passage,
+        questionText: `What does the term 'greenwashing' specifically denote in sustainable finance?`,
+        options: [
+          'Deceptively exaggerating environmental benefits to obtain lower-cost capital',
+          'Cleaning soiled paper currency through automated chemical treatments',
+          'Laundering corporate proceeds through non-profit environmental charities',
+          'Planting ornamental gardens on commercial bank branch premises',
+          'Mandating solar panel installations on all regional rural banks'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The author defines greenwashing as entities deceptively overstating environmental benefits to secure cheaper capital.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-4`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_24',
+        difficulty: 'easy',
+        passageText: passage,
+        questionText: `Which of the following is most nearly SIMILAR in meaning to the word 'CATALYZE' as used in the passage?`,
+        options: ['Accelerate', 'Halt', 'Diminish', 'Suppress', 'Obscure'],
+        correctOptionIndex: 0,
+        explanation: 'In "To catalyze investments in sustainable technology...", "catalyze" means to accelerate, trigger, or spur forward.',
+        marks: 1,
+        negativeMarks: 0.25
+      },
+      {
+        id: `${idPrefix}-5`,
+        sectionCode,
+        sectionName,
+        questionNumber: 0,
+        subjectCode: 'english',
+        topicName: 'Reading Comprehension',
+        patternCode: 'ENG_RC_25',
+        difficulty: 'medium',
+        passageText: passage,
+        questionText: `What conclusion does the author draw regarding sustainable banking in the final sentence?`,
+        options: [
+          'It is a vital imperative for preserving bank solvency against systemic climate shocks, not mere cosmetic CSR',
+          'It should be abandoned because climate phenomena have no impact on banking portfolios',
+          'It is an unnecessary regulatory burden that will bankrupt commercial lenders',
+          'It should be restricted entirely to voluntary student environmental clubs',
+          'It will inevitably lead to the abolition of sovereign green bonds'
+        ],
+        correctOptionIndex: 0,
+        explanation: 'The passage concludes that sustainable banking is no longer a cosmetic CSR gesture, but a fundamental imperative for safeguarding bank solvency against systemic climate shocks.',
+        marks: 1,
+        negativeMarks: 0.25
+      }
+    ];
+  }
+
+  public generateReadingComprehensionQuestions(count: number = 5, sectionCode: string = 'english', sectionName: string = 'Reading Comprehension'): ExamQuestionItem[] {
+    const runId = Math.random().toString(36).substring(2, 7);
+    const sets: ExamQuestionItem[][] = [
+      this.buildReadingComprehensionSet(`${runId}-rc1`, sectionCode, sectionName),
+      this.buildReadingComprehensionSet2(`${runId}-rc2`, sectionCode, sectionName),
+      this.buildReadingComprehensionSet3(`${runId}-rc3`, sectionCode, sectionName),
+      this.buildReadingComprehensionSet4(`${runId}-rc4`, sectionCode, sectionName),
+      this.buildReadingComprehensionSet5(`${runId}-rc5`, sectionCode, sectionName),
+    ];
+
+    const shuffled = this.shuffle(sets);
+    const result: ExamQuestionItem[] = [];
+    for (const set of shuffled) {
+      for (const item of set) {
+        result.push(item);
+        if (result.length >= count) {
+          return result;
+        }
+      }
+    }
+    return result.slice(0, count);
+  }
+
+  public generateParaJumbleQuestions(count: number = 5, sectionCode: string = 'english', sectionName: string = 'Para Jumbles'): ExamQuestionItem[] {
+    const runId = Math.random().toString(36).substring(2, 7);
+    const items = this.buildParaJumbleSet(runId, sectionCode, sectionName);
+    return items.slice(0, count);
   }
 
   private buildVocabContextQuestion(id: string, sectionCode: string, sectionName: string, index: number): ExamQuestionItem {
@@ -4255,7 +4907,24 @@ export class QuestionPatternEngineService {
     const runId = Math.random().toString(36).substring(2, 7);
 
     // BATCH GENERATION FOR CATEGORICAL BANKS (guarantees unique questions without replacement)
-    if (normalized.includes('comp') || normalized.includes('hardware') || normalized.includes('network') || normalized.includes('shortcut')) {
+    if (
+      normalized.includes('comprehension') ||
+      normalized.includes('reading') ||
+      normalized.includes('passage') ||
+      normalized === 'rc'
+    ) {
+      const rcItems = this.generateReadingComprehensionQuestions(count, 'english', 'Reading Comprehension');
+      rawItems.push(...rcItems);
+    } else if (
+      normalized.includes('computer') ||
+      normalized.includes('hardware') ||
+      normalized.includes('network') ||
+      normalized.includes('shortcut') ||
+      normalized.includes('ms office') ||
+      normalized.includes('cyber') ||
+      normalized.includes('operating system') ||
+      normalized === 'comp'
+    ) {
       const compItems = this.generateComputerSection(count, 'computer', 'Computer Aptitude');
       rawItems.push(...compItems);
     } else if (
@@ -4279,6 +4948,13 @@ export class QuestionPatternEngineService {
     ) {
       const gaItems = this.generateGaSection(count, 'ga', 'General & Banking Awareness');
       rawItems.push(...gaItems);
+    } else if (
+      normalized.includes('jumble') ||
+      normalized.includes('rearrange') ||
+      normalized.includes('sentence sequence')
+    ) {
+      const pjItems = this.generateParaJumbleQuestions(count, 'english', 'Para Jumbles');
+      rawItems.push(...pjItems);
     } else {
       // PARAMETRIC & ROTATING GENERATORS WITH UNIQUE SEEDS
       for (let i = 0; i < count; i++) {
@@ -4328,6 +5004,13 @@ export class QuestionPatternEngineService {
           rawItems.push(this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i));
         } else if (normalized.includes('cloze') || normalized.includes('filler')) {
           rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
+        } else if (normalized.includes('vocab') || normalized.includes('idiom') || normalized.includes('synonym') || normalized.includes('antonym')) {
+          rawItems.push(this.buildVocabContextQuestion(qId, 'english', 'English Language', i));
+        } else if (normalized.includes('eng') || (subjectFilter && subjectFilter.toLowerCase().includes('eng'))) {
+          // General English fallback
+          rawItems.push(i % 3 === 0
+            ? this.buildErrorSpottingQuestion(qId, 'english', 'English Language', i)
+            : (i % 3 === 1 ? this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i) : this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i)));
         } else {
           // Fallback arithmetic with specific topic attribution
           rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage', i));
@@ -4359,7 +5042,8 @@ export class QuestionPatternEngineService {
         id: `topic-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
         subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer'))),
         topic_name: topicName || item.topicName,
-        question_text: item.questionText,
+        passage_text: item.passageText,
+        question_text: item.passageText ? `${item.passageText}\n\n${item.questionText}` : item.questionText,
         options: fourOptions,
         correct_option_index: newCorrectIdx >= 0 ? newCorrectIdx : 0,
         explanation: item.explanation,

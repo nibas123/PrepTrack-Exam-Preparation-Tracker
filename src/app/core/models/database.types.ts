@@ -1,6 +1,6 @@
 export type LearningStatus = 'not_started' | 'learning' | 'learned' | 'revision_completed';
 export type Priority = 'low' | 'medium' | 'high';
-export type ExamStage = 'prelims' | 'mains' | 'both';
+export type ExamStage = 'prelims' | 'mains' | 'both' | 'objective' | 'descriptive';
 export type EventType =
   | 'exam_date'
   | 'application_open'
@@ -30,6 +30,7 @@ export interface QuizQuestion {
   subject_id: string;
   topic_id?: string | null;
   topic_name?: string;
+  passage_text?: string;
   question_text: string;
   options: string[];
   correct_option_index: number;
@@ -131,7 +132,7 @@ export interface ExamSubject {
   user_id: string;
   exam_id: string;
   subject_id: string;
-  stage: 'prelims' | 'mains' | 'both';
+  stage: ExamStage;
   display_order: number;
   created_at?: string;
   subject?: Subject;
@@ -286,10 +287,22 @@ export interface DashboardWidgetConfig {
 }
 
 // -------------------------------------------------------------
-// Interactive Mock Exam Simulator & Question Pattern Engine
+// Multi-Exam Tracks & Exam Categories
 // -------------------------------------------------------------
 
-export type ExamSubjectCode = 'quant' | 'reasoning' | 'english' | 'ga' | 'computer';
+export type ExamTrack = 'all' | 'bank' | 'kerala_hca';
+
+export type ExamSubjectCode =
+  | 'quant'
+  | 'reasoning'
+  | 'english'
+  | 'ga'
+  | 'computer'
+  | 'legal_gk'
+  | 'kerala_gk'
+  | 'english_hca'
+  | 'gk_hca'
+  | 'math_reasoning_hca';
 
 export type ExamPaletteStatus =
   | 'not_visited'       // Gray
@@ -328,7 +341,20 @@ export interface MockExamBlueprint {
   id: string;
   title: string;
   description?: string;
-  exam_category: 'IBPS_PO' | 'SBI_PO' | 'IBPS_CLERK' | 'SBI_CLERK' | 'RRB_PO' | 'RRB_CLERK' | 'RBI_EXAM' | 'NABARD' | 'INSURANCE' | 'SPECIALIST' | 'MIXED_SPRINT' | 'SECTIONAL';
+  exam_category:
+    | 'IBPS_PO'
+    | 'SBI_PO'
+    | 'IBPS_CLERK'
+    | 'SBI_CLERK'
+    | 'RRB_PO'
+    | 'RRB_CLERK'
+    | 'RBI_EXAM'
+    | 'NABARD'
+    | 'INSURANCE'
+    | 'SPECIALIST'
+    | 'MIXED_SPRINT'
+    | 'SECTIONAL'
+    | 'KERALA_HCA';
   exam_stage: 'prelims' | 'mains';
   total_duration_minutes: number;
   has_sectional_timing: boolean;

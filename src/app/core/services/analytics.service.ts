@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DataStorageService } from './data-storage.service';
 import { AuthService } from '../auth/auth.service';
+import { ExamTrackService } from './exam-track.service';
 import {
   DashboardSummary,
   SubjectProgress,
@@ -16,6 +17,15 @@ import {
 export class AnalyticsService {
   private dataStorage = inject(DataStorageService);
   private authService = inject(AuthService);
+  private examTrack = inject(ExamTrackService);
+
+  private matchesStage(esStage: ExamStage, targetStage: ExamStage): boolean {
+    if (targetStage === 'both' || esStage === 'both') return true;
+    if (targetStage === esStage) return true;
+    if (targetStage === 'prelims' && esStage === 'objective') return true;
+    if (targetStage === 'mains' && esStage === 'descriptive') return true;
+    return false;
+  }
 
   /**
    * Statuses considered "Completed" in PrepTrack: 'learned' and 'revision_completed'
@@ -42,7 +52,7 @@ export class AnalyticsService {
     if (stage === 'both') {
       stageSubjectIds = new Set(allTopics.map(t => t.subject_id));
     } else {
-      const filteredExamSubs = examSubjects.filter(es => es.stage === stage || es.stage === 'both');
+      const filteredExamSubs = examSubjects.filter(es => this.matchesStage(es.stage, stage));
       stageSubjectIds = new Set(filteredExamSubs.map(es => es.subject_id));
       // Fallback if none matched
       if (stageSubjectIds.size === 0) {
@@ -50,7 +60,12 @@ export class AnalyticsService {
       }
     }
 
-    const filteredTopics = allTopics.filter(t => stageSubjectIds.has(t.subject_id));
+    let filteredTopics = allTopics.filter(t => stageSubjectIds.has(t.subject_id));
+    if (this.examTrack.isKeralaHca()) {
+      filteredTopics = filteredTopics.filter(t => t.subject_id.includes('hca') || (t as any).is_hca);
+    } else if (this.examTrack.isBank()) {
+      filteredTopics = filteredTopics.filter(t => !t.subject_id.includes('hca'));
+    }
     const totalTopics = filteredTopics.length;
     const completedTopics = filteredTopics.filter(t => this.isTopicCompleted(t)).length;
     const syllabusCompletionPercentage = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
@@ -89,7 +104,13 @@ export class AnalyticsService {
       .filter(e => {
         const evDate = new Date(e.event_date);
         evDate.setHours(0, 0, 0, 0);
-        return evDate.getTime() >= todayDate.getTime();
+        if (evDate.getTime() < todayDate.getTime()) return false;
+        if (this.examTrack.isKeralaHca()) {
+          return e.title.toLowerCase().includes('high court') || e.title.toLowerCase().includes('hca');
+        } else if (this.examTrack.isBank()) {
+          return !e.title.toLowerCase().includes('high court') && !e.title.toLowerCase().includes('hca');
+        }
+        return true;
       })
       .sort((a, b) => a.event_date.localeCompare(b.event_date));
 
@@ -137,14 +158,19 @@ export class AnalyticsService {
     if (stage === 'both') {
       stageSubjectIds = new Set(allSubjects.map(s => s.id));
     } else {
-      const filteredExamSubs = examSubjects.filter(es => es.stage === stage || es.stage === 'both');
+      const filteredExamSubs = examSubjects.filter(es => this.matchesStage(es.stage, stage));
       stageSubjectIds = new Set(filteredExamSubs.map(es => es.subject_id));
       if (stageSubjectIds.size === 0) {
         stageSubjectIds = new Set(allSubjects.map(s => s.id));
       }
     }
 
-    const filteredSubjects = allSubjects.filter(s => stageSubjectIds.has(s.id));
+    let filteredSubjects = allSubjects.filter(s => stageSubjectIds.has(s.id));
+    if (this.examTrack.isKeralaHca()) {
+      filteredSubjects = filteredSubjects.filter(s => s.id.includes('hca') || s.name.toLowerCase().includes('kerala') || s.name.toLowerCase().includes('constitution'));
+    } else if (this.examTrack.isBank()) {
+      filteredSubjects = filteredSubjects.filter(s => !s.id.includes('hca') && !s.name.toLowerCase().includes('kerala'));
+    }
 
     return filteredSubjects.map(subject => {
       const subTopics = allTopics.filter(t => t.subject_id === subject.id);

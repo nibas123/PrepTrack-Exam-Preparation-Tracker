@@ -23,27 +23,24 @@ import { ToastContainerComponent } from './shared/components/toast-container/toa
       <router-outlet></router-outlet>
       <app-toast-container></app-toast-container>
     } @else {
-      <!-- Main Application Layout Shell -->
-      <div class="min-h-screen flex bg-slate-50">
-        <!-- Sidebar Navigation -->
+      <!-- Main Application Layout Shell: Full-width, distraction-free workspace -->
+      <div class="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors">
+        <!-- Sidebar Navigation Drawer (off-canvas for mobile & drawer access) -->
         <app-sidebar
           [mobileOpen]="isMobileSidebarOpen()"
           (closeMobile)="isMobileSidebarOpen.set(false)"
         ></app-sidebar>
 
-        <!-- Main Workspace Area -->
-        <div class="flex-1 flex flex-col min-w-0 min-h-screen">
-          <!-- Top Navbar -->
-          <app-navbar
-            [title]="currentPageTitle()"
-            (toggleMobile)="isMobileSidebarOpen.update(v => !v)"
-          ></app-navbar>
+        <!-- Top Header Navigation -->
+        <app-navbar
+          [title]="currentPageTitle()"
+          (toggleMobile)="isMobileSidebarOpen.update(v => !v)"
+        ></app-navbar>
 
-          <!-- Main Page Body -->
-          <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-            <router-outlet></router-outlet>
-          </main>
-        </div>
+        <!-- Main Content Area: Maximum screen space, clean distraction-free -->
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <router-outlet></router-outlet>
+        </main>
 
         <!-- Global Toast Container -->
         <app-toast-container></app-toast-container>
@@ -64,14 +61,20 @@ export class App {
 
   public currentPageTitle = computed(() => {
     const url = this.currentUrl();
-    if (url.includes('/syllabus')) return 'My Syllabus';
+    if (url.includes('/kerala-high-court')) return 'High Court Recruitment Hub';
+    if (url.includes('/study-library')) return 'Comprehensive Legal Study Library';
+    if (url.includes('/descriptive-lab')) return 'Descriptive Examination Lab';
+    if (url.includes('/revision')) return 'Smart Revision & Error Vault';
+    if (url.includes('/syllabus')) return 'Syllabus Tracker';
     if (url.includes('/daily-goals')) return 'Daily Goals';
     if (url.includes('/study-sessions')) return 'Study Sessions & Timer';
     if (url.includes('/mock-exams')) return 'Mock Exams';
-    if (url.includes('/exam-calendar')) return 'Exam Calendar';
+    if (url.includes('/exam-calendar')) return 'All Recruitment Examinations';
     if (url.includes('/quizzes')) return 'Practice Quizzes & Previous Papers';
+    if (url.includes('/growth-stats')) return 'Growth & Preparation Stats';
+    if (url.includes('/admin')) return 'Admin & AI Control Console';
     if (url.includes('/settings')) return 'Settings';
-    return 'Dashboard';
+    return 'Preparation Dashboard';
   });
 
   constructor() {

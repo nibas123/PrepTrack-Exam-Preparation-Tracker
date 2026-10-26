@@ -6,6 +6,12 @@ import { OfflineSyncService } from './offline-sync.service';
 import { AiConfigService } from './ai-config.service';
 import { QuestionPatternEngineService } from './question-pattern-engine.service';
 import { environment } from '../../../environments/environment';
+import {
+  KERALA_HCA_ENGLISH_POOL,
+  KERALA_HCA_GK_POOL,
+  KERALA_HCA_MATH_REASONING_POOL,
+  convertToQuizQuestion
+} from './kerala-hca-questions';
 
 @Injectable({
   providedIn: 'root'
@@ -226,7 +232,92 @@ export class QuizService {
 
   // --- ENGLISH QUESTIONS BANK ---
   getEnglishQuestionPool(): QuizQuestion[] {
+    const rcPassage1 =
+      `Directions (Q. 1 to 5): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `Central Bank Digital Currencies (CBDCs), such as the Reserve Bank of India's Digital Rupee (e₹), represent a sovereign digital legal tender issued directly by the central bank. Unlike decentralized cryptocurrencies, which exhibit extreme price volatility and lack intrinsic backing, a CBDC carries the same sovereign guarantee as physical banknotes. The RBI has bifurcated its pilot into two distinct segments: Wholesale CBDC (e₹-W), designed to streamline interbank settlements and government securities trading, and Retail CBDC (e₹-R), aimed at everyday peer-to-peer and peer-to-merchant transactions.\n\n` +
+      `A key advantage of CBDCs is the reduction in the physical cost of printing, transporting, and storing paper currency, alongside instantaneous settlement finality that reduces counterparty risk. However, policymakers remain mindful of potential disintermediation risks: if citizens convert large volumes of commercial bank deposits into risk-free central bank digital wallets during periods of financial stress, commercial banks could face liquidity constraints. Consequently, non-remunerative (zero-interest) holdings and tiered transaction caps have been incorporated into the design architecture.`;
+
+    const rcPassage2 =
+      `Directions (Q. 6 to 10): Read the following passage carefully and answer the questions given below it.\n\n` +
+      `India's Unified Payments Interface (UPI), developed by the National Payments Corporation of India (NPCI), has emerged as a globally recognized benchmark for digital public infrastructure (DPI). By interoperably linking bank accounts to virtual payment addresses via smartphones, UPI democratized retail electronic payments across socio-economic strata. The rapid transition from cash to digital micro-transactions was accelerated by the zero-Merchant Discount Rate (MDR) policy on UPI and RuPay debit card transactions, which incentivized millions of small kirana merchants to adopt QR code acceptance without bearing interchange overheads.\n\n` +
+      `Nonetheless, the ecosystem contends with systemic operational challenges. A key concern centers on the financial sustainability of acquiring payment aggregators and commercial banks, who incur substantial infrastructure, fraud detection, and transaction processing costs without direct transaction revenue. Concurrently, the exponential growth in payment volumes has exposed vulnerable rural first-time users to social engineering frauds and deceptive payment requests. Regulators must therefore strike a delicate equilibrium between promoting frictionless digital inclusion and ensuring the robust cybersecurity and economic viability of participant financial institutions.`;
+
     return [
+      {
+        id: 'eng-rc-1',
+        subject_id: 'sub-english',
+        topic_name: 'Reading Comprehension',
+        passage_text: rcPassage1,
+        question_text: `${rcPassage1}\n\nAccording to the passage, how does a Central Bank Digital Currency (CBDC) fundamentally differ from decentralized cryptocurrencies?`,
+        options: [
+          'It is a sovereign legal tender backed directly by the central bank',
+          'It exhibits higher price volatility than private tokens',
+          'It is issued exclusively by private commercial fintech firms',
+          'It carries a high annual interest rate for all retail holders'
+        ],
+        correct_option_index: 0,
+        explanation: 'The passage explicitly states that unlike volatile cryptocurrencies, a CBDC is a sovereign digital legal tender issued and backed directly by the central bank.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'eng-rc-2',
+        subject_id: 'sub-english',
+        topic_name: 'Reading Comprehension',
+        passage_text: rcPassage1,
+        question_text: `${rcPassage1}\n\nWhat is the primary objective of the Wholesale CBDC (e₹-W) segment mentioned in the passage?`,
+        options: [
+          'Streamlining interbank settlements and government securities trading',
+          'Replacing all rural cooperative bank branches',
+          'Providing high-interest savings accounts to retail households',
+          'Financing international cryptocurrency exchanges'
+        ],
+        correct_option_index: 0,
+        explanation: 'Wholesale CBDC (e₹-W) is designed to streamline interbank settlements and securities transactions.',
+        difficulty: 'medium'
+      },
+      {
+        id: 'eng-rc-3',
+        subject_id: 'sub-english',
+        topic_name: 'Reading Comprehension',
+        passage_text: rcPassage1,
+        question_text: `${rcPassage1}\n\nWhy have policymakers designed CBDC wallets to be "non-remunerative" (bearing zero interest)?`,
+        options: [
+          'To prevent commercial bank deposit disintermediation and liquidity drain',
+          'To increase the physical cost of printing paper currency',
+          'To encourage speculative trading in digital tokens',
+          'Because central banks cannot record digital transactions'
+        ],
+        correct_option_index: 0,
+        explanation: 'Non-remunerative holdings and caps prevent citizens from pulling large deposits out of commercial banks (disintermediation).',
+        difficulty: 'hard'
+      },
+      {
+        id: 'eng-rc-4',
+        subject_id: 'sub-english',
+        topic_name: 'Reading Comprehension',
+        passage_text: rcPassage1,
+        question_text: `${rcPassage1}\n\nWhich of the following is most nearly SIMILAR in meaning to the word 'BIFURCATED' as used in the passage?`,
+        options: ['Divided into two branches', 'Consolidated into one', 'Abolished permanently', 'Postponed indefinitely'],
+        correct_option_index: 0,
+        explanation: '"Bifurcated" means split or divided into two branches.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'eng-rc-5',
+        subject_id: 'sub-english',
+        topic_name: 'Reading Comprehension',
+        passage_text: rcPassage2,
+        question_text: `${rcPassage2}\n\nAccording to the passage, what policy directly encouraged small merchants to adopt QR code payments?`,
+        options: [
+          'Zero-Merchant Discount Rate (MDR) policy on UPI and RuPay',
+          'Mandatory government subsidization of smartphone hardware',
+          'Imposition of penalty taxes on physical cash withdrawals',
+          'Complete elimination of commercial bank transaction servers'
+        ],
+        correct_option_index: 0,
+        explanation: 'The transition was accelerated by the zero-MDR policy on UPI and RuPay debit cards, saving merchants interchange fees.',
+        difficulty: 'medium'
+      },
       {
         id: 'eng-1',
         subject_id: 'sub-english',
@@ -275,6 +366,57 @@ export class QuizService {
         options: ['remarkable', 'negligent', 'futile', 'fragile'],
         correct_option_index: 0,
         explanation: '"Remarkable" accurately conveys commendable strength despite economic hardship.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'eng-6',
+        subject_id: 'sub-english',
+        topic_name: 'Error Spotting',
+        question_text: 'Identify the error segment: "Hardly had the bank opened (A) / when a large crowd (B) / has entered the premises (C) / No error (D)"',
+        options: ['Part A', 'Part B', 'Part C (has entered -> entered)', 'Part D (No error)'],
+        correct_option_index: 2,
+        explanation: 'The correlative conjunction "Hardly had... when..." is followed by the past simple ("entered"), not present perfect ("has entered").',
+        difficulty: 'medium'
+      },
+      {
+        id: 'eng-7',
+        subject_id: 'sub-english',
+        topic_name: 'Para Jumbles',
+        passage_text: 'Directions: Rearrange sentences (A) Consequently foreign investors sold, (B) Global central banks hiked rates, (C) This triggered bond yield spikes, (D) Regulators added liquidity buffers.',
+        question_text: 'Directions: Rearrange the sentences to form a coherent sequence:\nA. Consequently, foreign investors withdrew capital.\nB. Global central banks hiked benchmark rates.\nC. This triggered a surge in sovereign bond yields.\nD. Domestic regulators introduced liquidity buffers.\n\nWhich sentence should be the FIRST in order?',
+        options: ['Sentence B', 'Sentence A', 'Sentence C', 'Sentence D'],
+        correct_option_index: 0,
+        explanation: 'Sentence B introduces the root cause: central banks hiking benchmark interest rates. Order: B -> C -> A -> D.',
+        difficulty: 'hard'
+      },
+      {
+        id: 'eng-8',
+        subject_id: 'sub-english',
+        topic_name: 'Sentence Improvement',
+        question_text: 'Select the best alternative: "Not only the director but also the analysts [was commended] for the accuracy of the report."',
+        options: ['were commended', 'was commended', 'are commended', 'have commended'],
+        correct_option_index: 0,
+        explanation: 'In "Not only... but also...", the verb agrees with the closer subject ("the analysts", which is plural), hence "were commended".',
+        difficulty: 'medium'
+      },
+      {
+        id: 'eng-9',
+        subject_id: 'sub-english',
+        topic_name: 'Vocabulary & Idioms',
+        question_text: 'Select the most appropriate synonym for "PRUDENT" as used in banking regulation:',
+        options: ['Cautious and judicious', 'Reckless and impulsive', 'Ostentatious and lavish', 'Hesitant and fearful'],
+        correct_option_index: 0,
+        explanation: '"Prudent" means acting with or showing care and thought for the future; cautious and judicious.',
+        difficulty: 'easy'
+      },
+      {
+        id: 'eng-10',
+        subject_id: 'sub-english',
+        topic_name: 'Fillers',
+        question_text: 'The Monetary Policy Committee voted ______ to retain the existing liquidity adjustment corridor.',
+        options: ['unanimously', 'ambiguously', 'reluctantly', 'erratically'],
+        correct_option_index: 0,
+        explanation: '"Unanimously" (with complete agreement of all members) accurately describes an aligned committee vote.',
         difficulty: 'easy'
       }
     ];
@@ -673,12 +815,15 @@ Format & Rules:
 5. Realistic exam patterns:
    - For Quantitative Aptitude: Include realistic bank arithmetic, speed math, percentage, profit/loss, simple/compound interest, time & work, or number series.
    - For Reasoning: Include syllogism, inequalities, blood relations, direction sense, or coding-decoding.
-   - For English: Include error spotting, cloze test, vocabulary, fillers, or idioms.
+   - For English:
+     * For Reading Comprehension: Provide a complete 150-250 word banking/financial/editorial passage. In "passage_text", provide the reading passage. In "question_text", provide the question statement (e.g. "According to the passage, what is...").
+     * For other topics: Include error spotting, cloze test, vocabulary, fillers, sentence rearrangement, or idioms.
    - For Banking / GA / Computer: Include RBI monetary policy, digital banking, cybersecurity, MS Office, or current financial terms.
 
 Output MUST be a valid JSON array of objects conforming to this schema:
 [
   {
+    "passage_text": "Optional 150-250 word reading passage if Reading Comprehension, else omit or null",
     "question_text": "Question statement here",
     "options": ["Option A", "Option B", "Option C", "Option D"],
     "correct_option_index": 0,
@@ -744,22 +889,31 @@ Output MUST be a valid JSON array of objects conforming to this schema:
           const completionTokens = data.usageMetadata?.candidatesTokenCount || Math.round(jsonText.length / 4);
           const totalTokens = data.usageMetadata?.totalTokenCount || (promptTokens + completionTokens);
 
-          const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => ({
-            id: `gemini-${Date.now()}-${idx}`,
-            subject_id: subjectFilter || 'sub-ai',
-            topic_name: q.topic_name || topicSummary || 'AI Practice',
-            question_text: q.question_text || q.question || '',
-            options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['A', 'B', 'C', 'D'],
-            correct_option_index: typeof q.correct_option_index === 'number' && q.correct_option_index >= 0 && q.correct_option_index <= 3 ? q.correct_option_index : 0,
-            explanation: q.explanation || 'Detailed explanation will be updated shortly.',
-            difficulty: q.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty),
-            created_at: nowIso,
-            correct_count: 0,
-            incorrect_count: 0,
-            last_attempted_at: undefined,
-            is_ai_generated: true,
-            generator_type: 'gemini_ai'
-          }));
+          const formattedQuestions: QuizQuestion[] = questionsArray.map((q: any, idx: number) => {
+            const passage = q.passage_text || (q.passage ? String(q.passage) : undefined);
+            const questionBody = q.question_text || q.question || '';
+            const combinedText = passage && !questionBody.startsWith(passage)
+              ? `${passage}\n\n${questionBody}`
+              : questionBody;
+
+            return {
+              id: `gemini-${Date.now()}-${idx}`,
+              subject_id: subjectFilter || 'sub-ai',
+              topic_name: q.topic_name || topicSummary || 'AI Practice',
+              passage_text: passage,
+              question_text: combinedText,
+              options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['A', 'B', 'C', 'D'],
+              correct_option_index: typeof q.correct_option_index === 'number' && q.correct_option_index >= 0 && q.correct_option_index <= 3 ? q.correct_option_index : 0,
+              explanation: q.explanation || 'Detailed explanation will be updated shortly.',
+              difficulty: q.difficulty || (difficulty === 'mixed' ? 'medium' : difficulty),
+              created_at: nowIso,
+              correct_count: 0,
+              incorrect_count: 0,
+              last_attempted_at: undefined,
+              is_ai_generated: true,
+              generator_type: 'gemini_ai'
+            };
+          });
 
           // Record telemetry
           this.aiConfig.recordAiUsage({
@@ -1053,8 +1207,14 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       pool = pool.concat(this.getBankingAwarenessQuestionPool());
     }
     // Check if filter matches Computer or is empty
-    if (!filter || filter.includes('comp') || filter.includes('computer') || filter.includes('sub-computer')) {
+    if (!filter || filter.includes('computer') || filter === 'comp' || filter.includes('sub-computer')) {
       pool = pool.concat(this.getComputerKnowledgeQuestionPool());
+    }
+    // Check if filter matches Kerala High Court Assistant, Constitution, or HCA subjects
+    if (!filter || filter.includes('hca') || filter.includes('kerala') || filter.includes('constitution') || filter.includes('legal') || filter.includes('subj-') || filter.includes('11111111-1111-4111-8111-111111111107') || filter.includes('11111111-1111-4111-8111-111111111106') || filter.includes('11111111-1111-4111-8111-111111111108')) {
+      pool = pool.concat(this.getKeralaHcaGkQuestionPool());
+      pool = pool.concat(this.getKeralaHcaEnglishQuestionPool());
+      pool = pool.concat(this.getKeralaHcaMathQuestionPool());
     }
 
     // If still empty (e.g. custom subject UUID), generate quant questions as guaranteed baseline
@@ -1104,7 +1264,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
       return {
         id: `${blueprintId}-q-${idx + 1}`,
-        subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer'))),
+        subject_id: (item.subjectCode as string).includes('hca') || (item.subjectCode as string).includes('kerala') ? 'sub-kerala-hca' : (item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer')))),
         topic_name: item.topicName || 'Mock Exam Section',
         question_text: item.passageText ? `${item.passageText}\n\n${item.questionText}` : item.questionText,
         options: fourOptions,
@@ -1122,9 +1282,43 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     return this.deduplicateQuestions(quizQuestions);
   }
 
+  // --- KERALA HIGH COURT ASSISTANT QUESTION POOLS ---
+  public getKeralaHcaGkQuestionPool(): QuizQuestion[] {
+    return KERALA_HCA_GK_POOL.map((def, idx) =>
+      convertToQuizQuestion(def, `hca-gk-q-${idx + 1}`, '11111111-1111-4111-8111-111111111107')
+    );
+  }
+
+  public getKeralaHcaEnglishQuestionPool(): QuizQuestion[] {
+    return KERALA_HCA_ENGLISH_POOL.map((def, idx) =>
+      convertToQuizQuestion(def, `hca-eng-q-${idx + 1}`, '11111111-1111-4111-8111-111111111106')
+    );
+  }
+
+  public getKeralaHcaMathQuestionPool(): QuizQuestion[] {
+    return KERALA_HCA_MATH_REASONING_POOL.map((def, idx) =>
+      convertToQuizQuestion(def, `hca-math-q-${idx + 1}`, '11111111-1111-4111-8111-111111111109')
+    );
+  }
+
   // --- PREVIOUS YEARS' PAPERS (Original & Licensed Mock Tests) ---
   getPreviousPapers(): PreviousPaper[] {
     return [
+      {
+        id: 'paper-kerala-hca-2024',
+        exam_name: 'Kerala High Court Assistant Official Benchmark Paper (100 Qs)',
+        year: 2024,
+        stage: 'prelims',
+        total_marks: 100,
+        duration_minutes: 75,
+        official_source_license: 'Licensed High Court of Kerala Examination Pattern',
+        sections: [
+          { subject_name: 'General English', questions_count: 50 },
+          { subject_name: 'General Knowledge & Constitution', questions_count: 40 },
+          { subject_name: 'Basic Mathematics & Reasoning', questions_count: 10 }
+        ],
+        questions: this.getPaperQuestions('kerala-hca-objective-mock-1')
+      },
       {
         id: 'paper-ibps-po-2025',
         exam_name: 'IBPS PO Prelims 2025 (Memory-Based Official Pattern)',

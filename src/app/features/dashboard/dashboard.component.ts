@@ -15,6 +15,7 @@ import {
 } from '../../core/models/database.types';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
+import { ExamTrackService } from '../../core/services/exam-track.service';
 import confetti from 'canvas-confetti';
 
 @Component({
@@ -26,32 +27,104 @@ import confetti from 'canvas-confetti';
       <!-- Clean Top Bar: Exam Stage Switcher & Widget Settings Shortcut -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
-          <div class="flex items-center space-x-2">
-            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Banking Prep Dashboard</h2>
+          <div class="flex items-center space-x-2.5">
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
+              @if (examTrack.isKeralaHca()) {
+                <svg class="w-5 h-5 text-court-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                <span>Kerala High Court Assistant</span>
+              } @else if (examTrack.isBank()) {
+                <svg class="w-5 h-5 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                <span>Banking Prep Dashboard</span>
+              } @else {
+                <svg class="w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                <span>Multi-Exam Preparation Dashboard</span>
+              }
+            </h2>
             <span class="w-2 h-2 rounded-full bg-emerald-500" title="Live Synced"></span>
+            @if (examTrack.isKeralaHca()) {
+              <a
+                routerLink="/kerala-high-court"
+                class="px-2.5 py-0.5 rounded text-[11px] font-semibold bg-court-50 text-court-800 border border-court-200 hover:bg-court-100 transition-colors flex items-center space-x-1"
+              >
+                <span>HCA Portal</span>
+                <span>→</span>
+              </a>
+            }
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">Track your readiness for IBPS PO, SBI PO, and Clerk examinations</p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            @if (examTrack.isKeralaHca()) {
+              High Court of Kerala: Objective (100M, 75m), Descriptive English (60M) & Viva
+            } @else if (examTrack.isBank()) {
+              Track your readiness for IBPS PO, SBI PO, and Clerk examinations
+            } @else {
+              Unified readiness tracking across Banking Exams & Kerala High Court Assistant
+            }
+          </p>
         </div>
 
         <div class="flex items-center space-x-2.5">
-          <!-- Stage Toggle: Prelims vs Mains -->
+          <!-- Stage Switcher: Dynamic based on Track -->
           <div class="inline-flex p-1 bg-slate-100/80 rounded-xl border border-slate-200/50">
-            <button
-              type="button"
-              (click)="switchStage('prelims')"
-              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
-              [ngClass]="activeStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-            >
-              Prelims
-            </button>
-            <button
-              type="button"
-              (click)="switchStage('mains')"
-              class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
-              [ngClass]="activeStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-            >
-              Mains
-            </button>
+            @if (examTrack.isKeralaHca()) {
+              <button
+                type="button"
+                (click)="switchStage('objective')"
+                class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'objective' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Objective (100M)
+              </button>
+              <button
+                type="button"
+                (click)="switchStage('descriptive')"
+                class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'descriptive' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Descriptive (60M)
+              </button>
+            } @else if (examTrack.isBank()) {
+              <button
+                type="button"
+                (click)="switchStage('prelims')"
+                class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Prelims
+              </button>
+              <button
+                type="button"
+                (click)="switchStage('mains')"
+                class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Mains
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="switchStage('both')"
+                class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'both' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                All
+              </button>
+              <button
+                type="button"
+                (click)="switchStage('prelims')"
+                class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'prelims' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Prelims / Obj
+              </button>
+              <button
+                type="button"
+                (click)="switchStage('mains')"
+                class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                [ngClass]="activeStage() === 'mains' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Mains / Desc
+              </button>
+            }
           </div>
 
           <!-- Configure Widgets Shortcut -->
@@ -69,33 +142,35 @@ import confetti from 'canvas-confetti';
 
       <!-- WIDGET 1: Urgent Exam Countdown Banner -->
       @if (widgetConfig.config().showNextExamBanner && summary()?.nextExam; as exam) {
-        <div class="bg-gradient-to-r from-brand-600 via-indigo-600 to-indigo-700 rounded-2xl p-5 text-white shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="rounded-2xl p-5 text-white shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+             [ngClass]="examTrack.isKeralaHca() ? 'bg-court-900 border border-court-800' : 'bg-brand-900 border border-brand-800'">
           <div class="flex items-center space-x-3.5">
-            <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+            <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/15">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <div>
               <div class="flex items-center space-x-2">
-                <span class="text-[10px] uppercase tracking-wider font-bold text-brand-200">Next Upcoming Milestone</span>
-                <span class="text-[10px] px-2 py-0.2 rounded-full bg-white/20 text-white font-medium capitalize">{{ exam.status }}</span>
+                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-300">Next Target Milestone</span>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-white/15 text-white font-medium capitalize">{{ exam.status }}</span>
               </div>
               <h3 class="text-base font-bold mt-0.5">{{ exam.title }}</h3>
-              <p class="text-xs text-brand-100">Target date: {{ exam.date }}</p>
+              <p class="text-xs text-slate-300">Target examination date: {{ exam.date }}</p>
             </div>
           </div>
 
           <div class="flex items-center space-x-4 self-end sm:self-auto">
             <div class="text-right">
               <div class="text-2xl font-black tracking-tight">{{ exam.daysRemaining }}</div>
-              <div class="text-[9px] uppercase tracking-wider text-brand-200 font-bold">Days Left</div>
+              <div class="text-[10px] uppercase tracking-wider text-slate-300 font-semibold">Days Remaining</div>
             </div>
             <a
               routerLink="/exam-calendar"
-              class="px-3 py-1.5 rounded-lg bg-white text-brand-700 text-xs font-bold hover:bg-brand-50 transition-colors shadow-2xs"
+              class="px-3.5 py-1.5 rounded-lg bg-white text-slate-900 text-xs font-semibold hover:bg-slate-100 transition-colors shadow-2xs flex items-center space-x-1"
             >
-              Calendar →
+              <span>View Deadlines</span>
+              <span>→</span>
             </a>
           </div>
         </div>
@@ -389,6 +464,7 @@ import confetti from 'canvas-confetti';
 })
 export class DashboardComponent implements OnInit {
   public widgetConfig = inject(WidgetConfigService);
+  public examTrack = inject(ExamTrackService);
   private analytics = inject(AnalyticsService);
   private dataStorage = inject(DataStorageService);
   private timerService = inject(TimerService);
@@ -412,6 +488,11 @@ export class DashboardComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.examTrack.isKeralaHca()) {
+      this.activeStage.set('objective');
+    } else {
+      this.activeStage.set('prelims');
+    }
     await this.loadDashboardData();
   }
 
@@ -448,7 +529,13 @@ export class DashboardComponent implements OnInit {
       .filter(e => {
         const d = new Date(e.event_date);
         d.setHours(0, 0, 0, 0);
-        return d.getTime() >= todayDate.getTime();
+        if (d.getTime() < todayDate.getTime()) return false;
+        if (this.examTrack.isKeralaHca()) {
+          return e.title.toLowerCase().includes('high court') || e.title.toLowerCase().includes('hca');
+        } else if (this.examTrack.isBank()) {
+          return !e.title.toLowerCase().includes('high court') && !e.title.toLowerCase().includes('hca');
+        }
+        return true;
       })
       .slice(0, 3);
 

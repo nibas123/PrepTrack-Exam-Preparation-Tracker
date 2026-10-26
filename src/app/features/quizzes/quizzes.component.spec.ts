@@ -189,4 +189,35 @@ describe('QuizzesComponent - Multi-Topic Search & Selection Functionality', () =
       false
     );
   });
+
+  it('should correctly extract reading passage and question statement using getQuestionDisplay', () => {
+    const qWithPassage = {
+      id: 'q-rc-1',
+      subject_id: 'sub-eng',
+      topic_name: 'Reading Comprehension',
+      passage_text: 'Directions: Read this paragraph about CBDCs.',
+      question_text: 'Directions: Read this paragraph about CBDCs.\n\nAccording to the passage, what is a CBDC?',
+      options: ['Option A', 'Option B', 'Option C', 'Option D'],
+      correct_option_index: 0,
+      explanation: 'Detailed explanation'
+    };
+
+    const display = component.getQuestionDisplay(qWithPassage);
+    expect(display.passage).toBe('Directions: Read this paragraph about CBDCs.');
+    expect(display.question).toBe('According to the passage, what is a CBDC?');
+
+    const regularQ = {
+      id: 'q-arith-1',
+      subject_id: 'sub-quant',
+      topic_name: 'Percentage',
+      question_text: 'What is 20% of 150?',
+      options: ['30', '40', '50', '60'],
+      correct_option_index: 0,
+      explanation: '20% of 150 = 30'
+    };
+
+    const regularDisplay = component.getQuestionDisplay(regularQ);
+    expect(regularDisplay.passage).toBeNull();
+    expect(regularDisplay.question).toBe('What is 20% of 150?');
+  });
 });

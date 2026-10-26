@@ -17,10 +17,19 @@ export class AuthService {
   private currentProfileSignal = signal<Profile | null>(null);
   private isLoadingSignal = signal<boolean>(true);
 
+  public static readonly ADMIN_EMAIL = 'nibasnazeem@gmail.com';
+
   public readonly currentUser = this.currentUserSignal.asReadonly();
   public readonly currentProfile = this.currentProfileSignal.asReadonly();
   public readonly isLoading = this.isLoadingSignal.asReadonly();
   public readonly isAuthenticated = computed(() => !!this.currentUserSignal());
+  public readonly isAdmin = computed(() => {
+    const user = this.currentUserSignal();
+    const userEmail = user?.email?.toLowerCase().trim();
+    if (userEmail === AuthService.ADMIN_EMAIL) return true;
+    const localEmail = localStorage.getItem('preptrack_user_email')?.toLowerCase().trim();
+    return localEmail === AuthService.ADMIN_EMAIL;
+  });
   private authInitPromise: Promise<void>;
 
   constructor() {
@@ -100,6 +109,9 @@ export class AuthService {
       }
 
       if (data.user) {
+        if (data.user.email) {
+          localStorage.setItem('preptrack_user_email', data.user.email);
+        }
         this.currentUserSignal.set(data.user);
         await this.loadProfile(data.user.id);
         this.toast.success('Signed in successfully');
