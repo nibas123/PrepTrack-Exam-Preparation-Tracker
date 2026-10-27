@@ -868,7 +868,7 @@ export function convertToExamQuestionItem(
   id: string,
   sectionCode: string,
   sectionName: string,
-  questionNumber: number,
+  questionNumber: number = 0,
   marks: number = 1,
   negativeMarks: number = 0.25
 ): ExamQuestionItem {

@@ -487,6 +487,48 @@ import confetti from 'canvas-confetti';
                     }
                   </div>
                 </div>
+
+                <!-- Daily 5 Fresh Unique Questions Card (When Single Topic is Selected) -->
+                @if (selectedTopicNames().length === 1) {
+                  <div class="p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs animate-in fade-in duration-150">
+                    <div class="flex items-center space-x-2.5">
+                      <span class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
+                        ⚡
+                      </span>
+                      <div>
+                        <div class="flex items-center space-x-2">
+                          <h4 class="text-xs font-bold text-amber-950">Daily 5 Unique Questions</h4>
+                          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                            {{ todayDateString }}
+                          </span>
+                        </div>
+                        <p class="text-[11px] text-amber-800 mt-0.5">
+                          Authentic, non-repeating questions generated for <strong>{{ selectedTopicNames()[0] }}</strong> using your Gemini token.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2 shrink-0">
+                      <button
+                        type="button"
+                        (click)="startDailyFiveQuiz(selectedTopicNames()[0], false)"
+                        [disabled]="isGeneratingQuestions()"
+                        class="px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all flex items-center space-x-1.5 disabled:opacity-75"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span>Start Today's 5 Questions</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="startDailyFiveQuiz(selectedTopicNames()[0], true)"
+                        [disabled]="isGeneratingQuestions()"
+                        class="p-2 rounded-lg bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 text-xs font-semibold transition-all"
+                        title="Force generate 5 brand new unique questions for today"
+                      >
+                        🔄
+                      </button>
+                    </div>
+                  </div>
+                }
               </div>
 
               <!-- AI Question Generator Toggle & Difficulty Selector -->
@@ -802,6 +844,7 @@ export class QuizzesComponent implements OnInit {
   public aiPowered = signal<boolean>(this.quizService.aiConfig.getAiDefaultToggleState());
   public selectedDifficulty = signal<'easy' | 'medium' | 'hard' | 'mixed'>('mixed');
   public isGeneratingQuestions = signal<boolean>(false);
+  public readonly todayDateString = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
   public readonly difficulties: { value: 'easy' | 'medium' | 'hard' | 'mixed'; label: string; desc: string }[] = [
     { value: 'mixed', label: 'Mixed', desc: 'Real Exam' },
@@ -1011,6 +1054,36 @@ export class QuizzesComponent implements OnInit {
     this.isTopicDropdownOpen.set(false);
   }
 
+  async startDailyFiveQuiz(topicName: string, forceRefresh: boolean = false): Promise<void> {
+    const selectedSub = this.subjects().find(s => s.id === this.selectedSubjectId());
+    const subFilter = this.selectedSubjectId() === 'all' ? undefined : (selectedSub?.name || this.selectedSubjectId());
+
+    this.isGeneratingQuestions.set(true);
+    try {
+      const questions = await this.quizService.getDailyFiveQuestionsForTopic(topicName, subFilter, forceRefresh);
+      if (!questions || questions.length === 0) {
+        this.toast.error('Could not generate questions for ' + topicName);
+        return;
+      }
+      const unique = this.quizService.deduplicateQuestions(questions);
+      this.activeQuestions.set(unique);
+      this.currentQuestionIndex.set(0);
+      this.selectedOptionIndex.set(null);
+      this.recordedAnswers = [];
+      this.quizStartTime = Date.now();
+      this.quizCompleted.set(false);
+      this.quizActive.set(true);
+
+      this.startQuestionTimer();
+      this.toast.success(`Loaded 5 fresh questions for ${topicName}!`);
+    } catch (err) {
+      console.error('Daily quiz start error:', err);
+      this.toast.error('Failed to load daily questions.');
+    } finally {
+      this.isGeneratingQuestions.set(false);
+    }
+  }
+
   async startQuiz(): Promise<void> {
     const selectedSub = this.subjects().find(s => s.id === this.selectedSubjectId());
     const subFilter = this.selectedSubjectId() === 'all' ? undefined : (selectedSub?.name || this.selectedSubjectId());
@@ -1018,13 +1091,20 @@ export class QuizzesComponent implements OnInit {
     this.isGeneratingQuestions.set(true);
     try {
       const topicFilter = this.selectedTopicNames().length > 0 ? this.selectedTopicNames() : undefined;
-      const questions = await this.quizService.getQuestions(
-        subFilter,
-        topicFilter,
-        this.questionCount(),
-        this.selectedDifficulty(),
-        this.aiPowered()
-      );
+      let questions: QuizQuestion[] = [];
+
+      // If user selected exactly 1 topic, 5 questions, and AI is enabled, use daily unique questions!
+      if (this.questionCount() === 5 && this.selectedTopicNames().length === 1 && this.aiPowered()) {
+        questions = await this.quizService.getDailyFiveQuestionsForTopic(this.selectedTopicNames()[0], subFilter, false);
+      } else {
+        questions = await this.quizService.getQuestions(
+          subFilter,
+          topicFilter,
+          this.questionCount(),
+          this.selectedDifficulty(),
+          this.aiPowered()
+        );
+      }
 
       if (!questions || questions.length === 0) {
         this.toast.error('Could not assemble questions for this selection.');

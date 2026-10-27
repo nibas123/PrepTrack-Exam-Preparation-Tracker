@@ -42,6 +42,7 @@ export interface QuizQuestion {
   last_attempted_at?: string;
   is_ai_generated?: boolean;
   generator_type?: 'gemini_ai' | 'algorithmic_engine' | 'blueprint_static' | 'manual_seed';
+  daily_date?: string; // YYYY-MM-DD
 }
 
 export interface ManualQuestionLog {

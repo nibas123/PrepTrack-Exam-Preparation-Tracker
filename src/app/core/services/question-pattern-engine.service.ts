@@ -4859,18 +4859,22 @@ export class QuestionPatternEngineService {
   // =========================================================================
 
   private generateNumericDistractors(correctVal: number, rawList: number[]): number[] {
+    const roundNumber = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+    const cleanCorrect = roundNumber(correctVal);
     const unique = new Set<number>();
+
     for (const val of rawList) {
-      if (val !== correctVal && !unique.has(val) && unique.size < 4) {
-        unique.add(val);
+      const cleanVal = roundNumber(val);
+      if (cleanVal !== cleanCorrect && !unique.has(cleanVal) && unique.size < 4) {
+        unique.add(cleanVal);
       }
     }
 
     // Pad if needed
     let delta = 1;
     while (unique.size < 4) {
-      const candidate = correctVal + (delta * (unique.size % 2 === 0 ? 1 : -1));
-      if (candidate !== correctVal && !unique.has(candidate)) {
+      const candidate = roundNumber(cleanCorrect + (delta * (unique.size % 2 === 0 ? 1 : -1)));
+      if (candidate !== cleanCorrect && !unique.has(candidate)) {
         unique.add(candidate);
       }
       delta++;
@@ -5006,13 +5010,113 @@ export class QuestionPatternEngineService {
           rawItems.push(this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i));
         } else if (normalized.includes('vocab') || normalized.includes('idiom') || normalized.includes('synonym') || normalized.includes('antonym')) {
           rawItems.push(this.buildVocabContextQuestion(qId, 'english', 'English Language', i));
+        } else if (
+          normalized.includes('writ') ||
+          normalized.includes('226') ||
+          normalized.includes('227') ||
+          normalized.includes('constitut') ||
+          normalized.includes('fundamental') ||
+          normalized.includes('dpsp') ||
+          normalized.includes('preamble') ||
+          normalized.includes('judicia') ||
+          normalized.includes('high court') ||
+          normalized.includes('article') ||
+          normalized.includes('court')
+        ) {
+          // Authentic Constitution & High Court Jurisprudence questions
+          const matchedGk = KERALA_HCA_GK_POOL.filter(def => {
+            const text = (def.question + ' ' + def.topic + ' ' + def.explanation).toLowerCase();
+            return (
+              text.includes('226') ||
+              text.includes('writ') ||
+              text.includes('constitut') ||
+              text.includes('court') ||
+              text.includes('article') ||
+              text.includes('amendment') ||
+              text.includes('habeas') ||
+              text.includes('mandamus')
+            );
+          });
+          const source = matchedGk.length > 0 ? matchedGk : KERALA_HCA_GK_POOL;
+          const chosenDef = source[i % source.length];
+          rawItems.push(convertToExamQuestionItem(chosenDef, qId, 'kerala_hca_gk', 'Constitution & High Court', i + 1));
+        } else if (
+          normalized.includes('kerala') ||
+          normalized.includes('renaissance') ||
+          normalized.includes('reformer') ||
+          normalized.includes('ayyankali') ||
+          normalized.includes('guru') ||
+          normalized.includes('satyagraha') ||
+          normalized.includes('geography') ||
+          normalized.includes('history')
+        ) {
+          // Authentic Kerala History, Renaissance & Geography questions
+          const matchedGk = KERALA_HCA_GK_POOL.filter(def => {
+            const text = (def.question + ' ' + def.topic + ' ' + def.explanation).toLowerCase();
+            return (
+              text.includes('kerala') ||
+              text.includes('renaissance') ||
+              text.includes('ayyankali') ||
+              text.includes('swamikal') ||
+              text.includes('temple') ||
+              text.includes('river') ||
+              text.includes('lake') ||
+              text.includes('district')
+            );
+          });
+          const source = matchedGk.length > 0 ? matchedGk : KERALA_HCA_GK_POOL;
+          const chosenDef = source[i % source.length];
+          rawItems.push(convertToExamQuestionItem(chosenDef, qId, 'kerala_hca_gk', 'Facts about Kerala & Renaissance', i + 1));
+        } else if (
+          normalized.includes('legal') ||
+          normalized.includes('maxim') ||
+          normalized.includes('cpc') ||
+          normalized.includes('crpc') ||
+          normalized.includes('bnss') ||
+          normalized.includes('evidence') ||
+          normalized.includes('bsa') ||
+          normalized.includes('latin') ||
+          normalized.includes('glossary')
+        ) {
+          // Authentic Legal Glossary, Maxims & Procedure questions
+          const legalTerms = KERALA_HCA_ENGLISH_POOL.filter(def => {
+            const text = (def.question + ' ' + def.topic + ' ' + def.explanation).toLowerCase();
+            return (
+              text.includes('legal') ||
+              text.includes('court') ||
+              text.includes('caveat') ||
+              text.includes('perjury') ||
+              text.includes('injunction') ||
+              text.includes('status quo') ||
+              text.includes('pro bono') ||
+              text.includes('indictment')
+            );
+          });
+          const source = legalTerms.length > 0 ? legalTerms : KERALA_HCA_ENGLISH_POOL;
+          const chosenDef = source[i % source.length];
+          rawItems.push(convertToExamQuestionItem(chosenDef, qId, 'english', 'Legal Glossary & Latin Maxims', i + 1));
         } else if (normalized.includes('eng') || (subjectFilter && subjectFilter.toLowerCase().includes('eng'))) {
           // General English fallback
           rawItems.push(i % 3 === 0
             ? this.buildErrorSpottingQuestion(qId, 'english', 'English Language', i)
             : (i % 3 === 1 ? this.buildPhraseReplacementQuestion(qId, 'english', 'English Language', i) : this.buildDoubleFillerQuestion(qId, 'english', 'English Language', i)));
+        } else if (
+          subjectFilter &&
+          (subjectFilter.toLowerCase().includes('gk') ||
+            subjectFilter.toLowerCase().includes('kerala') ||
+            subjectFilter.toLowerCase().includes('constitut') ||
+            subjectFilter.toLowerCase().includes('law') ||
+            subjectFilter.toLowerCase().includes('general') ||
+            subjectFilter.toLowerCase().includes('court'))
+        ) {
+          // General Knowledge / Constitution fallback for GK subjects
+          const chosenDef = KERALA_HCA_GK_POOL[i % KERALA_HCA_GK_POOL.length];
+          rawItems.push(convertToExamQuestionItem(chosenDef, qId, 'kerala_hca_gk', 'General Knowledge & Constitution', i + 1));
+        } else if (subjectFilter && (subjectFilter.toLowerCase().includes('reas') || subjectFilter.toLowerCase().includes('logic'))) {
+          // Reasoning fallback
+          rawItems.push(this.buildSyllogismQuestion(qId, 'reasoning', 'Reasoning Ability', i));
         } else {
-          // Fallback arithmetic with specific topic attribution
+          // Fallback arithmetic ONLY for quant/math or unspecified numeric topics
           rawItems.push(this.buildArithmeticQuestion(qId, 'quant', 'Quantitative Aptitude', 'Percentage', i));
         }
       }
@@ -5040,7 +5144,7 @@ export class QuestionPatternEngineService {
 
       return {
         id: `topic-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
-        subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : 'sub-computer'))),
+        subject_id: item.subjectCode === 'quant' ? 'sub-quant' : (item.subjectCode === 'reasoning' ? 'sub-reasoning' : (item.subjectCode === 'english' ? 'sub-english' : (item.subjectCode === 'ga' ? 'sub-ga' : (String(item.subjectCode).includes('hca') || String(item.subjectCode).includes('kerala') ? '11111111-1111-4111-8111-111111111107' : 'sub-computer')))),
         topic_name: topicName || item.topicName,
         passage_text: item.passageText,
         question_text: item.passageText ? `${item.passageText}\n\n${item.questionText}` : item.questionText,

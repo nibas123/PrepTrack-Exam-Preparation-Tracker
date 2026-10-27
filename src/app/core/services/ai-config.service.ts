@@ -66,7 +66,7 @@ const TELEMETRY_KEY = 'preptrack_ai_telemetry';
 export class AiConfigService {
   private readonly defaultPrimaryKey = (environment as any).geminiApiKey || '';
   private readonly defaultFallbackKey = (environment as any).geminiApiKeyFallback || '';
-  private readonly defaultModel = 'gemini-3.1-flash-lite-preview';
+  private readonly defaultModel = 'gemini-3.5-flash-lite';
 
   public readonly config = signal<GeminiTokenConfig>(this.loadConfig());
   public readonly telemetry = signal<AiUsageTelemetry>(this.loadTelemetry());
@@ -83,13 +83,25 @@ export class AiConfigService {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        let model = parsed.model || this.defaultModel;
+        // Migrate legacy deprecated models that return 404 to gemini-3.5-flash-lite
+        if (
+          !model ||
+          model.includes('gemini-2.5') ||
+          model.includes('gemini-3.1-flash-lite-preview') ||
+          model.includes('gemini-1.5') ||
+          model === 'gemini-pro'
+        ) {
+          model = 'gemini-3.5-flash-lite';
+        }
+
         return {
           enabled: parsed.enabled !== undefined ? !!parsed.enabled : true,
           policy: parsed.policy || 'smart_frugal',
-          defaultQuizAiToggle: parsed.defaultQuizAiToggle !== undefined ? !!parsed.defaultQuizAiToggle : false,
+          defaultQuizAiToggle: parsed.defaultQuizAiToggle !== undefined ? !!parsed.defaultQuizAiToggle : true,
           primaryKey: parsed.primaryKey !== undefined ? parsed.primaryKey : this.defaultPrimaryKey,
           fallbackKey: parsed.fallbackKey !== undefined ? parsed.fallbackKey : this.defaultFallbackKey,
-          model: parsed.model || this.defaultModel,
+          model,
           temperature: typeof parsed.temperature === 'number' ? parsed.temperature : 0.7,
           maxCacheSize: typeof parsed.maxCacheSize === 'number' ? parsed.maxCacheSize : 300,
           lastTestedAt: parsed.lastTestedAt,
@@ -107,7 +119,7 @@ export class AiConfigService {
     return {
       enabled: true,
       policy: 'smart_frugal',
-      defaultQuizAiToggle: false,
+      defaultQuizAiToggle: true,
       primaryKey: this.defaultPrimaryKey,
       fallbackKey: this.defaultFallbackKey,
       model: this.defaultModel,
@@ -216,7 +228,11 @@ export class AiConfigService {
   }
 
   public getEffectiveModel(): string {
-    return this.config().model?.trim() || this.defaultModel;
+    const raw = this.config().model?.trim();
+    if (!raw || raw.includes('gemini-2.5') || raw.includes('gemini-3.1-flash-lite-preview') || raw.includes('gemini-1.5') || raw === 'gemini-pro') {
+      return this.defaultModel;
+    }
+    return raw;
   }
 
   public getTemperature(): number {

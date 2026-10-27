@@ -764,6 +764,30 @@ export class QuizService {
     ];
   }
 
+  private readonly FINGERPRINT_STORAGE_KEY = 'preptrack_generated_question_fingerprints';
+
+  private getQuestionFingerprints(): string[] {
+    try {
+      const stored = localStorage.getItem(this.FINGERPRINT_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private recordQuestionFingerprints(stems: string[]): void {
+    try {
+      const existing = this.getQuestionFingerprints();
+      const set = new Set(existing);
+      for (const stem of stems) {
+        const norm = (stem || '').trim().toLowerCase().slice(0, 120);
+        if (norm) set.add(norm);
+      }
+      const updated = Array.from(set).slice(-500); // retain last 500
+      localStorage.setItem(this.FINGERPRINT_STORAGE_KEY, JSON.stringify(updated));
+    } catch {}
+  }
+
   // --- GEMINI AI QUESTION GENERATION ---
   async generateGeminiQuestions(
     subjectFilter?: string,
@@ -791,8 +815,84 @@ export class QuizService {
       ? topicFilter.map(t => t.trim()).filter(Boolean)
       : (topicFilter ? topicFilter.split(',').map(t => t.trim()).filter(Boolean) : []);
     const topicSummary = topicNames.join(', ') || undefined;
+    const topicSummaryLower = (topicSummary || '').toLowerCase();
+    const subjectFilterLower = (subjectFilter || '').toLowerCase();
 
-    const subjectContext = subjectFilter && subjectFilter !== 'all' ? subjectFilter : 'Indian Banking Exams (Quantitative Aptitude, Reasoning, English Language, General Awareness, Computer Aptitude)';
+    // Domain detection: High Court / Constitution / Law / Kerala vs Banking / Quant
+    const isHighCourtLegal =
+      topicSummaryLower.includes('writ') ||
+      topicSummaryLower.includes('226') ||
+      topicSummaryLower.includes('227') ||
+      topicSummaryLower.includes('constitut') ||
+      topicSummaryLower.includes('high court') ||
+      topicSummaryLower.includes('judicia') ||
+      topicSummaryLower.includes('court') ||
+      topicSummaryLower.includes('article') ||
+      topicSummaryLower.includes('amendment') ||
+      topicSummaryLower.includes('fundamental') ||
+      topicSummaryLower.includes('dpsp') ||
+      topicSummaryLower.includes('preamble') ||
+      topicSummaryLower.includes('kerala') ||
+      topicSummaryLower.includes('renaissance') ||
+      topicSummaryLower.includes('reformer') ||
+      topicSummaryLower.includes('legal') ||
+      topicSummaryLower.includes('maxim') ||
+      topicSummaryLower.includes('cpc') ||
+      topicSummaryLower.includes('crpc') ||
+      topicSummaryLower.includes('bnss') ||
+      topicSummaryLower.includes('bsa') ||
+      topicSummaryLower.includes('evidence') ||
+      subjectFilterLower.includes('kerala') ||
+      subjectFilterLower.includes('court') ||
+      subjectFilterLower.includes('hca') ||
+      subjectFilterLower.includes('law') ||
+      subjectFilterLower.includes('constitut') ||
+      subjectFilterLower.includes('11111111-1111-4111-8111-111111111107');
+
+    const persona = isHighCourtLegal
+      ? `You are a premier senior question paper setter and legal academic for Indian High Court Recruitment Examinations (High Court of Kerala Assistant, Judicial Service / Munsiff-Magistrate, Typist-Clerk) and Constitutional Law in India.`
+      : `You are a premier senior question paper setter for Indian Competitive Examinations (Banking IBPS/SBI, SSC CGL, and State PSCs).`;
+
+    let specificTopicGuidance = '';
+    if (topicSummaryLower.includes('226') || topicSummaryLower.includes('227') || topicSummaryLower.includes('writ')) {
+      specificTopicGuidance = `
+CRITICAL DOMAIN DIRECTIVE (Articles 226 & 227 - High Court Writs):
+All ${count} questions MUST strictly test:
+1. Article 226: High Court power to issue writs (Habeas Corpus, Mandamus, Prohibition, Quo Warranto, Certiorari) for Fundamental Rights AND for "any other purpose".
+2. Article 227: High Court supervisory jurisdiction over all subordinate courts and tribunals within its territorial limits (difference between supervisory and appellate powers).
+3. Contrasting Article 32 (Supreme Court) with Article 226 (High Court): wider scope of Art 226, territorial jurisdiction, discretionary nature vs guaranteed fundamental right.
+4. Landmark judgments: L. Chandra Kumar, Whirlpool Corporation, Surya Dev Rai v. Ram Chander Rai, Radhey Shyam v. Chhabi Nath.
+5. Specific writ conditions: When Mandamus can/cannot be issued, Habeas Corpus against illegal detention, Quo Warranto against usurpation of public office, Certiorari for errors apparent on the face of the record or breach of Natural Justice.
+UNDER NO CIRCUMSTANCES should you generate arithmetic, math, percentages, or banking questions! Every single question MUST be an authentic legal/constitutional question.`;
+    } else if (topicSummaryLower.includes('kerala') || topicSummaryLower.includes('renaissance') || topicSummaryLower.includes('reformer')) {
+      specificTopicGuidance = `
+CRITICAL DOMAIN DIRECTIVE (Kerala Renaissance & History):
+All ${count} questions MUST strictly test Kerala social reformers (Ayyankali, Sree Narayana Guru, Chattampi Swamikal, Sahodaran Ayyappan, Vakkom Moulavi, Poykayil Yohannan, K. Kelappan), landmark historical movements (Vaikom Satyagraha, Guruvayur Satyagraha, Temple Entry Proclamation 1936, Villuvandi Samaram 1893, Malayali Memorial 1891), or Kerala history and geography.
+DO NOT generate math or banking questions.`;
+    } else if (topicSummaryLower.includes('legal') || topicSummaryLower.includes('maxim') || topicSummaryLower.includes('cpc') || topicSummaryLower.includes('crpc')) {
+      specificTopicGuidance = `
+CRITICAL DOMAIN DIRECTIVE (Legal Glossary & Maxims):
+All ${count} questions MUST test authentic legal maxims (Audi Alteram Partem, Nemo Judex, Res Judicata, Caveat Emptor, Mens Rea, Ultra Vires, Status Quo, Pro Bono, Injunction, Perjury, Indictment) or procedural law under CPC / CrPC / BNSS / Indian Evidence Act / BSA.`;
+    } else if (topicSummaryLower.includes('percent') || topicSummaryLower.includes('arithmetic') || topicSummaryLower.includes('quant') || topicSummaryLower.includes('interest')) {
+      specificTopicGuidance = `
+CRITICAL DOMAIN DIRECTIVE (Quantitative Aptitude):
+Generate authentic mathematical aptitude questions. Ensure all numbers, percentages, and arithmetic operations are mathematically precise. Cleanly round any fractional percentages or currencies to 2 decimal places (never output floating point artifacts like 12.670000000000002%).`;
+    }
+
+    // Collect recently generated question stems for this topic from local cache to prevent duplicate questions
+    const existingBank = this.getStoredQuestionBank();
+    const existingStemsForTopic = existingBank
+      .filter(q => !topicSummary || (q.topic_name || '').toLowerCase().includes(topicSummaryLower))
+      .map(q => q.question_text.slice(0, 100).trim())
+      .slice(0, 15);
+
+    const uniquenessClause = existingStemsForTopic.length > 0
+      ? `\nSTRICT UNIQUENESS ENFORCEMENT:\nThe candidate has already been served the following questions. You MUST NOT duplicate or ask similar variations of these stems:\n${existingStemsForTopic.map((s, idx) => `${idx + 1}. ${s}`).join('\n')}\nEvery single question must be fresh, unique, and explore a different section, sub-clause, application, or case law.`
+      : `\nSTRICT UNIQUENESS ENFORCEMENT:\nGenerate strictly unique questions that do not repeat standard clichés. Every question must be distinct.`;
+
+    const subjectContext = subjectFilter && subjectFilter !== 'all'
+      ? subjectFilter
+      : (isHighCourtLegal ? 'Kerala High Court Assistant & Judicial Services Examination' : 'Indian Banking Exams (Quantitative Aptitude, Reasoning, English Language, General Awareness)');
     const topicContext = topicNames.length > 1
       ? `Target Topics (${topicNames.length}): ${topicNames.join(', ')}. You MUST generate questions distributed across all these topics (${topicNames.join(', ')}).`
       : (topicNames.length === 1 ? `Topic: ${topicNames[0]}` : 'Mixed exam syllabus topics');
@@ -800,25 +900,21 @@ export class QuizService {
       ? 'Include a balanced mix of Easy (30%), Medium (50%), and Hard (20%) questions.'
       : `All questions must strictly be of ${difficulty.toUpperCase()} difficulty level.`;
 
-    const prompt = `You are a premier senior question paper setter for Indian Banking examinations (IBPS PO/Clerk, SBI PO/Clerk, RRB, RBI Grade B).
+    const prompt = `${persona}
 Generate exactly ${count} distinct, high-quality multiple choice practice questions.
 
 Subject / Domain: ${subjectContext}
 ${topicContext}
 Target Difficulty: ${difficultyGuide}
+${specificTopicGuidance}
+${uniquenessClause}
 
 Format & Rules:
 1. Each question must strictly have exactly 4 options.
 2. Exactly one option must be correct.
 3. The correct_option_index must be the 0-based index (0, 1, 2, or 3) of that correct option in the options array.
-4. Provide a clear, step-by-step mathematical or logical explanation.
-5. Realistic exam patterns:
-   - For Quantitative Aptitude: Include realistic bank arithmetic, speed math, percentage, profit/loss, simple/compound interest, time & work, or number series.
-   - For Reasoning: Include syllogism, inequalities, blood relations, direction sense, or coding-decoding.
-   - For English:
-     * For Reading Comprehension: Provide a complete 150-250 word banking/financial/editorial passage. In "passage_text", provide the reading passage. In "question_text", provide the question statement (e.g. "According to the passage, what is...").
-     * For other topics: Include error spotting, cloze test, vocabulary, fillers, sentence rearrangement, or idioms.
-   - For Banking / GA / Computer: Include RBI monetary policy, digital banking, cybersecurity, MS Office, or current financial terms.
+4. Provide a clear, step-by-step authoritative explanation citing relevant Articles, sections, or logic.
+5. All 4 options must be plausible distractors without floating-point artifacts.
 
 Output MUST be a valid JSON array of objects conforming to this schema:
 [
@@ -827,9 +923,9 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     "question_text": "Question statement here",
     "options": ["Option A", "Option B", "Option C", "Option D"],
     "correct_option_index": 0,
-    "explanation": "Detailed step-by-step solution here",
+    "explanation": "Authoritative explanation citing relevant Article/Rule/Formula",
     "difficulty": "${difficulty === 'mixed' ? 'medium' : difficulty}",
-    "topic_name": "${topicSummary || 'Banking Exam Prep'}"
+    "topic_name": "${topicSummary || (isHighCourtLegal ? 'Constitution & High Court' : 'General Practice')}"
   }
 ]`;
 
@@ -839,8 +935,9 @@ Output MUST be a valid JSON array of objects conforming to this schema:
       const keyType: 'primary' | 'fallback' = i === 0 ? 'primary' : 'fallback';
       const startTime = performance.now();
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const response = await fetch(endpoint, {
+        let activeModel = model;
+        let endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${apiKey}`;
+        let response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -851,6 +948,28 @@ Output MUST be a valid JSON array of objects conforming to this schema:
             }
           })
         });
+
+        // Backup retry if model experiences temporary spike (503) or is deprecated (404)
+        if (!response.ok && (response.status === 503 || response.status === 404)) {
+          const alternateModel = activeModel === 'gemini-3.5-flash-lite' ? 'gemini-3.8-flash' : 'gemini-3.5-flash-lite';
+          console.info(`Retrying Gemini request with alternate model: ${alternateModel}`);
+          endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${alternateModel}:generateContent?key=${apiKey}`;
+          const retryResp = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                response_mime_type: 'application/json',
+                temperature: temperature
+              }
+            })
+          });
+          if (retryResp.ok) {
+            response = retryResp;
+            activeModel = alternateModel;
+          }
+        }
 
         const latencyMs = Math.round(performance.now() - startTime);
 
@@ -931,6 +1050,7 @@ Output MUST be a valid JSON array of objects conforming to this schema:
 
           // Cache newly generated questions to persistent bank
           this.cacheGeneratedQuestions(formattedQuestions);
+          this.recordQuestionFingerprints(formattedQuestions.map(q => q.question_text));
           return formattedQuestions.slice(0, count);
         }
       } catch (err: any) {
@@ -955,6 +1075,62 @@ Output MUST be a valid JSON array of objects conforming to this schema:
     // If both keys fail or network is down, gracefully fallback to code-based generator
     console.info('Falling back to built-in dynamic generators');
     return this.getFallbackQuestions(subjectFilter, topicFilter, count);
+  }
+
+  /**
+   * Generates 5 unique daily questions for a specific topic, powered by the user's Gemini token.
+   * Cached by day (preptrack_daily5_YYYY-MM-DD_<topic>) so the candidate gets 5 fresh, unique questions everyday.
+   */
+  public async getDailyFiveQuestionsForTopic(
+    topicName: string,
+    subjectFilter?: string,
+    forceRefresh: boolean = false
+  ): Promise<QuizQuestion[]> {
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const normalizedTopic = (topicName || 'General Practice')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '_');
+    const dailyKey = `preptrack_daily5_${today}_${normalizedTopic}`;
+
+    if (!forceRefresh) {
+      try {
+        const cached = localStorage.getItem(dailyKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length >= 5) {
+            return parsed.slice(0, 5);
+          }
+        }
+      } catch {}
+    }
+
+    // Generate 5 strictly unique questions for today via Gemini AI
+    let freshQuestions: QuizQuestion[] = [];
+    try {
+      freshQuestions = await this.generateGeminiQuestions(subjectFilter, topicName, 5, 'mixed');
+    } catch (e) {
+      console.warn('Daily 5 Gemini generation failed, using pattern engine:', e);
+    }
+
+    if (!freshQuestions || freshQuestions.length < 5) {
+      const fallback = this.patternEngine.generateQuizQuestionsForTopic(topicName, subjectFilter, 5, 'mixed');
+      freshQuestions = [...(freshQuestions || []), ...fallback].slice(0, 5);
+    }
+
+    const uniqueDaily = this.deduplicateQuestions(freshQuestions).map(q => ({
+      ...q,
+      daily_date: today,
+      is_ai_generated: true,
+      topic_name: topicName
+    }));
+
+    try {
+      localStorage.setItem(dailyKey, JSON.stringify(uniqueDaily));
+      this.cacheGeneratedQuestions(uniqueDaily);
+      this.recordQuestionFingerprints(uniqueDaily.map(q => q.question_text));
+    } catch {}
+
+    return uniqueDaily;
   }
 
   // --- PERSISTENT QUESTION BANK WITH PERFORMANCE LEDGER ---
