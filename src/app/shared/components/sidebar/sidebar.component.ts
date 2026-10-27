@@ -16,23 +16,23 @@ interface NavItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <!-- Mobile Backdrop -->
+    <!-- Backdrop -->
     @if (mobileOpen()) {
       <div
-        class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+        class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-200"
         (click)="closeMobile.emit()"
       ></div>
     }
 
-    <!-- Sidebar Container -->
+    <!-- Sidebar Off-Canvas Drawer -->
     <aside
-      class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200/90 flex flex-col transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200/90 flex flex-col transition-transform duration-200 ease-in-out shadow-2xl"
       [class.translate-x-0]="mobileOpen()"
       [class.-translate-x-full]="!mobileOpen()"
     >
       <!-- Brand Header -->
       <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100">
-        <a routerLink="/dashboard" class="flex items-center space-x-3">
+        <a routerLink="/dashboard" (click)="closeMobile.emit()" class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xs"
                [ngClass]="examTrack.isKeralaHca() ? 'bg-court-700' : 'bg-brand-900'">
             @if (examTrack.isKeralaHca()) {
@@ -53,11 +53,12 @@ interface NavItem {
           </div>
         </a>
 
-        <!-- Mobile close button -->
+        <!-- Drawer close button -->
         <button
           type="button"
           (click)="closeMobile.emit()"
-          class="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+          class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+          title="Close drawer"
         >
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
